@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.1] - 2026-03-15
+
+### Changed
+- Repository root normalized to the project directory (`citas`) so tracked paths are now directly under `backend/`, `docs/`, and `frontend/`.
+
+### Docs
+- Updated root documentation to reflect the new repository layout and release workflow.
+
 ## [0.1.0] - 2026-03-15
 
 ### Added
