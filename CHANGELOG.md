@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.2] - 2026-03-16
+
+### Changed
+- Refactored frontend API access into modular files under `frontend/lib/api/`.
+- Split frontend domain types into dedicated files under `frontend/types/` and kept centralized exports via `frontend/types/index.ts`.
+
+### Chore
+- Ignored local assistant tooling artifacts to keep repository status clean.
+
 ## [0.1.1] - 2026-03-15
 
 ### Changed
