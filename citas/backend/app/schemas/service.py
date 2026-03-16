@@ -1,0 +1,46 @@
+import uuid
+from decimal import Decimal
+
+from pydantic import BaseModel, field_validator
+
+
+class ServiceCreate(BaseModel):
+    name: str
+    description: str | None = None
+    duration_minutes: int
+    price: Decimal
+    is_active: bool = True
+
+    @field_validator("duration_minutes")
+    @classmethod
+    def positive_duration(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("duration_minutes must be positive")
+        return v
+
+    @field_validator("price")
+    @classmethod
+    def non_negative_price(cls, v: Decimal) -> Decimal:
+        if v < 0:
+            raise ValueError("price must be non-negative")
+        return v
+
+
+class ServiceRead(BaseModel):
+    id: uuid.UUID
+    business_id: uuid.UUID
+    name: str
+    description: str | None
+    duration_minutes: int
+    price: Decimal
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+
+
+class ServiceUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    duration_minutes: int | None = None
+    price: Decimal | None = None
+    is_active: bool | None = None
