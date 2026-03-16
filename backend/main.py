@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.routers import auth, users, businesses, services, staff, schedules, bookings
 
 app = FastAPI(
-    title="Citas API",
+    title="Agenda Web API",
     description="SaaS appointment management platform",
     version="1.0.0",
 )

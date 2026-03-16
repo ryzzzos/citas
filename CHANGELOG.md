@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.3] - 2026-03-16
+
+### Added
+- Added the initial Alembic schema migration for core domain tables.
+- Added Windows-oriented backend setup and PostgreSQL bootstrap instructions.
+
+### Changed
+- Renamed the project branding from `Citas` to `Agenda Web` across backend and frontend UI text.
+- Updated backend settings defaults to use `agenda_web_db` and support JSON or comma-separated `ALLOWED_ORIGINS` values.
+- Updated package metadata and project context documentation to reflect the new naming and structure.
+
+### Fixed
+- Added missing backend dependencies for email validation and bcrypt compatibility.
+
 ## [0.1.2] - 2026-03-16
 
 ### Changed

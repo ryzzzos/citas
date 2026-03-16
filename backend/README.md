@@ -1,9 +1,12 @@
-# Citas — Backend (FastAPI)
+# Agenda Web — Backend (FastAPI)
 
 ## Setup
 
 ```bash
 cd backend
+
+# Install PostgreSQL (Windows, one-time)
+winget install --id PostgreSQL.PostgreSQL.17 -e --accept-source-agreements --accept-package-agreements --silent
 
 # Create and activate virtualenv
 python -m venv .venv
@@ -14,7 +17,8 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # Copy and configure env
-cp .env.example .env
+Copy-Item .env.example .env      # Windows PowerShell
+# cp .env.example .env           # macOS/Linux
 # Edit .env with your DATABASE_URL and SECRET_KEY
 
 # Run DB migrations
@@ -22,6 +26,29 @@ alembic upgrade head
 
 # Start dev server
 uvicorn main:app --reload
+
+# If you run from project root instead of backend/
+# .\.venv\Scripts\python.exe -m uvicorn main:app --app-dir backend --reload
+```
+
+## PostgreSQL bootstrap (Windows)
+
+Use these commands once to create the app user and DB:
+
+```powershell
+$env:PGPASSWORD = 'postgres'
+$psql = "C:\Program Files\PostgreSQL\17\bin\psql.exe"
+
+& $psql -U postgres -h 127.0.0.1 -d postgres -c "CREATE ROLE agenda_web_app LOGIN PASSWORD 'agenda_web_dev_2026';" 2>$null
+& $psql -U postgres -h 127.0.0.1 -d postgres -c "CREATE DATABASE agenda_web_db OWNER agenda_web_app;" 2>$null
+& $psql -U postgres -h 127.0.0.1 -d postgres -c "ALTER DATABASE agenda_web_db OWNER TO agenda_web_app;"
+```
+
+Then set in `.env`:
+
+```env
+DATABASE_URL=postgresql://agenda_web_app:agenda_web_dev_2026@127.0.0.1:5432/agenda_web_db
+ALLOWED_ORIGINS=["http://localhost:3000"]
 ```
 
 Interactive docs available at http://localhost:8000/docs

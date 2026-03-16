@@ -1,4 +1,4 @@
-# Project Context: SaaS Appointment Management Platform
+# Project Context: Agenda Web Platform
 
 ## Overview
 
@@ -12,13 +12,13 @@ A SaaS platform that allows service businesses (spas, barbershops, beauty salons
 ## Architecture
 
 ```
-citas/
+agenda-web/
 ├── docs/                    ← project documentation
 ├── backend/                 ← FastAPI (Python) REST API
-└── citas/                   ← Next.js frontend
+└── frontend/                ← Next.js frontend
 ```
 
-### Frontend (citas/)
+### Frontend (frontend/)
 - **Framework**: Next.js 16 + React 19 + TypeScript
 - **Styling**: Tailwind CSS v4
 - **Responsabilities**: Customer UI, business dashboard, marketplace
@@ -155,10 +155,10 @@ citas/
 | `backend/app/services/` | Business logic (framework-agnostic) |
 | `backend/app/core/` | Config, security, dependencies |
 | `backend/alembic/` | Database migrations |
-| `citas/app/` | Next.js App Router pages |
-| `citas/components/` | Reusable React components |
-| `citas/lib/` | API client and utilities |
-| `citas/types/` | Shared TypeScript types |
+| `frontend/app/` | Next.js App Router pages |
+| `frontend/components/` | Reusable React components |
+| `frontend/lib/` | API client and utilities |
+| `frontend/types/` | Shared TypeScript types |
 
 ## How to Use This Context
 

@@ -1,4 +1,4 @@
-# Citas
+# Agenda Web
 
 SaaS platform for appointment management where customers can discover businesses and book services, and business owners can manage their agenda.
 

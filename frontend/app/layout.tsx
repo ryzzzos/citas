@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Citas — Reserva tu cita online",
-  description: "Plataforma de gestión de citas para negocios de servicios",
+  title: "Agenda Web — Reserva tu cita online",
+  description: "Plataforma de gestión de agenda y reservas para negocios de servicios",
 };
 
 export default function RootLayout({

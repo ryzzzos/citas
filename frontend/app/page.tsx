@@ -6,14 +6,14 @@ export default function HomePage() {
       {/* Hero */}
       <section className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center">
         <span className="rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
-          Plataforma SaaS de gestión de citas
+          Plataforma SaaS de gestión de agenda
         </span>
         <h1 className="max-w-2xl text-5xl font-bold tracking-tight text-zinc-900 dark:text-white">
           Gestiona tu agenda,{" "}
           <span className="text-zinc-500">haz crecer tu negocio</span>
         </h1>
         <p className="max-w-lg text-lg text-zinc-500 dark:text-zinc-400">
-          Permite a tus clientes reservar citas en línea. Sin llamadas, sin
+          Permite a tus clientes reservar en línea. Sin llamadas, sin
           confusiones. Solo más clientes y menos trabajo administrativo.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">

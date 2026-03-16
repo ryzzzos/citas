@@ -56,7 +56,7 @@ export default function DashboardPage() {
       <p className="mb-8 text-sm text-zinc-500">
         {user?.role === "business_owner"
           ? "Panel de negocio"
-          : "Tus citas próximas"}
+          : "Tus reservas próximas"}
       </p>
 
       {user?.role === "business_owner" && (
@@ -78,11 +78,11 @@ export default function DashboardPage() {
 
       <section>
         <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
-          {user?.role === "business_owner" ? "Últimas reservas" : "Mis citas"}
+          {user?.role === "business_owner" ? "Últimas reservas" : "Mis reservas"}
         </h2>
         {bookings.length === 0 ? (
           <div className="rounded-xl border border-zinc-200 p-8 text-center text-sm text-zinc-400 dark:border-zinc-800">
-            No tienes citas aún.{" "}
+            No tienes reservas aún.{" "}
             <Link href="/marketplace" className="underline">
               Busca un negocio
             </Link>
