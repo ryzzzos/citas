@@ -7,6 +7,18 @@ export interface ListBusinessesParams {
   category?: string;
 }
 
+export interface CreateBusinessInput {
+  name: string;
+  description?: string | null;
+  category: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
 export async function listBusinesses(
   params: ListBusinessesParams = {}
 ): Promise<Business[]> {
@@ -18,7 +30,11 @@ export async function getBusiness(id: string): Promise<Business> {
   return request<Business>(`/businesses/${id}`);
 }
 
-export async function createBusiness(data: Partial<Business>): Promise<Business> {
+export async function getMyBusiness(): Promise<Business> {
+  return request<Business>("/businesses/me");
+}
+
+export async function createBusiness(data: CreateBusinessInput): Promise<Business> {
   return request<Business>("/businesses/", {
     method: "POST",
     body: JSON.stringify(data),

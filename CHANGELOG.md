@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.4] - 2026-03-23
+
+### Added
+- First navigable dashboard experience with dedicated layout, sidebar navigation, and agenda module views.
+- Business onboarding flow in frontend with session guard and business profile creation screen.
+- Backend migration to enforce one business profile per owner using a unique constraint.
+
+### Changed
+- Updated navbar and dashboard UI structure to support new dashboard navigation behavior.
+- Extended frontend business API helpers with owner-specific business retrieval.
+- Updated project and backend documentation to reflect onboarding and dashboard structure.
+
 ## [0.1.3] - 2026-03-16
 
 ### Added

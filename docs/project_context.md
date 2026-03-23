@@ -24,6 +24,18 @@ agenda-web/
 - **Responsabilities**: Customer UI, business dashboard, marketplace
 - **Must be**: responsive, mobile-friendly
 
+### Frontend UI Architecture Decisions
+
+- **Dashboard shell pattern**: use a left sidebar navigation layout for all dashboard routes.
+- **Layout ownership**: create `frontend/app/dashboard/layout.tsx` as the shared shell for dashboard pages.
+- **Sidebar component**: create and keep navigation in `frontend/components/layout/DashboardSidebar.tsx`.
+- **Componentization rule**: keep route files focused on page content and data; navigation/chrome belongs to reusable components.
+- **Responsive behavior**: desktop = fixed left sidebar, mobile/tablet = collapsible drawer with keyboard and screen-reader support.
+- **Routing**: sidebar items must use Next.js App Router links and clearly represent dashboard sections.
+- **Visual direction**: dark, high-contrast, card-based dashboard aesthetic inspired by modern fintech/admin products.
+- **Accessibility baseline**: visible focus states, semantic landmarks (`aside`, `nav`, `main`), `aria-current` on active item, and minimum touch target sizes.
+- **Design tokens**: centralize colors, spacing, radii, and shadows through reusable Tailwind utility patterns or CSS variables.
+
 ### Backend (backend/)
 - **Framework**: FastAPI (Python)
 - **Responsibilities**: business logic, authentication, bookings, payments, geolocation, user management
@@ -144,6 +156,7 @@ agenda-web/
 - **Migrations**: always use Alembic, never modify schema manually
 - **Error handling**: use HTTPException with clear status codes and messages
 - **Clean code**: descriptive names, single-responsibility functions
+- **Dashboard composition**: keep dashboard navigation reusable and isolated in `frontend/components/layout/`.
 
 ## Key Paths
 

@@ -89,6 +89,7 @@ alembic upgrade head
 | POST | /api/v1/auth/login | Login, returns JWT |
 | GET | /api/v1/users/me | Current user profile |
 | POST | /api/v1/businesses/ | Create business (owner) |
+| GET | /api/v1/businesses/me | Current owner's business (source of truth for onboarding) |
 | GET | /api/v1/businesses/ | List businesses (filter by city/category) |
 | GET | /api/v1/businesses/{id} | Business detail |
 | POST | /api/v1/businesses/{id}/services | Add service |
@@ -101,3 +102,12 @@ alembic upgrade head
 | GET | /api/v1/bookings/my | Customer's bookings |
 | GET | /api/v1/bookings/business/{id} | Business agenda |
 | PATCH | /api/v1/bookings/{id}/status | Update booking status |
+
+### Onboarding constraints
+
+- Registering a user with role `business_owner` does not auto-create a business profile.
+- On `POST /api/v1/businesses/`, if the current owner already has a business profile, API returns `409 Business profile already exists`.
+- `GET /api/v1/businesses/me` returns:
+    - `200` with business profile when it exists.
+    - `404` with stable detail `Business profile not created` when missing.
+    - `403` for roles outside `business_owner` and `admin`.

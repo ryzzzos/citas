@@ -17,6 +17,13 @@ def create_business(
     current_user: User = Depends(require_business_owner),
     db: Session = Depends(get_db),
 ):
+    existing_business = db.query(Business).filter(Business.owner_id == current_user.id).first()
+    if existing_business:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Business profile already exists",
+        )
+
     business = Business(**data.model_dump(), owner_id=current_user.id)
     db.add(business)
     db.commit()
@@ -38,6 +45,23 @@ def list_businesses(
     if category:
         query = query.filter(Business.category.ilike(f"%{category}%"))
     return query.offset(skip).limit(limit).all()
+
+
+@router.get("/me", response_model=BusinessRead)
+def get_my_business(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role not in ("business_owner", "admin"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Business owner role required")
+
+    business = db.query(Business).filter(Business.owner_id == current_user.id).first()
+    if not business:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Business profile not created",
+        )
+    return business
 
 
 @router.get("/{business_id}", response_model=BusinessRead)

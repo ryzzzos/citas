@@ -1,6 +1,65 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { getMe, getMyBusiness } from "@/lib/api";
+
+type OnboardingState = "idle" | "pending" | "ready";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const hideOnDashboard = pathname.startsWith("/dashboard");
+  const [onboardingState, setOnboardingState] = useState<OnboardingState>("idle");
+
+  useEffect(() => {
+    if (hideOnDashboard) {
+      return;
+    }
+
+    let active = true;
+
+    async function loadSessionState(): Promise<void> {
+      const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+      if (!token) {
+        if (active) setOnboardingState("idle");
+        return;
+      }
+
+      try {
+        const me = await getMe();
+        if (!active) return;
+
+        if (me.role !== "business_owner") {
+          setOnboardingState("ready");
+          return;
+        }
+
+        try {
+          await getMyBusiness();
+          if (active) setOnboardingState("ready");
+        } catch (error) {
+          if (!active) return;
+          const detail = error instanceof Error ? error.message : "";
+          setOnboardingState(detail === "Business profile not created" ? "pending" : "ready");
+        }
+      } catch {
+        if (active) setOnboardingState("idle");
+      }
+    }
+
+    loadSessionState();
+
+    return () => {
+      active = false;
+    };
+  }, [hideOnDashboard]);
+
+  if (hideOnDashboard) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
@@ -11,9 +70,15 @@ export default function Navbar() {
           <Link href="/marketplace" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
             Negocios
           </Link>
-          <Link href="/dashboard" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
-            Mi panel
-          </Link>
+          {onboardingState === "pending" ? (
+            <Link href="/onboarding/business" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
+              Completar onboarding
+            </Link>
+          ) : (
+            <Link href="/dashboard" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
+              Mi panel
+            </Link>
+          )}
           <Link
             href="/auth/login"
             className="rounded-full bg-zinc-900 px-4 py-1.5 text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
