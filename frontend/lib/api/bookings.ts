@@ -19,6 +19,17 @@ export interface CreateBookingInput {
 
 export type BookingStatusUpdate = "confirmed" | "cancelled" | "completed";
 
+export interface BusinessAgendaQuery {
+  timezone: string;
+  from_at?: string;
+  to_at?: string;
+  booking_date?: string;
+  statuses?: string[];
+  staff_id?: string;
+  service_id?: string;
+  q?: string;
+}
+
 export async function getAvailability(
   params: GetAvailabilityParams
 ): Promise<string[]> {
@@ -39,10 +50,23 @@ export async function myBookings(): Promise<Booking[]> {
 
 export async function businessAgenda(
   businessId: string,
-  date?: string
+  query: BusinessAgendaQuery
 ): Promise<Booking[]> {
-  const query = toQueryString({ booking_date: date });
-  return request<Booking[]>(`/bookings/business/${businessId}${query ? `?${query}` : ""}`);
+  const params = new URLSearchParams();
+
+  params.set("timezone", query.timezone);
+  if (query.from_at) params.set("from_at", query.from_at);
+  if (query.to_at) params.set("to_at", query.to_at);
+  if (query.booking_date) params.set("booking_date", query.booking_date);
+  if (query.staff_id) params.set("staff_id", query.staff_id);
+  if (query.service_id) params.set("service_id", query.service_id);
+  if (query.q) params.set("q", query.q);
+
+  for (const status of query.statuses ?? []) {
+    params.append("statuses", status);
+  }
+
+  return request<Booking[]>(`/bookings/business/${businessId}?${params.toString()}`);
 }
 
 export async function updateBookingStatus(

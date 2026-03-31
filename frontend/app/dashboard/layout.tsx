@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pageTitle = getDashboardTitle(pathname);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_10%,rgba(16,185,129,0.18),transparent_38%),radial-gradient(circle_at_92%_8%,rgba(14,165,233,0.12),transparent_34%),linear-gradient(180deg,#030712_0%,#09090b_100%)] text-zinc-100">
+    <div className="h-dvh overflow-hidden bg-[radial-gradient(circle_at_10%_10%,rgba(16,185,129,0.18),transparent_38%),radial-gradient(circle_at_92%_8%,rgba(14,165,233,0.12),transparent_34%),linear-gradient(180deg,#030712_0%,#09090b_100%)] text-zinc-100">
       <a
         href="#dashboard-main"
         className="sr-only z-[70] rounded-md bg-zinc-900 px-3 py-2 text-sm text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-emerald-300"
@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <DashboardSidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
 
-      <div className="relative lg:pl-72">
+      <div className="relative flex h-full flex-col lg:pl-72">
         <header className="sticky top-0 z-20 border-b border-zinc-800/90 bg-zinc-950/85 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
@@ -84,7 +84,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main id="dashboard-main" className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main
+          id="dashboard-main"
+          className="mx-auto h-[calc(100dvh-4rem)] w-full max-w-[1500px] overflow-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+        >
           {children}
         </main>
       </div>

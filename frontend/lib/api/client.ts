@@ -34,6 +34,19 @@ async function parseErrorDetail(response: Response): Promise<string> {
   const detail = (payload as { detail?: unknown }).detail;
   if (typeof detail === "string") return detail;
 
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0] as { msg?: unknown; loc?: unknown };
+    const msg = typeof first?.msg === "string" ? first.msg : null;
+    const loc = Array.isArray(first?.loc)
+      ? first.loc
+          .map((part) => String(part))
+          .join(".")
+      : null;
+
+    if (msg && loc) return `${loc}: ${msg}`;
+    if (msg) return msg;
+  }
+
   return fallback;
 }
 

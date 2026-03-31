@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.5] - 2026-03-31
+
+### Added
+- Modularized agenda architecture with dedicated components for filters, header, timeline, states, and booking cards.
+- New agenda utility layer with calendar calculations, timezone helpers, and type definitions under `frontend/lib/agenda/`.
+- Timezone support in backend with `tzdata` dependency for robust date/time handling across regions.
+- Extended bookings API with enhanced filtering and status management in backend routers.
+
+### Changed
+- Refactored agenda page from monolithic component to orchestrator pattern with modular sub-components.
+- Improved data fetching with dedicated `useAgendaData` hook for centralized agenda state management.
+- Updated dashboard layout to better support modularized agenda views and filters.
+
+### Refactor
+- Split large agenda component tree into focused, testable, and reusable components for better maintainability.
+- Better separation of concerns between data layer, UI components, and business logic.
+
 ## [0.1.4] - 2026-03-23
 
 ### Added
