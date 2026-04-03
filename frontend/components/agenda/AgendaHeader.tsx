@@ -26,20 +26,20 @@ export default function AgendaHeader({
   onNext,
 }: AgendaHeaderProps) {
   return (
-    <header className="rounded-3xl border border-zinc-800 bg-zinc-900/75 p-4 sm:p-5">
+    <header className="dashboard-surface-1 p-4 sm:p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Agenda operativa</p>
-          <h2 className="mt-2 text-xl font-semibold text-zinc-100 sm:text-2xl">{title}</h2>
-          <p className="mt-1 text-xs text-zinc-400">Zona horaria canonica: {timezone}</p>
+          <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">Agenda operativa</p>
+          <h2 className="dashboard-title mt-2 text-xl font-semibold sm:text-2xl">{title}</h2>
+          <p className="dashboard-text-secondary mt-1 text-xs">Zona horaria canonica: {timezone}</p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="inline-flex min-h-11 items-center rounded-xl border border-zinc-700 bg-zinc-950/70 p-1.5">
+          <div className="dashboard-surface-2 inline-flex min-h-11 items-center p-1.5">
             <button
               type="button"
               onClick={onPrevious}
-              className="min-h-9 rounded-lg px-3 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+              className="dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
               aria-label="Periodo anterior"
             >
               Anterior
@@ -47,21 +47,21 @@ export default function AgendaHeader({
             <button
               type="button"
               onClick={onToday}
-              className="min-h-9 rounded-lg px-3 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+              className="dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] border border-teal-300/70 bg-teal-500 px-3 text-sm font-semibold text-slate-950 hover:bg-teal-400"
             >
               Hoy
             </button>
             <button
               type="button"
               onClick={onNext}
-              className="min-h-9 rounded-lg px-3 text-sm font-medium text-zinc-200 transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+              className="dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
               aria-label="Periodo siguiente"
             >
               Siguiente
             </button>
           </div>
 
-          <div role="tablist" aria-label="Selector de vista" className="inline-flex min-h-11 rounded-xl border border-zinc-700 bg-zinc-950/70 p-1.5">
+          <div role="tablist" aria-label="Selector de vista" className="dashboard-surface-2 inline-flex min-h-11 p-1.5">
             {VIEW_OPTIONS.map((option) => {
               const active = option.value === view;
               return (
@@ -73,10 +73,10 @@ export default function AgendaHeader({
                   aria-disabled={option.disabled}
                   disabled={option.disabled}
                   onClick={() => onViewChange(option.value)}
-                  className={`min-h-9 rounded-lg px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 ${
+                  className={`dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium ${
                     active
-                      ? "bg-emerald-500 text-zinc-950"
-                      : "text-zinc-300 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      ? "border border-teal-300/70 bg-teal-500 text-slate-950"
+                      : "[color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)] disabled:cursor-not-allowed disabled:opacity-50"
                   }`}
                 >
                   {option.label}

@@ -20,7 +20,7 @@ function BadgeMark({ active }: { active: boolean }) {
     <span
       aria-hidden="true"
       className={`h-2 w-2 rounded-full transition ${
-        active ? "bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.9)]" : "bg-zinc-600"
+        active ? "bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.45)] dark:bg-teal-300 dark:shadow-[0_0_10px_rgba(45,212,191,0.65)]" : "bg-slate-400 dark:bg-slate-600"
       }`}
     />
   );
@@ -37,7 +37,7 @@ function SidebarGroup({
 }) {
   return (
     <section aria-label={group.label}>
-      <h2 className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+      <h2 className="dashboard-text-muted px-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
         {group.label}
       </h2>
       <ul className="mt-2 space-y-1.5">
@@ -50,16 +50,16 @@ function SidebarGroup({
                 href={item.href}
                 onClick={onItemSelect}
                 aria-current={active ? "page" : undefined}
-                className={`group flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3 py-2.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 ${
+                className={`dashboard-interactive dashboard-focusable group flex min-h-12 items-center justify-between gap-3 rounded-[var(--dashboard-radius-md)] border px-3 py-2.5 ${
                   active
-                    ? "border-zinc-700 bg-zinc-800/95 text-zinc-100 shadow-[0_12px_30px_-24px_rgba(16,185,129,0.8)]"
-                    : "border-transparent text-zinc-300 hover:border-zinc-700/70 hover:bg-zinc-800/60"
+                    ? "border-[color:var(--dashboard-border-default)] bg-[color:var(--dashboard-surface-1)] [color:var(--dashboard-text-primary)] shadow-[var(--dashboard-shadow-sm)]"
+                    : "border-transparent [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_72%,transparent)]"
                 }`}
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold">{item.label}</span>
                   {item.hint ? (
-                    <span className="block truncate text-xs text-zinc-500 group-hover:text-zinc-400">
+                    <span className="dashboard-text-muted block truncate text-xs group-hover:[color:var(--dashboard-text-secondary)]">
                       {item.hint}
                     </span>
                   ) : null}
@@ -77,10 +77,10 @@ function SidebarGroup({
 function SidebarContent({ pathname, onItemSelect }: { pathname: string; onItemSelect: () => void }) {
   return (
     <>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/90 p-4 shadow-[0_35px_60px_-45px_rgba(0,0,0,0.95)]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Agenda Web</p>
-        <p className="mt-2 text-lg font-semibold text-zinc-100">Control Center</p>
-        <p className="mt-1 text-xs text-zinc-400">Gestion integral de reservas y operacion diaria.</p>
+      <div className="dashboard-surface-1 p-4">
+        <p className="dashboard-text-muted text-[10px] font-semibold uppercase tracking-[0.24em]">Agenda Web</p>
+        <p className="dashboard-title mt-2 text-lg font-semibold">Control Center</p>
+        <p className="dashboard-text-secondary mt-1 text-xs">Gestion integral de reservas y operacion diaria.</p>
       </div>
 
       <nav className="mt-6 space-y-6" aria-label="Navegacion del dashboard">
@@ -105,7 +105,7 @@ export default function DashboardSidebar({
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-zinc-800 bg-zinc-950/95 px-4 py-5 backdrop-blur lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-base)_86%,transparent)] px-4 py-5 backdrop-blur-xl lg:block">
         <SidebarContent pathname={pathname} onItemSelect={() => undefined} />
       </aside>
 
@@ -116,13 +116,13 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={onCloseMobile}
-          className={`absolute inset-0 bg-black/60 transition ${mobileOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-slate-950/45 transition duration-200 motion-reduce:transition-none ${mobileOpen ? "opacity-100" : "opacity-0"}`}
           aria-label="Cerrar menu lateral"
         />
 
         <aside
           id="dashboard-mobile-menu"
-          className={`absolute inset-y-0 left-0 w-[86vw] max-w-80 border-r border-zinc-800 bg-zinc-950 px-4 py-5 shadow-2xl transition-transform duration-200 ${
+          className={`absolute inset-y-0 left-0 w-[86vw] max-w-80 border-r border-[color:var(--dashboard-border-subtle)] bg-[color:var(--dashboard-surface-base)] px-4 py-5 shadow-[var(--dashboard-shadow-lg)] transition-transform duration-200 motion-reduce:transition-none ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >

@@ -1,8 +1,14 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.routers import auth, users, businesses, services, staff, schedules, bookings
+
+STORAGE_ROOT = Path(__file__).resolve().parent / "storage"
+STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(
     title="Agenda Web API",
@@ -25,6 +31,7 @@ app.include_router(services.router, prefix="/api/v1/services", tags=["services"]
 app.include_router(staff.router, prefix="/api/v1/staff", tags=["staff"])
 app.include_router(schedules.router, prefix="/api/v1/schedules", tags=["schedules"])
 app.include_router(bookings.router, prefix="/api/v1/bookings", tags=["bookings"])
+app.mount("/storage", StaticFiles(directory=STORAGE_ROOT), name="storage")
 
 
 @app.get("/health")

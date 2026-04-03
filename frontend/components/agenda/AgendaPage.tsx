@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import AgendaFiltersBar from "@/components/agenda/AgendaFiltersBar";
 import AgendaHeader from "@/components/agenda/AgendaHeader";
 import AgendaRightRail from "@/components/agenda/AgendaRightRail";
-import { AgendaEmptyState, AgendaErrorState, AgendaLoadingState } from "@/components/agenda/AgendaStates";
+import { AgendaErrorState, AgendaLoadingState } from "@/components/agenda/AgendaStates";
 import AgendaTimeline from "@/components/agenda/AgendaTimeline";
 import {
   formatViewLabel,

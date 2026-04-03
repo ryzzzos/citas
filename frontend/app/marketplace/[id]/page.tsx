@@ -1,13 +1,40 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getBusiness, listServices, listStaff, getAvailability, createBooking } from "@/lib/api";
 import type { Business, Service, Staff } from "@/types";
 import Button from "@/components/ui/Button";
 
+function ServiceThumbnail({ service }: { service: Service }) {
+  const [imageError, setImageError] = useState(false);
+
+  if (!service.image_url || imageError) {
+    return (
+      <div
+        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-zinc-300 text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+        aria-label={service.image_url ? "No se pudo cargar la imagen del servicio" : "Servicio sin imagen"}
+      >
+        Sin imagen
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={service.image_url}
+      alt={`Imagen del servicio ${service.name}`}
+      className="h-16 w-16 shrink-0 rounded-lg border border-zinc-200 object-cover dark:border-zinc-700"
+      loading="lazy"
+      onError={() => setImageError(true)}
+    />
+  );
+}
+
 export default function BusinessDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [business, setBusiness] = useState<Business | null>(null);
   const [services, setServices] = useState<Service[]>([]);
@@ -29,18 +56,30 @@ export default function BusinessDetailPage() {
       try {
         const [biz, svcs, sf] = await Promise.all([
           getBusiness(id),
-          listServices(id),
+          listServices(id, { includeInactive: false }),
           listStaff(id),
         ]);
         setBusiness(biz);
         setServices(svcs);
         setStaff(sf);
+
+        const serviceFromQuery = searchParams.get("service");
+        if (serviceFromQuery) {
+          const serviceExists = svcs.some((service) => service.id === serviceFromQuery);
+          if (serviceExists) {
+            setSelectedService(serviceFromQuery);
+          } else {
+            setBookingError(
+              "El servicio solicitado no esta disponible para reserva. Selecciona otro servicio activo."
+            );
+          }
+        }
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [id]);
+  }, [id, searchParams]);
 
   async function loadSlots() {
     if (!selectedService || !selectedStaff || !date) return;
@@ -74,7 +113,14 @@ export default function BusinessDetailPage() {
       });
       router.push("/dashboard");
     } catch (err: unknown) {
-      setBookingError(err instanceof Error ? err.message : "Error al reservar");
+      const message = err instanceof Error ? err.message : "Error al reservar";
+      if (message.includes("Service not found")) {
+        setBookingError(
+          "Este servicio ya no esta activo. Vuelve al catalogo para elegir uno disponible."
+        );
+      } else {
+        setBookingError(message);
+      }
     } finally {
       setBookingLoading(false);
     }
@@ -110,8 +156,13 @@ export default function BusinessDetailPage() {
         <ul className="grid gap-3 sm:grid-cols-2">
           {services.map((s) => (
             <li key={s.id} className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-              <p className="font-medium text-zinc-900 dark:text-white">{s.name}</p>
-              <p className="text-sm text-zinc-500">{s.duration_minutes} min · ${s.price}</p>
+              <div className="flex items-start gap-3">
+                <ServiceThumbnail service={s} />
+                <div>
+                  <p className="font-medium text-zinc-900 dark:text-white">{s.name}</p>
+                  <p className="text-sm text-zinc-500">{s.duration_minutes} min · ${s.price}</p>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
@@ -204,7 +255,14 @@ export default function BusinessDetailPage() {
             <p className="text-sm text-zinc-400">No hay horarios disponibles para esa fecha.</p>
           )}
 
-          {bookingError && <p className="text-sm text-red-500">{bookingError}</p>}
+          {bookingError ? (
+            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-200">
+              <p>{bookingError}</p>
+              <Link href="/marketplace" className="mt-2 inline-flex underline underline-offset-4">
+                Volver al marketplace
+              </Link>
+            </div>
+          ) : null}
 
           <Button
             onClick={handleBook}

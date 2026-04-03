@@ -56,9 +56,12 @@ export async function request<T>(
 ): Promise<T> {
   const token = getAccessToken();
 
-  const headers = new Headers({ "Content-Type": "application/json" });
+  const headers = new Headers();
   if (options.headers) {
     new Headers(options.headers).forEach((value, key) => headers.set(key, value));
+  }
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
   }
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);

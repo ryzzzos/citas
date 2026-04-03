@@ -33,6 +33,13 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         match: "prefix",
         hint: "Operacion diaria y semanal",
       },
+      {
+        id: "services",
+        label: "Mis servicios",
+        href: "/dashboard/services",
+        match: "prefix",
+        hint: "Catalogo interno y estados",
+      },
     ],
   },
   {

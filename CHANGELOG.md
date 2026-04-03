@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.6] - 2026-04-03
+
+### Added
+- New services management module in dashboard with list, filters, create/edit modal, and row actions.
+- Image upload support for services via backend endpoint and static storage mounting.
+- Alembic migration to add `image_url` column to `services` table.
+- Theme infrastructure in frontend with `next-themes`, custom provider, and animated theme toggler.
+- Dashboard visual system documentation in frontend docs.
+
+### Changed
+- Expanded backend service schemas and validations for name, duration, price, and `image_url`.
+- Updated services API client and types for image upload, include inactive services, and richer service payloads.
+- Refined dashboard shell, homepage cards, marketplace detail screen, and agenda modules to match the new visual system.
+- Updated global CSS tokens and utilities to unify surfaces, typography, focus states, and motion rules.
+
+### Fixed
+- Booking creation now validates that selected service belongs to the same business as the booking.
+
 ## [0.1.5] - 2026-03-31
 
 ### Added

@@ -11,7 +11,7 @@ from app.services.availability_service import _overlaps_any
 
 def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
     service = db.get(Service, data.service_id)
-    if not service or not service.is_active:
+    if not service or not service.is_active or service.business_id != data.business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
 
     end_time = (

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { getDashboardTitle } from "@/components/layout/dashboardNavigation";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -27,10 +28,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pageTitle = getDashboardTitle(pathname);
 
   return (
-    <div className="h-dvh overflow-hidden bg-[radial-gradient(circle_at_10%_10%,rgba(16,185,129,0.18),transparent_38%),radial-gradient(circle_at_92%_8%,rgba(14,165,233,0.12),transparent_34%),linear-gradient(180deg,#030712_0%,#09090b_100%)] text-zinc-100">
+    <div className="dashboard-app-bg h-dvh overflow-hidden [color:var(--dashboard-text-primary)]">
       <a
         href="#dashboard-main"
-        className="sr-only z-[70] rounded-md bg-zinc-900 px-3 py-2 text-sm text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+        className="sr-only z-[70] rounded-md bg-[var(--dashboard-surface-1)] px-3 py-2 text-sm shadow-[var(--dashboard-shadow-sm)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--dashboard-border-focus)]"
       >
         Saltar al contenido principal
       </a>
@@ -38,58 +39,66 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <DashboardSidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
 
       <div className="relative flex h-full flex-col lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-zinc-800/90 bg-zinc-950/85 backdrop-blur">
-          <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-700 text-zinc-200 transition hover:border-zinc-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 lg:hidden"
-              aria-label="Abrir menu lateral"
-              aria-controls="dashboard-mobile-menu"
-              aria-expanded={mobileOpen}
+        <div className="flex h-full flex-col p-2 sm:p-3 lg:p-4">
+          <div className="dashboard-main-shell relative flex h-full min-h-0 flex-col overflow-hidden">
+            <header className="sticky top-0 z-20 border-b border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)] backdrop-blur-xl">
+              <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(true)}
+                  className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex h-11 w-11 items-center justify-center lg:hidden"
+                  aria-label="Abrir menu lateral"
+                  aria-controls="dashboard-mobile-menu"
+                  aria-expanded={mobileOpen}
+                >
+                  <span aria-hidden="true" className="text-lg leading-none">
+                    ≡
+                  </span>
+                </button>
+
+                <div className="min-w-0 flex-1">
+                  <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">Panel SaaS</p>
+                  <h1 className="dashboard-title truncate text-base font-semibold sm:text-lg">{pageTitle}</h1>
+                </div>
+
+                <label className="dashboard-surface-2 hidden min-w-52 items-center gap-2 px-3 py-2 text-sm md:flex">
+                  <span aria-hidden="true" className="dashboard-text-muted">⌕</span>
+                  <input
+                    type="search"
+                    placeholder="Buscar modulo"
+                    className="dashboard-focusable w-full border-none bg-transparent text-sm [color:var(--dashboard-text-secondary)] placeholder:[color:var(--dashboard-text-muted)] focus:outline-none"
+                  />
+                </label>
+
+                <div className="flex items-center gap-2">
+                  <AnimatedThemeToggler
+                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex h-10 w-10 items-center justify-center"
+                    aria-label="Cambiar tema"
+                  />
+                  <Link
+                    href="/dashboard/agenda"
+                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable hidden min-h-10 items-center px-3 text-xs font-semibold uppercase tracking-wide [color:var(--dashboard-text-secondary)] sm:inline-flex"
+                  >
+                    Agenda
+                  </Link>
+                  <Link
+                    href="/marketplace"
+                    className="dashboard-interactive dashboard-focusable inline-flex min-h-10 items-center rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-3 text-xs font-semibold uppercase tracking-wide text-slate-950 hover:bg-teal-400"
+                  >
+                    Explorar
+                  </Link>
+                </div>
+              </div>
+            </header>
+
+            <main
+              id="dashboard-main"
+              className="mx-auto min-h-0 w-full max-w-[1500px] flex-1 overflow-hidden px-4 py-5 sm:px-6 lg:px-8 lg:py-7"
             >
-              <span aria-hidden="true" className="text-lg leading-none">
-                ≡
-              </span>
-            </button>
-
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Panel SaaS</p>
-              <h1 className="truncate text-base font-semibold text-zinc-100 sm:text-lg">{pageTitle}</h1>
-            </div>
-
-            <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-400 md:flex">
-              <span aria-hidden="true">⌕</span>
-              <input
-                type="search"
-                placeholder="Buscar modulo"
-                className="w-full border-none bg-transparent text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none"
-              />
-            </label>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href="/dashboard/agenda"
-                className="hidden min-h-10 items-center rounded-xl border border-zinc-700 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-200 transition hover:border-zinc-500 hover:text-white sm:inline-flex"
-              >
-                Agenda
-              </Link>
-              <Link
-                href="/marketplace"
-                className="inline-flex min-h-10 items-center rounded-xl bg-emerald-500 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
-              >
-                Explorar
-              </Link>
-            </div>
+              {children}
+            </main>
           </div>
-        </header>
-
-        <main
-          id="dashboard-main"
-          className="mx-auto h-[calc(100dvh-4rem)] w-full max-w-[1500px] overflow-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
-        >
-          {children}
-        </main>
+        </div>
       </div>
     </div>
   );

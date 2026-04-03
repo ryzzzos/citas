@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { getMe, getMyBusiness } from "@/lib/api";
 
 type OnboardingState = "idle" | "pending" | "ready";
@@ -67,6 +68,10 @@ export default function Navbar() {
           Agenda Web
         </Link>
         <nav className="flex items-center gap-4 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+          <AnimatedThemeToggler
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/80 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            aria-label="Cambiar tema"
+          />
           <Link href="/marketplace" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
             Negocios
           </Link>

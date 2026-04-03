@@ -74,10 +74,10 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 }
 
 function getBookingTone(status: AgendaBooking["status"]): string {
-  if (status === "pending") return "border-amber-400/70 bg-amber-400/10 text-amber-100";
-  if (status === "confirmed") return "border-emerald-400/70 bg-emerald-400/10 text-emerald-100";
-  if (status === "completed") return "border-sky-400/70 bg-sky-400/10 text-sky-100";
-  return "border-rose-400/70 bg-rose-400/10 text-rose-100";
+  if (status === "pending") return "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-500/35 dark:bg-amber-500/15 dark:text-amber-100";
+  if (status === "confirmed") return "border-teal-300 bg-teal-50 text-teal-900 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-100";
+  if (status === "completed") return "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-500/35 dark:bg-sky-500/15 dark:text-sky-100";
+  return "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-500/35 dark:bg-rose-500/15 dark:text-rose-100";
 }
 
 function renderEventBlock(
@@ -93,7 +93,7 @@ function renderEventBlock(
   return (
     <article
       key={booking.id}
-      className={`absolute overflow-hidden rounded-xl border p-2 shadow-[0_15px_30px_-20px_rgba(0,0,0,0.95)] backdrop-blur-sm ${getBookingTone(
+      className={`absolute overflow-hidden rounded-[var(--dashboard-radius-md)] border p-2 shadow-[var(--dashboard-shadow-sm)] ${getBookingTone(
         booking.status
       )}`}
       style={{
@@ -106,17 +106,17 @@ function renderEventBlock(
       aria-label={`${booking.serviceName} ${booking.startAt.toFormat("HH:mm")} a ${booking.endAt.toFormat("HH:mm")}`}
     >
       <p className="truncate text-xs font-semibold leading-tight">{booking.serviceName}</p>
-      <p className="mt-1 text-[11px] text-zinc-200/90">
+      <p className="mt-1 text-[11px] text-current/85">
         {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
       </p>
-      <p className="truncate text-[10px] text-zinc-300/90">{booking.staffName}</p>
+      <p className="truncate text-[10px] text-current/70">{booking.staffName}</p>
 
       <div className="mt-1.5 flex flex-wrap gap-1">
         <button
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="min-h-7 rounded-md border border-white/30 bg-white/10 px-1.5 text-[10px] font-semibold text-zinc-100 disabled:opacity-40"
+          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current disabled:opacity-40 dark:bg-slate-950/35"
         >
           Ok
         </button>
@@ -124,14 +124,14 @@ function renderEventBlock(
           type="button"
           onClick={() => onCancel(booking.id)}
           disabled={booking.status === "cancelled" || booking.status === "completed"}
-          className="min-h-7 rounded-md border border-white/30 bg-white/10 px-1.5 text-[10px] font-semibold text-zinc-100 disabled:opacity-40"
+          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current disabled:opacity-40 dark:bg-slate-950/35"
         >
           X
         </button>
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-7 rounded-md border border-white/30 bg-white/10 px-1.5 text-[10px] font-semibold text-zinc-100"
+          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current dark:bg-slate-950/35"
         >
           R
         </button>
@@ -154,35 +154,35 @@ export default function AgendaTimeline({
   return (
     <section
       aria-label="Timeline de citas"
-      className="flex h-full min-h-0 flex-col rounded-3xl border border-zinc-800 bg-zinc-900/75 p-3 sm:p-4"
+      className="dashboard-surface-1 flex h-full min-h-0 flex-col p-3 sm:p-4"
     >
       <div className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
           <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
-            <div className="sticky left-0 top-0 z-40 rounded-xl border border-zinc-800 bg-zinc-900/95 px-2 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500 shadow-[6px_0_14px_-10px_rgba(0,0,0,0.9)]">
+            <div className="dashboard-surface-2 dashboard-text-muted sticky left-0 top-0 z-40 px-2 py-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
               Hora
             </div>
             {columns.map((column) => (
               <div
                 key={column.isoDate}
-                className={`sticky top-0 z-30 rounded-xl border px-3 py-2 text-sm backdrop-blur-sm ${
+                className={`sticky top-0 z-30 rounded-[var(--dashboard-radius-md)] border px-3 py-2 text-sm ${
                   column.isToday
-                    ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-100"
-                    : "border-zinc-700 bg-zinc-950/60 text-zinc-200"
+                    ? "border-teal-300 bg-teal-50 text-teal-900 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-100"
+                    : "border-[color:var(--dashboard-border-subtle)] bg-[color:var(--dashboard-surface-2)] [color:var(--dashboard-text-secondary)]"
                 }`}
               >
                 <p className="font-semibold">{column.dayLabel}</p>
-                <p className="text-xs text-zinc-400">{column.dateLabel}</p>
+                <p className="dashboard-text-muted text-xs">{column.dateLabel}</p>
               </div>
             ))}
 
-            <div className="sticky left-0 z-20 relative rounded-xl border border-zinc-800 bg-zinc-950/96 shadow-[6px_0_14px_-10px_rgba(0,0,0,0.9)]">
+            <div className="dashboard-surface-2 sticky left-0 z-20 relative">
               {hourMarkers.map((hour) => {
                 const [hours] = hour.split(":");
                 const top = (Number(hours) * 60 + 30) * PX_PER_MINUTE;
                 return (
                   <div key={hour} className="absolute inset-x-0" style={{ top }}>
-                    <p className="-translate-y-1/2 px-2 text-[11px] font-semibold text-zinc-500">{hour}</p>
+                    <p className="dashboard-text-muted -translate-y-1/2 px-2 text-[11px] font-semibold">{hour}</p>
                   </div>
                 );
               })}
@@ -194,7 +194,7 @@ export default function AgendaTimeline({
               return (
                 <div
                   key={column.isoDate}
-                  className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/45"
+                  className="relative overflow-hidden rounded-[var(--dashboard-radius-md)] border border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-2)_86%,transparent)]"
                   style={{ height: canvasHeight }}
                   role="group"
                   aria-label={`${column.dayLabel} ${column.dateLabel}`}
@@ -205,7 +205,7 @@ export default function AgendaTimeline({
                     return (
                       <div
                         key={`${column.isoDate}-${hour}`}
-                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-800"
+                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-[color:var(--dashboard-border-subtle)]"
                         style={{ top }}
                         aria-hidden="true"
                       />
