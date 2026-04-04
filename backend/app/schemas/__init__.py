@@ -1,6 +1,12 @@
 from app.schemas.auth import Token, LoginRequest
 from app.schemas.user import UserCreate, UserRead, UserUpdate
-from app.schemas.business import BusinessCreate, BusinessRead, BusinessUpdate
+from app.schemas.business import (
+    BusinessCreate,
+    BusinessImageUploadRead,
+    BusinessRead,
+    BusinessSlugAvailabilityRead,
+    BusinessUpdate,
+)
 from app.schemas.service import ServiceCreate, ServiceRead, ServiceUpdate
 from app.schemas.staff import StaffCreate, StaffRead, StaffUpdate
 from app.schemas.schedule import ScheduleCreate, ScheduleRead
@@ -9,7 +15,7 @@ from app.schemas.booking import BookingCreate, BookingRead, BookingStatusUpdate
 __all__ = [
     "Token", "LoginRequest",
     "UserCreate", "UserRead", "UserUpdate",
-    "BusinessCreate", "BusinessRead", "BusinessUpdate",
+    "BusinessCreate", "BusinessRead", "BusinessUpdate", "BusinessSlugAvailabilityRead", "BusinessImageUploadRead",
     "ServiceCreate", "ServiceRead", "ServiceUpdate",
     "StaffCreate", "StaffRead", "StaffUpdate",
     "ScheduleCreate", "ScheduleRead",

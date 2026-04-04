@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CalendarDays, Compass, Menu, Search } from "lucide-react";
 
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { getDashboardTitle } from "@/components/layout/dashboardNavigation";
+import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -51,9 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   aria-controls="dashboard-mobile-menu"
                   aria-expanded={mobileOpen}
                 >
-                  <span aria-hidden="true" className="text-lg leading-none">
-                    ≡
-                  </span>
+                  <AppIcon icon={Menu} size="md" />
                 </button>
 
                 <div className="min-w-0 flex-1">
@@ -62,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
 
                 <label className="dashboard-surface-2 hidden min-w-52 items-center gap-2 px-3 py-2 text-sm md:flex">
-                  <span aria-hidden="true" className="dashboard-text-muted">⌕</span>
+                  <AppIcon icon={Search} className="dashboard-text-muted" />
                   <input
                     type="search"
                     placeholder="Buscar modulo"
@@ -77,14 +77,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   />
                   <Link
                     href="/dashboard/agenda"
-                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable hidden min-h-10 items-center px-3 text-xs font-semibold uppercase tracking-wide [color:var(--dashboard-text-secondary)] sm:inline-flex"
+                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable hidden min-h-10 items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wide [color:var(--dashboard-text-secondary)] sm:inline-flex"
                   >
+                    <AppIcon icon={CalendarDays} size="xs" />
                     Agenda
                   </Link>
                   <Link
                     href="/marketplace"
-                    className="dashboard-interactive dashboard-focusable inline-flex min-h-10 items-center rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-3 text-xs font-semibold uppercase tracking-wide text-slate-950 hover:bg-teal-400"
+                    className="dashboard-interactive dashboard-focusable inline-flex min-h-10 items-center gap-2 rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-3 text-xs font-semibold uppercase tracking-wide text-slate-950 hover:bg-teal-400"
                   >
+                    <AppIcon icon={Compass} size="xs" />
                     Explorar
                   </Link>
                 </div>

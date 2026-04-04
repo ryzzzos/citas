@@ -1,3 +1,6 @@
+import type { LucideIcon } from "lucide-react";
+import { BriefcaseBusiness, Building2, CalendarDays, Compass, LayoutDashboard } from "lucide-react";
+
 export type DashboardMatchMode = "exact" | "prefix";
 
 export interface DashboardNavItem {
@@ -5,6 +8,7 @@ export interface DashboardNavItem {
   label: string;
   href: string;
   match: DashboardMatchMode;
+  icon: LucideIcon;
   hint?: string;
 }
 
@@ -24,6 +28,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         label: "Resumen",
         href: "/dashboard",
         match: "exact",
+        icon: LayoutDashboard,
         hint: "Vista general del negocio",
       },
       {
@@ -31,6 +36,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         label: "Agenda",
         href: "/dashboard/agenda",
         match: "prefix",
+        icon: CalendarDays,
         hint: "Operacion diaria y semanal",
       },
       {
@@ -38,7 +44,16 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         label: "Mis servicios",
         href: "/dashboard/services",
         match: "prefix",
+        icon: BriefcaseBusiness,
         hint: "Catalogo interno y estados",
+      },
+      {
+        id: "business-profile",
+        label: "Perfil de negocio",
+        href: "/dashboard/business-profile",
+        match: "prefix",
+        icon: Building2,
+        hint: "Identidad publica y conversion",
       },
     ],
   },
@@ -51,6 +66,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         label: "Marketplace",
         href: "/marketplace",
         match: "prefix",
+        icon: Compass,
         hint: "Visibilidad frente a clientes",
       },
     ],

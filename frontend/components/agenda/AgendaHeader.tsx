@@ -1,4 +1,6 @@
 import type { AgendaView } from "@/lib/agenda/types";
+import { ChevronLeft, ChevronRight, Clock3 } from "lucide-react";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface AgendaHeaderProps {
   title: string;
@@ -31,7 +33,10 @@ export default function AgendaHeader({
         <div>
           <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">Agenda operativa</p>
           <h2 className="dashboard-title mt-2 text-xl font-semibold sm:text-2xl">{title}</h2>
-          <p className="dashboard-text-secondary mt-1 text-xs">Zona horaria canonica: {timezone}</p>
+          <p className="dashboard-text-secondary mt-1 inline-flex items-center gap-1.5 text-xs">
+            <AppIcon icon={Clock3} size="xs" />
+            Zona horaria canonica: {timezone}
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -39,9 +44,10 @@ export default function AgendaHeader({
             <button
               type="button"
               onClick={onPrevious}
-              className="dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
+              className="dashboard-interactive dashboard-focusable inline-flex min-h-9 items-center gap-1 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
               aria-label="Periodo anterior"
             >
+              <AppIcon icon={ChevronLeft} />
               Anterior
             </button>
             <button
@@ -54,10 +60,11 @@ export default function AgendaHeader({
             <button
               type="button"
               onClick={onNext}
-              className="dashboard-interactive dashboard-focusable min-h-9 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
+              className="dashboard-interactive dashboard-focusable inline-flex min-h-9 items-center gap-1 rounded-[var(--dashboard-radius-sm)] px-3 text-sm font-medium [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)]"
               aria-label="Periodo siguiente"
             >
               Siguiente
+              <AppIcon icon={ChevronRight} />
             </button>
           </div>
 

@@ -1,4 +1,6 @@
 import Button from "@/components/ui/Button";
+import { BriefcaseBusiness, CircleCheckBig, CircleOff, Plus } from "lucide-react";
+import AppIcon from "@/components/ui/AppIcon";
 import type { Service } from "@/types";
 
 interface ServicesHeaderProps {
@@ -24,20 +26,24 @@ export default function ServicesHeader({ services, onCreate }: ServicesHeaderPro
         </div>
 
         <Button onClick={onCreate} className="min-h-11 rounded-[var(--dashboard-radius-md)] px-4">
+          <AppIcon icon={Plus} className="mr-2" />
           Nuevo servicio
         </Button>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <article className="dashboard-surface-2 p-3">
+          <AppIcon icon={BriefcaseBusiness} className="dashboard-text-muted" />
           <p className="dashboard-text-muted text-xs">Total</p>
           <p className="dashboard-title mt-1 text-2xl font-semibold">{services.length}</p>
         </article>
         <article className="dashboard-surface-2 p-3">
+          <AppIcon icon={CircleCheckBig} className="text-teal-700 dark:text-teal-300" />
           <p className="dashboard-text-muted text-xs">Activos</p>
           <p className="mt-1 text-2xl font-semibold text-teal-700 dark:text-teal-300">{activeCount}</p>
         </article>
         <article className="dashboard-surface-2 p-3">
+          <AppIcon icon={CircleOff} className="text-amber-700 dark:text-amber-300" />
           <p className="dashboard-text-muted text-xs">Inactivos</p>
           <p className="mt-1 text-2xl font-semibold text-amber-700 dark:text-amber-300">{inactiveCount}</p>
         </article>

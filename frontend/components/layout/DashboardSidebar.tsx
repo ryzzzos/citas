@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { X } from "lucide-react";
 
 import {
   DASHBOARD_NAV_GROUPS,
@@ -9,6 +10,7 @@ import {
   type DashboardNavItem,
   isItemActive,
 } from "@/components/layout/dashboardNavigation";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface DashboardSidebarProps {
   mobileOpen: boolean;
@@ -43,6 +45,7 @@ function SidebarGroup({
       <ul className="mt-2 space-y-1.5">
         {group.items.map((item: DashboardNavItem) => {
           const active = isItemActive(pathname, item);
+          const ItemIcon = item.icon;
 
           return (
             <li key={item.id}>
@@ -56,13 +59,16 @@ function SidebarGroup({
                     : "border-transparent [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_72%,transparent)]"
                 }`}
               >
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{item.label}</span>
-                  {item.hint ? (
-                    <span className="dashboard-text-muted block truncate text-xs group-hover:[color:var(--dashboard-text-secondary)]">
-                      {item.hint}
-                    </span>
-                  ) : null}
+                <span className="flex min-w-0 items-start gap-3">
+                  <AppIcon icon={ItemIcon} className="mt-0.5 shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{item.label}</span>
+                    {item.hint ? (
+                      <span className="dashboard-text-muted block truncate text-xs group-hover:[color:var(--dashboard-text-secondary)]">
+                        {item.hint}
+                      </span>
+                    ) : null}
+                  </span>
                 </span>
                 <BadgeMark active={active} />
               </Link>
@@ -126,6 +132,14 @@ export default function DashboardSidebar({
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="dashboard-surface-2 dashboard-interactive dashboard-focusable absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center"
+            aria-label="Cerrar menu lateral"
+          >
+            <AppIcon icon={X} />
+          </button>
           <SidebarContent pathname={pathname} onItemSelect={onCloseMobile} />
         </aside>
       </div>

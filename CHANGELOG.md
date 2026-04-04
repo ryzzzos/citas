@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.1.7] - 2026-04-04
+
+### Added
+- Business profile identity fields in backend and migration support: `slug`, `cover_image_url`, `logo_image_url`, `whatsapp_phone`, and `public_bio`.
+- New business profile module in dashboard with dedicated route, editor hook, and reusable profile components.
+- Slug availability and business lookup by slug endpoints for public profile addressing.
+- Business cover and logo image upload endpoints with file type and size validation.
+- Reusable `AppIcon` UI component for consistent icon rendering.
+
+### Changed
+- Extended business schemas and API contracts in backend/frontend for the new profile identity model.
+- Updated dashboard navigation and layout to include business profile management flow.
+- Refined dashboard and agenda UI components to align with the new navigation and profile experience.
+- Updated services filters/header and business API clients/types to support profile preview and editor workflows.
+
+### Fixed
+- Enforced slug normalization, reserved word checks, and uniqueness handling to avoid collisions in business public URLs.
+
 ## [0.1.6] - 2026-04-03
 
 ### Added

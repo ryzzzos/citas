@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LayoutDashboard, LogIn, Store, UserRoundCheck } from "lucide-react";
 
+import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { getMe, getMyBusiness } from "@/lib/api";
 
@@ -73,21 +75,25 @@ export default function Navbar() {
             aria-label="Cambiar tema"
           />
           <Link href="/marketplace" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
+            <AppIcon icon={Store} className="mr-1.5 inline" />
             Negocios
           </Link>
           {onboardingState === "pending" ? (
             <Link href="/onboarding/business" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
+              <AppIcon icon={UserRoundCheck} className="mr-1.5 inline" />
               Completar onboarding
             </Link>
           ) : (
             <Link href="/dashboard" className="transition-colors hover:text-zinc-900 dark:hover:text-white">
+              <AppIcon icon={LayoutDashboard} className="mr-1.5 inline" />
               Mi panel
             </Link>
           )}
           <Link
             href="/auth/login"
-            className="rounded-full bg-zinc-900 px-4 py-1.5 text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900 px-4 py-1.5 text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
+            <AppIcon icon={LogIn} />
             Iniciar sesión
           </Link>
         </nav>

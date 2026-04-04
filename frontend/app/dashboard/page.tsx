@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass, Hourglass, TrendingUp } from "lucide-react";
 import { getMe, myBookings } from "@/lib/api";
+import AppIcon from "@/components/ui/AppIcon";
 import type { Booking, User } from "@/types";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -65,15 +67,17 @@ export default function DashboardPage() {
           {user?.role === "business_owner" ? (
             <Link
               href="/dashboard/agenda"
-              className="dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-4 text-sm font-semibold text-slate-950 hover:bg-teal-400"
+              className="dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center gap-2 rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-4 text-sm font-semibold text-slate-950 hover:bg-teal-400"
             >
+              <AppIcon icon={CalendarDays} />
               Abrir agenda
             </Link>
           ) : null}
           <Link
             href="/marketplace"
-            className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center px-4 text-sm font-semibold [color:var(--dashboard-text-secondary)]"
+            className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold [color:var(--dashboard-text-secondary)]"
           >
+            <AppIcon icon={Compass} />
             Explorar marketplace
           </Link>
         </div>
@@ -81,11 +85,13 @@ export default function DashboardPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <article className="dashboard-surface-2 p-4">
+          <AppIcon icon={ClipboardList} className="dashboard-text-muted" />
           <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Reservas</p>
           <p className="dashboard-title mt-2 text-2xl font-semibold">{bookings.length}</p>
           <p className="dashboard-text-secondary mt-1 text-xs">En el rango consultado</p>
         </article>
         <article className="dashboard-surface-2 p-4">
+          <AppIcon icon={Hourglass} className="text-amber-700 dark:text-amber-200" />
           <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Pendientes</p>
           <p className="mt-2 text-2xl font-semibold text-amber-700 dark:text-amber-200">
             {bookings.filter((booking) => booking.status === "pending").length}
@@ -93,6 +99,7 @@ export default function DashboardPage() {
           <p className="dashboard-text-secondary mt-1 text-xs">Requieren accion</p>
         </article>
         <article className="dashboard-surface-2 p-4">
+          <AppIcon icon={TrendingUp} className="text-teal-700 dark:text-teal-200" />
           <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Confirmadas</p>
           <p className="mt-2 text-2xl font-semibold text-teal-700 dark:text-teal-200">
             {bookings.filter((booking) => booking.status === "confirmed").length}
@@ -100,6 +107,7 @@ export default function DashboardPage() {
           <p className="dashboard-text-secondary mt-1 text-xs">Listas para atender</p>
         </article>
         <article className="dashboard-surface-2 p-4">
+          <AppIcon icon={CheckCircle2} className="text-sky-700 dark:text-sky-200" />
           <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Completadas</p>
           <p className="mt-2 text-2xl font-semibold text-sky-700 dark:text-sky-200">
             {bookings.filter((booking) => booking.status === "completed").length}
@@ -115,6 +123,7 @@ export default function DashboardPage() {
 
         {bookings.length === 0 ? (
           <div className="dashboard-text-secondary mt-4 rounded-[var(--dashboard-radius-md)] border border-dashed border-[color:var(--dashboard-border-default)] p-8 text-center text-sm">
+            <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-2" />
             No hay reservas aun. <Link href="/marketplace" className="dashboard-focusable rounded-sm text-teal-700 underline underline-offset-4 dark:text-teal-300">Busca un negocio</Link>
           </div>
         ) : (

@@ -1,4 +1,6 @@
 import type { AgendaFilters } from "@/lib/agenda/types";
+import { Search, ShieldCheck, UserRound, WandSparkles } from "lucide-react";
+import AppIcon from "@/components/ui/AppIcon";
 import type { BookingStatus, Service, Staff } from "@/types";
 
 interface AgendaFiltersBarProps {
@@ -25,7 +27,10 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
     <section aria-label="Filtros de agenda" className="dashboard-surface-1 p-4 sm:p-5">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <label className="dashboard-text-secondary space-y-1.5 text-xs">
-          Estado
+          <span className="inline-flex items-center gap-1.5">
+            <AppIcon icon={ShieldCheck} size="xs" />
+            Estado
+          </span>
           <select
             value={filters.status}
             onChange={(event) => onFiltersChange(updateStatus(filters, event.target.value as AgendaFilters["status"]))}
@@ -40,7 +45,10 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
         </label>
 
         <label className="dashboard-text-secondary space-y-1.5 text-xs">
-          Staff
+          <span className="inline-flex items-center gap-1.5">
+            <AppIcon icon={UserRound} size="xs" />
+            Staff
+          </span>
           <select
             value={filters.staffId}
             onChange={(event) => onFiltersChange({ ...filters, staffId: event.target.value })}
@@ -56,7 +64,10 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
         </label>
 
         <label className="dashboard-text-secondary space-y-1.5 text-xs">
-          Servicio
+          <span className="inline-flex items-center gap-1.5">
+            <AppIcon icon={WandSparkles} size="xs" />
+            Servicio
+          </span>
           <select
             value={filters.serviceId}
             onChange={(event) => onFiltersChange({ ...filters, serviceId: event.target.value })}
@@ -72,7 +83,10 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
         </label>
 
         <label className="dashboard-text-secondary space-y-1.5 text-xs">
-          Buscar
+          <span className="inline-flex items-center gap-1.5">
+            <AppIcon icon={Search} size="xs" />
+            Buscar
+          </span>
           <input
             type="search"
             value={filters.query}
