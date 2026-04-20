@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     app_env: str = "development"
     allowed_origins: list[str] = ["http://localhost:3000"]
+    geocoding_user_agent: str = "agenda-web-geocoder"
+    geocoding_timeout_seconds: int = 3
 
     @field_validator("allowed_origins", mode="before")
     @classmethod

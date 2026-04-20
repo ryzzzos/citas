@@ -1,6 +1,7 @@
 import type {
   Business,
   BusinessImageUpload,
+  BusinessMapResponse,
   BusinessSlugAvailability,
   UpdateBusinessInput,
 } from "@/types";
@@ -10,6 +11,17 @@ import { request, toQueryString } from "./client";
 export interface ListBusinessesParams {
   city?: string;
   category?: string;
+}
+
+export interface ListBusinessesMapParams {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+  city?: string;
+  category?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export interface CreateBusinessInput {
@@ -34,6 +46,11 @@ export async function listBusinesses(
 ): Promise<Business[]> {
   const query = toQueryString(params);
   return request<Business[]>(`/businesses${query ? `?${query}` : ""}`);
+}
+
+export async function listBusinessesMap(params: ListBusinessesMapParams): Promise<BusinessMapResponse> {
+  const query = toQueryString(params);
+  return request<BusinessMapResponse>(`/businesses/map?${query}`);
 }
 
 export async function getBusiness(id: string): Promise<Business> {

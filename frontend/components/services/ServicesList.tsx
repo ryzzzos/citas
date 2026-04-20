@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ServiceActionsMenu from "@/components/services/ServiceActionsMenu";
 import type { Service } from "@/types";
 import { useState } from "react";
@@ -38,11 +39,14 @@ function ServiceThumbnail({ service }: { service: Service }) {
   }
 
   return (
-    <img
+    <Image
       src={service.image_url}
       alt={`Imagen del servicio ${service.name}`}
+      width={56}
+      height={56}
       className="h-14 w-14 shrink-0 rounded-lg border border-zinc-200 object-cover dark:border-zinc-700"
       loading="lazy"
+      unoptimized
       onError={() => setImageError(true)}
     />
   );

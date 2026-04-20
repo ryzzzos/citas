@@ -3,9 +3,8 @@
 import { useMemo, useState } from "react";
 
 import Button from "@/components/ui/Button";
+import BusinessProfileView from "@/components/business-profile/BusinessProfileView";
 import { useBusinessProfileEditor } from "@/lib/business-profile/useBusinessProfileEditor";
-
-import BusinessProfileView from "./BusinessProfileView";
 
 function FieldLabel({ htmlFor, label }: { htmlFor: string; label: string }) {
   return (
@@ -211,7 +210,7 @@ export default function BusinessProfileEditorPage() {
               </Button>
             </div>
             <p id="slug-helper" className="text-xs text-zinc-500 dark:text-zinc-400">
-              URL futura: marketplace/{draft.slug || "tu-negocio"}
+              URL publica: /{draft.slug || "tu-negocio"}
             </p>
             {slugAvailable === true ? (
               <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Slug disponible.</p>
@@ -327,7 +326,7 @@ export default function BusinessProfileEditorPage() {
       </div>
 
       <div className="-mt-5 min-h-0 overflow-y-auto pr-1 sm:-mt-6 lg:-mt-7">
-        <div className="mx-auto w-full max-w-[1080px]">
+        <div className="mx-auto w-full max-w-[1240px]">
           <BusinessProfileView
             business={previewBusiness}
             services={services}

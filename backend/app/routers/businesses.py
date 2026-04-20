@@ -1,9 +1,11 @@
 import uuid
 from pathlib import Path
 import re
+from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_business_owner
@@ -12,9 +14,16 @@ from app.models.user import User
 from app.schemas.business import (
     BusinessCreate,
     BusinessImageUploadRead,
+    BusinessMapResponseRead,
     BusinessRead,
     BusinessSlugAvailabilityRead,
     BusinessUpdate,
+)
+from app.services.geocoding_service import (
+    GEOCODING_STATUS_FAILED,
+    GEOCODING_STATUS_MANUAL,
+    GEOCODING_STATUS_SUCCESS,
+    geocode_business_location,
 )
 
 router = APIRouter()
@@ -30,13 +39,13 @@ RESERVED_BUSINESS_SLUGS = {
     "home",
     "login",
     "logout",
-    "marketplace",
     "onboarding",
     "pricing",
     "register",
     "services",
     "settings",
     "staff",
+    "sucursales",
     "support",
     "terms",
 }
@@ -91,6 +100,35 @@ def _build_unique_slug(seed: str, db: Session, exclude_business_id: uuid.UUID | 
         candidate = f"{base}-{suffix}"
         suffix += 1
     return candidate
+
+
+def _apply_manual_coordinates(payload: dict[str, Any]) -> None:
+    payload["geocoding_status"] = GEOCODING_STATUS_MANUAL
+    payload["geocoding_error"] = None
+    payload["geocoded_at"] = None
+
+
+def _apply_geocoding(payload: dict[str, Any], *, name: str, address: str, city: str) -> None:
+    result = geocode_business_location(name=name, address=address, city=city)
+
+    payload["geocoding_status"] = result.status
+    payload["geocoding_error"] = result.error
+
+    if result.status == GEOCODING_STATUS_SUCCESS:
+        payload["latitude"] = result.latitude
+        payload["longitude"] = result.longitude
+        payload["geocoded_at"] = datetime.now(timezone.utc)
+        return
+
+    payload["latitude"] = None
+    payload["longitude"] = None
+    payload["geocoded_at"] = None
+
+
+def _effective_value(updates: dict[str, Any], key: str, current_value: Any) -> Any:
+    if key in updates:
+        return updates[key]
+    return current_value
 
 
 def _get_owned_business(business_id: uuid.UUID, current_user: User, db: Session) -> Business:
@@ -163,6 +201,17 @@ def create_business(
     slug_seed = requested_slug or _slugify(payload["name"])
     payload["slug"] = _build_unique_slug(slug_seed, db)
 
+    coordinates_provided = payload.get("latitude") is not None and payload.get("longitude") is not None
+    if coordinates_provided:
+        _apply_manual_coordinates(payload)
+    else:
+        _apply_geocoding(
+            payload,
+            name=payload["name"],
+            address=payload["address"],
+            city=payload["city"],
+        )
+
     business = Business(**payload, owner_id=current_user.id)
     db.add(business)
     db.commit()
@@ -188,6 +237,85 @@ def get_business_by_slug(slug: str, db: Session = Depends(get_db)):
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Business not found")
     return business
+
+
+@router.get("/map", response_model=BusinessMapResponseRead)
+def list_businesses_for_map(
+    north: float = Query(..., ge=-90, le=90),
+    south: float = Query(..., ge=-90, le=90),
+    east: float = Query(..., ge=-180, le=180),
+    west: float = Query(..., ge=-180, le=180),
+    city: str | None = Query(default=None),
+    category: str | None = Query(default=None),
+    limit: int = Query(default=200, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
+    if north <= south:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="north must be greater than south",
+        )
+    if east == west:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="east and west cannot be equal",
+        )
+
+    query = db.query(Business).filter(Business.latitude.is_not(None), Business.longitude.is_not(None))
+    query = query.filter(Business.latitude <= north, Business.latitude >= south)
+
+    if east > west:
+        query = query.filter(Business.longitude >= west, Business.longitude <= east)
+    else:
+        # Support anti-meridian viewports where east wraps around the globe.
+        query = query.filter(or_(Business.longitude >= west, Business.longitude <= east))
+
+    if city:
+        query = query.filter(Business.city.ilike(f"%{city}%"))
+    if category:
+        query = query.filter(Business.category.ilike(f"%{category}%"))
+
+    total = query.count()
+    businesses = query.order_by(Business.created_at.desc()).offset(offset).limit(limit).all()
+
+    items = [
+        {
+            "id": business.id,
+            "slug": business.slug,
+            "name": business.name,
+            "category": business.category,
+            "city": business.city,
+            "address": business.address,
+            "latitude": float(business.latitude),
+            "longitude": float(business.longitude),
+            "public_bio": business.public_bio,
+            "logo_image_url": business.logo_image_url,
+            "cover_image_url": business.cover_image_url,
+            "geocoding_status": business.geocoding_status,
+        }
+        for business in businesses
+        if business.latitude is not None and business.longitude is not None
+    ]
+
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "has_more": offset + len(items) < total,
+        "viewport": {
+            "north": north,
+            "south": south,
+            "east": east,
+            "west": west,
+        },
+        "clustering": {
+            "enabled": True,
+            "strategy": "frontend",
+            "recommended_radius": 60,
+        },
+    }
 
 
 @router.get("/", response_model=list[BusinessRead])
@@ -250,6 +378,35 @@ def update_business(
             updates["slug"] = normalized_slug
         else:
             updates["slug"] = _build_unique_slug(_slugify(updates.get("name") or business.name), db, business.id)
+
+    coordinates_provided = (
+        "latitude" in updates
+        and "longitude" in updates
+        and updates["latitude"] is not None
+        and updates["longitude"] is not None
+    )
+    latitude_in_updates = "latitude" in updates
+    longitude_in_updates = "longitude" in updates
+    location_data_changed = any(field in updates for field in ("name", "address", "city"))
+
+    if coordinates_provided:
+        _apply_manual_coordinates(updates)
+    else:
+        effective_latitude = _effective_value(updates, "latitude", business.latitude)
+        effective_longitude = _effective_value(updates, "longitude", business.longitude)
+        should_regeocode = (
+            (location_data_changed and not latitude_in_updates and not longitude_in_updates)
+            or effective_latitude is None
+            or effective_longitude is None
+        )
+
+        if should_regeocode:
+            _apply_geocoding(
+                updates,
+                name=_effective_value(updates, "name", business.name),
+                address=_effective_value(updates, "address", business.address),
+                city=_effective_value(updates, "city", business.city),
+            )
 
     for field, value in updates.items():
         setattr(business, field, value)

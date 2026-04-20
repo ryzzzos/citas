@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.2.0] - 2026-04-20
+
+### Added
+- Business geocoding pipeline in backend with dedicated `geocoding_service`, schema fields, and migration support for geocoding status.
+- Operational scripts for backfilling/re-geocoding business locations and seeding demo businesses.
+- New public business route based on slug at `frontend/app/[slug]/page.tsx`.
+- New `sucursales` discovery module with map canvas, markers, filters, and detail sheet components.
+- UI utility additions including `magic-card` integration and shared frontend utility helpers.
+
+### Changed
+- Extended business router and business schemas to support geocoding lifecycle and enriched business profile data.
+- Updated dashboard shell and navigation to align with the new public business and branch-discovery experience.
+- Refined business profile, services list, service form modal, navbar, and homepage behavior for the new flow.
+- Updated frontend and backend dependencies/configuration to support the new discovery and location features.
+
+### Removed
+- Removed legacy marketplace pages under `frontend/app/marketplace/` in favor of the new route and discovery structure.
+- Removed outdated business profile resolver helper and old showcase component.
+- Removed stale project context document in `docs/project_context.md`.
+
 ## [0.1.7] - 2026-04-04
 
 ### Added

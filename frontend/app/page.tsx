@@ -24,10 +24,10 @@ export default function HomePage() {
             Registra tu negocio
           </Link>
           <Link
-            href="/marketplace"
+            href="/sucursales"
             className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            Buscar negocios
+            Explorar sucursales
           </Link>
         </div>
       </section>

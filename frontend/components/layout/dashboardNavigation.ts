@@ -62,12 +62,12 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     label: "Plataforma",
     items: [
       {
-        id: "marketplace",
-        label: "Marketplace",
-        href: "/marketplace",
+        id: "sucursales",
+        label: "Sucursales",
+        href: "/sucursales",
         match: "prefix",
         icon: Compass,
-        hint: "Visibilidad frente a clientes",
+        hint: "Descubrimiento publico por mapa",
       },
     ],
   },

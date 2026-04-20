@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import Button from "@/components/ui/Button";
@@ -300,10 +301,13 @@ export default function ServiceFormModal({
             {previewUrl ? (
               <div className="mt-2">
                 <p className="dashboard-text-muted mb-2 text-xs">Vista previa</p>
-                <img
+                <Image
                   src={previewUrl}
                   alt={form.name ? `Vista previa de ${form.name}` : "Vista previa de la imagen del servicio"}
+                  width={640}
+                  height={320}
                   className="h-40 w-full rounded-lg border border-zinc-200 object-cover dark:border-zinc-700"
+                  unoptimized
                 />
               </div>
             ) : null}

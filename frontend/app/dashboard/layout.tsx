@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     Agenda
                   </Link>
                   <Link
-                    href="/marketplace"
+                    href="/sucursales"
                     className="dashboard-interactive dashboard-focusable inline-flex min-h-10 items-center gap-2 rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-3 text-xs font-semibold uppercase tracking-wide text-slate-950 hover:bg-teal-400"
                   >
                     <AppIcon icon={Compass} size="xs" />

@@ -32,6 +32,9 @@ class Business(Base):
     city: Mapped[str] = mapped_column(String(100), nullable=False)
     latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    geocoding_status: Mapped[str] = mapped_column(String(24), nullable=False, default="pending", index=True)
+    geocoding_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    geocoded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

@@ -60,7 +60,7 @@ export default function DashboardPage() {
         <p className="dashboard-text-secondary mt-2 max-w-2xl text-sm leading-6">
           {user?.role === "business_owner"
             ? "Administra la operacion de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
-            : "Consulta tus proximas reservas y accede rapido al marketplace para reservar nuevos servicios."}
+            : "Consulta tus proximas reservas y accede rapido al mapa de sucursales para reservar nuevos servicios."}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2.5">
@@ -74,11 +74,11 @@ export default function DashboardPage() {
             </Link>
           ) : null}
           <Link
-            href="/marketplace"
+            href="/sucursales"
             className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold [color:var(--dashboard-text-secondary)]"
           >
             <AppIcon icon={Compass} />
-            Explorar marketplace
+            Explorar sucursales
           </Link>
         </div>
       </section>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         {bookings.length === 0 ? (
           <div className="dashboard-text-secondary mt-4 rounded-[var(--dashboard-radius-md)] border border-dashed border-[color:var(--dashboard-border-default)] p-8 text-center text-sm">
             <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-2" />
-            No hay reservas aun. <Link href="/marketplace" className="dashboard-focusable rounded-sm text-teal-700 underline underline-offset-4 dark:text-teal-300">Busca un negocio</Link>
+            No hay reservas aun. <Link href="/sucursales" className="dashboard-focusable rounded-sm text-teal-700 underline underline-offset-4 dark:text-teal-300">Busca una sucursal</Link>
           </div>
         ) : (
           <ul className="mt-4 space-y-3">
