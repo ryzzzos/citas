@@ -1,7 +1,11 @@
 import type { ComponentPropsWithoutRef } from "react";
 import type { LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+
 
 const ICON_SIZE_CLASS = {
   xs: "h-3.5 w-3.5",

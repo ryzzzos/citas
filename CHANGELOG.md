@@ -24,6 +24,20 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 - Removed outdated business profile resolver helper and old showcase component.
 - Removed stale project context document in `docs/project_context.md`.
 
+## [0.2.1] - 2026-04-28
+
+### Added
+- Small improvements to the agenda UI and timeline rendering to improve readability and mobile spacing.
+- New UI components and form controls: `Button`, `Input`, and `AppIcon` refinements.
+
+### Changed
+- Refinements to `BusinessProfileEditorPage` and profile preview behavior for a smoother edit/preview flow.
+- Dashboard layout and navigation tweaks to improve focus on profile and services pages.
+- Replaced `frontend/lib/utils.ts` with localized utility functions in components (removed global util file).
+
+### Fixed
+- Various UI spacing and responsive bugs in the dashboard and sucursales discovery components.
+
 ## [0.1.7] - 2026-04-04
 
 ### Added

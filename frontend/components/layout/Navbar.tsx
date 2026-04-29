@@ -8,7 +8,11 @@ import { LayoutDashboard, LogIn, Store, UserRoundCheck } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { getMe, getMyBusiness } from "@/lib/api";
-import { cn, glassRecipes } from "@/lib/utils";
+
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 
 type OnboardingState = "idle" | "pending" | "ready";
 
@@ -70,7 +74,7 @@ export default function Navbar() {
     "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors",
     "text-[color:var(--dashboard-text-secondary)] hover:text-[color:var(--dashboard-text-primary)]",
     "whitespace-nowrap",
-    glassRecipes.floating
+    "glass-floating"
   );
 
   return (
@@ -84,7 +88,7 @@ export default function Navbar() {
         className={cn(
           "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-[1.35rem] px-3.5 sm:px-6",
           isMapRoute ? "w-full max-w-[78rem]" : "w-full max-w-6xl",
-          glassRecipes.island
+          "glass-panel"
         )}
       >
         <Link
@@ -98,7 +102,7 @@ export default function Navbar() {
             className={cn(
               "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
               "text-[color:var(--dashboard-text-secondary)] focus-visible:ring-[color:var(--dashboard-accent)]",
-              glassRecipes.floatingMuted
+              "glass-floating-muted"
             )}
             aria-label="Cambiar tema"
           />
@@ -131,7 +135,7 @@ export default function Navbar() {
               "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 transition-colors",
               "text-[color:var(--dashboard-text-primary)] hover:text-[color:var(--dashboard-text-secondary)]",
               "whitespace-nowrap",
-              glassRecipes.floating
+              "glass-floating"
             )}
           >
             <AppIcon icon={LogIn} />

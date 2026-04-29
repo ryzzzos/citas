@@ -43,12 +43,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="relative flex h-full flex-col lg:pl-72">
         <div className="flex h-full flex-col p-2 sm:p-3 lg:p-4">
           <div className="dashboard-main-shell relative flex h-full min-h-0 flex-col overflow-hidden">
-            <header className="sticky top-0 z-20 border-b border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_88%,transparent)] backdrop-blur-xl">
+            <header className="sticky top-0 z-20 border-b border-zinc-200/50 bg-white/70 backdrop-blur-2xl dark:border-zinc-800/50 dark:bg-black/50">
               <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
-                  className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex h-11 w-11 items-center justify-center lg:hidden"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-700/50 lg:hidden"
                   aria-label="Abrir menu lateral"
                   aria-controls="dashboard-mobile-menu"
                   aria-expanded={mobileOpen}
@@ -57,34 +57,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
 
                 <div className="min-w-0 flex-1">
-                  <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">Panel SaaS</p>
-                  <h1 className="dashboard-title truncate text-base font-semibold sm:text-lg">{pageTitle}</h1>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--app-primary)] dark:text-blue-400">Panel SaaS</p>
+                  <h1 className="truncate text-base font-bold tracking-tight text-slate-900 dark:text-white sm:text-lg">{pageTitle}</h1>
                 </div>
 
-                <label className="dashboard-surface-2 hidden min-w-52 items-center gap-2 px-3 py-2 text-sm md:flex">
-                  <AppIcon icon={Search} className="dashboard-text-muted" />
+                <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-zinc-200/60 bg-zinc-50/50 px-3 py-2 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm transition-all focus-within:border-[var(--app-primary)] focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--app-primary-soft)] md:flex dark:border-zinc-800/60 dark:bg-zinc-900/50 dark:focus-within:border-[var(--app-primary-strong)] dark:focus-within:bg-zinc-900 dark:focus-within:ring-[rgba(37,99,235,0.15)]">
+                  <AppIcon icon={Search} className="text-zinc-400" />
                   <input
                     type="search"
-                    placeholder="Buscar modulo"
-                    className="dashboard-focusable w-full border-none bg-transparent text-sm [color:var(--dashboard-text-secondary)] placeholder:[color:var(--dashboard-text-muted)] focus:outline-none"
+                    placeholder="Buscar módulo..."
+                    className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:text-white dark:placeholder:text-zinc-500"
                   />
                 </label>
 
                 <div className="flex items-center gap-2">
                   <AnimatedThemeToggler
-                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex h-10 w-10 items-center justify-center"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-700/50"
                     aria-label="Cambiar tema"
                   />
                   <Link
                     href="/dashboard/agenda"
-                    className="dashboard-surface-2 dashboard-interactive dashboard-focusable hidden min-h-10 items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wide [color:var(--dashboard-text-secondary)] sm:inline-flex"
+                    className="hidden min-h-10 items-center gap-2 rounded-full px-4 text-[13px] font-semibold tracking-tight text-zinc-600 transition-colors hover:bg-zinc-100/80 dark:text-zinc-300 dark:hover:bg-zinc-800/80 sm:inline-flex"
                   >
                     <AppIcon icon={CalendarDays} size="xs" />
                     Agenda
                   </Link>
                   <Link
                     href="/sucursales"
-                    className="dashboard-interactive dashboard-focusable inline-flex min-h-10 items-center gap-2 rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-3 text-xs font-semibold uppercase tracking-wide text-slate-950 hover:bg-teal-400"
+                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--app-primary-gradient)] px-5 text-[13px] font-semibold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent"
                   >
                     <AppIcon icon={Compass} size="xs" />
                     Explorar

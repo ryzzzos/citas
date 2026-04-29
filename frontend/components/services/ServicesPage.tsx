@@ -92,7 +92,7 @@ export default function ServicesPage() {
   if (loading) {
     return (
       <div className="dashboard-surface-1 flex min-h-[50vh] items-center justify-center">
-        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-teal-500 dark:border-slate-700 dark:border-t-teal-300" />
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--app-primary)] dark:border-slate-700 dark:border-t-blue-400" />
       </div>
     );
   }

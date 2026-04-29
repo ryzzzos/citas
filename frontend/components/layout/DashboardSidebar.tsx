@@ -21,8 +21,10 @@ function BadgeMark({ active }: { active: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`h-2 w-2 rounded-full transition ${
-        active ? "bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.45)] dark:bg-teal-300 dark:shadow-[0_0_10px_rgba(45,212,191,0.65)]" : "bg-slate-400 dark:bg-slate-600"
+      className={`h-2 w-2 rounded-full transition-all duration-300 ${
+        active 
+          ? "bg-[var(--app-primary)] shadow-[0_0_12px_var(--app-primary)] scale-110" 
+          : "bg-slate-300 dark:bg-slate-700"
       }`}
     />
   );
@@ -53,14 +55,14 @@ function SidebarGroup({
                 href={item.href}
                 onClick={onItemSelect}
                 aria-current={active ? "page" : undefined}
-                className={`dashboard-interactive dashboard-focusable group flex min-h-12 items-center justify-between gap-3 rounded-[var(--dashboard-radius-md)] border px-3 py-2.5 ${
+                className={`dashboard-interactive dashboard-focusable group flex min-h-12 items-center justify-between gap-3 rounded-[1rem] border px-3 py-2.5 transition-all duration-300 ${
                   active
-                    ? "border-[color:var(--dashboard-border-default)] bg-[color:var(--dashboard-surface-1)] [color:var(--dashboard-text-primary)] shadow-[var(--dashboard-shadow-sm)]"
-                    : "border-transparent [color:var(--dashboard-text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--dashboard-surface-1)_72%,transparent)]"
+                    ? "border-[rgba(255,255,255,0.4)] bg-[var(--glass-surface-1-bg)] text-[var(--app-primary-strong)] shadow-[0_8px_24px_-8px_rgba(37,99,235,0.15)] backdrop-blur-xl dark:border-[rgba(255,255,255,0.06)] dark:text-[var(--app-primary-soft)]"
+                    : "border-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
                 }`}
               >
                 <span className="flex min-w-0 items-start gap-3">
-                  <AppIcon icon={ItemIcon} className="mt-0.5 shrink-0" />
+                  <AppIcon icon={ItemIcon} className={`mt-0.5 shrink-0 transition-transform duration-300 ${active ? "scale-110" : ""}`} />
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">{item.label}</span>
                     {item.hint ? (
@@ -83,13 +85,21 @@ function SidebarGroup({
 function SidebarContent({ pathname, onItemSelect }: { pathname: string; onItemSelect: () => void }) {
   return (
     <>
-      <div className="dashboard-surface-1 p-4">
-        <p className="dashboard-text-muted text-[10px] font-semibold uppercase tracking-[0.24em]">Agenda Web</p>
-        <p className="dashboard-title mt-2 text-lg font-semibold">Control Center</p>
-        <p className="dashboard-text-secondary mt-1 text-xs">Gestion integral de reservas y operacion diaria.</p>
+      <div className="mb-2 px-1">
+        <div className="rounded-[1.25rem] border border-white/50 bg-white/40 p-4 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)] dark:text-blue-400">
+            Agenda Web
+          </p>
+          <p className="mt-1.5 text-[19px] font-bold tracking-tight text-slate-900 dark:text-white">
+            Control Center
+          </p>
+          <p className="mt-2 text-[11px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+            Gestión integral de reservas y operación diaria.
+          </p>
+        </div>
       </div>
 
-      <nav className="mt-6 space-y-6" aria-label="Navegacion del dashboard">
+      <nav className="mt-6 space-y-6 px-1" aria-label="Navegacion del dashboard">
         {DASHBOARD_NAV_GROUPS.map((group) => (
           <SidebarGroup
             key={group.id}

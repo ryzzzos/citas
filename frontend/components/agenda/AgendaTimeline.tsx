@@ -74,10 +74,10 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 }
 
 function getBookingTone(status: AgendaBooking["status"]): string {
-  if (status === "pending") return "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-500/35 dark:bg-amber-500/15 dark:text-amber-100";
-  if (status === "confirmed") return "border-teal-300 bg-teal-50 text-teal-900 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-100";
-  if (status === "completed") return "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-500/35 dark:bg-sky-500/15 dark:text-sky-100";
-  return "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-500/35 dark:bg-rose-500/15 dark:text-rose-100";
+  if (status === "pending") return "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300";
+  if (status === "confirmed") return "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300";
+  if (status === "completed") return "border-slate-200/60 bg-slate-500/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-300";
+  return "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300";
 }
 
 function renderEventBlock(
@@ -93,7 +93,7 @@ function renderEventBlock(
   return (
     <article
       key={booking.id}
-      className={`absolute overflow-hidden rounded-[var(--dashboard-radius-md)] border p-2 shadow-[var(--dashboard-shadow-sm)] ${getBookingTone(
+      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] ${getBookingTone(
         booking.status
       )}`}
       style={{
@@ -105,18 +105,18 @@ function renderEventBlock(
       role="article"
       aria-label={`${booking.serviceName} ${booking.startAt.toFormat("HH:mm")} a ${booking.endAt.toFormat("HH:mm")}`}
     >
-      <p className="truncate text-xs font-semibold leading-tight">{booking.serviceName}</p>
-      <p className="mt-1 text-[11px] text-current/85">
+      <p className="truncate text-[13px] font-bold leading-tight tracking-tight">{booking.serviceName}</p>
+      <p className="mt-1 text-[11px] font-medium text-current/80">
         {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
       </p>
-      <p className="truncate text-[10px] text-current/70">{booking.staffName}</p>
+      <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-widest text-current/60">{booking.staffName}</p>
 
-      <div className="mt-1.5 flex flex-wrap gap-1">
+      <div className="mt-2.5 flex flex-wrap gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 sm:opacity-100">
         <button
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current disabled:opacity-40 dark:bg-slate-950/35"
+          className="min-h-7 rounded-xl border border-[rgba(255,255,255,0.4)] bg-[var(--app-primary-gradient)] px-2 text-[10px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Ok
         </button>
@@ -124,14 +124,14 @@ function renderEventBlock(
           type="button"
           onClick={() => onCancel(booking.id)}
           disabled={booking.status === "cancelled" || booking.status === "completed"}
-          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current disabled:opacity-40 dark:bg-slate-950/35"
+          className="min-h-7 rounded-xl border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent bg-gradient-to-b from-rose-500 to-rose-600 px-2 text-[10px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(225,29,72,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           X
         </button>
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="dashboard-interactive dashboard-focusable min-h-7 rounded-[var(--dashboard-radius-sm)] border border-current/25 bg-white/60 px-1.5 text-[10px] font-semibold text-current dark:bg-slate-950/35"
+          className="min-h-7 rounded-xl border border-white/60 bg-white/50 px-2 text-[10px] font-bold tracking-tight text-current shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white active:scale-[0.98] dark:border-white/10 dark:bg-black/20 dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] dark:hover:bg-black/40"
         >
           R
         </button>
@@ -154,35 +154,35 @@ export default function AgendaTimeline({
   return (
     <section
       aria-label="Timeline de citas"
-      className="dashboard-surface-1 flex h-full min-h-0 flex-col p-3 sm:p-4"
+      className="flex h-full min-h-0 flex-col rounded-3xl border border-white/50 bg-white/60 p-4 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl sm:p-5 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]"
     >
       <div className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
           <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
-            <div className="dashboard-surface-2 dashboard-text-muted sticky left-0 top-0 z-40 px-2 py-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
+            <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
               Hora
             </div>
             {columns.map((column) => (
               <div
                 key={column.isoDate}
-                className={`sticky top-0 z-30 rounded-[var(--dashboard-radius-md)] border px-3 py-2 text-sm ${
+                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm ${
                   column.isToday
-                    ? "border-teal-300 bg-teal-50 text-teal-900 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-100"
-                    : "border-[color:var(--dashboard-border-subtle)] bg-[color:var(--dashboard-surface-2)] [color:var(--dashboard-text-secondary)]"
+                    ? "border-blue-200/60 bg-blue-500/10 text-blue-900 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-100"
+                    : "border-zinc-200/60 bg-zinc-50/70 text-slate-500 dark:border-zinc-800/60 dark:bg-zinc-900/50 dark:text-slate-400"
                 }`}
               >
-                <p className="font-semibold">{column.dayLabel}</p>
-                <p className="dashboard-text-muted text-xs">{column.dateLabel}</p>
+                <p className="font-bold tracking-tight text-slate-900 dark:text-white">{column.dayLabel}</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">{column.dateLabel}</p>
               </div>
             ))}
 
-            <div className="dashboard-surface-2 sticky left-0 z-20 relative">
+            <div className="sticky left-0 z-20 relative bg-[inherit]">
               {hourMarkers.map((hour) => {
                 const [hours] = hour.split(":");
                 const top = (Number(hours) * 60 + 30) * PX_PER_MINUTE;
                 return (
                   <div key={hour} className="absolute inset-x-0" style={{ top }}>
-                    <p className="dashboard-text-muted -translate-y-1/2 px-2 text-[11px] font-semibold">{hour}</p>
+                    <p className="-translate-y-1/2 px-2 text-[11px] font-bold tracking-widest text-slate-400">{hour}</p>
                   </div>
                 );
               })}
@@ -194,7 +194,7 @@ export default function AgendaTimeline({
               return (
                 <div
                   key={column.isoDate}
-                  className="relative overflow-hidden rounded-[var(--dashboard-radius-md)] border border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-2)_86%,transparent)]"
+                  className="relative overflow-hidden rounded-2xl border border-zinc-200/40 bg-white/40 shadow-[inset_0_1px_rgba(255,255,255,0.2)] dark:border-zinc-800/40 dark:bg-black/10 dark:shadow-[inset_0_1px_rgba(0,0,0,0.2)]"
                   style={{ height: canvasHeight }}
                   role="group"
                   aria-label={`${column.dayLabel} ${column.dateLabel}`}
@@ -205,7 +205,7 @@ export default function AgendaTimeline({
                     return (
                       <div
                         key={`${column.isoDate}-${hour}`}
-                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-[color:var(--dashboard-border-subtle)]"
+                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-200 dark:border-zinc-800"
                         style={{ top }}
                         aria-hidden="true"
                       />

@@ -123,7 +123,7 @@ export default function BusinessOnboardingPage() {
   }
 
   return (
-    <main className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-gradient-to-br from-amber-50 via-white to-teal-50 px-4 py-10 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
+    <main className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100/50 px-4 py-10 dark:from-zinc-950 dark:via-zinc-950 dark:to-blue-950/20">
       <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/80 bg-white/90 p-6 shadow-[0_25px_55px_-35px_rgba(0,0,0,0.6)] backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/85 md:p-8">
         <p className="mb-2 inline-flex items-center rounded-full border border-amber-300/70 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-700 dark:border-amber-500/40 dark:bg-amber-400/10 dark:text-amber-200">
           Onboarding obligatorio

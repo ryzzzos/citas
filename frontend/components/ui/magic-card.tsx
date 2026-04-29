@@ -1,7 +1,11 @@
 import { type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react"
 import { ArrowRight, Clock3, Tag } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+
 
 interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode

@@ -6,7 +6,11 @@ import { useState } from "react";
 import { ExternalLink, MapPin, X } from "lucide-react";
 
 import type { BusinessMapPoint } from "@/types";
-import { cn, glassRecipes } from "@/lib/utils";
+
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 
 interface SucursalesDetailSheetProps {
   business: BusinessMapPoint | null;
@@ -41,7 +45,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
     <section
       className={cn(
         "pointer-events-auto fixed bottom-4 left-4 right-4 z-[500] rounded-[1.85rem] p-4 lg:bottom-[max(env(safe-area-inset-bottom),1.25rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[420px] lg:max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-6rem)] lg:overflow-y-auto",
-        glassRecipes.surfaceStrong
+        "glass-panel-heavy"
       )}
       aria-label="Detalle de sucursal"
     >
@@ -84,7 +88,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
                 onClick={onClose}
                 className={cn(
                   "dashboard-focusable absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-100",
-                  glassRecipes.floating
+                  "glass-floating"
                 )}
                 aria-label="Cerrar detalle"
               >
@@ -96,7 +100,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
 
           <div
             className={cn(
-              glassRecipes.floatingMuted,
+              "glass-floating-muted",
               "absolute -bottom-10 left-5 grid h-[4.75rem] w-[4.75rem] place-items-center overflow-hidden rounded-full border-2 p-0",
               "shadow-[0_22px_38px_-22px_rgba(2,6,23,0.74)]"
             )}
@@ -151,7 +155,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
           href={`/${business.slug}`}
           className={cn(
             "dashboard-focusable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold",
-            glassRecipes.floating
+            "glass-floating"
           )}
           style={{ color: "var(--dashboard-text-primary)" }}
         >

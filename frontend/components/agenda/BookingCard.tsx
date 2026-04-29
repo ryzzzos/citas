@@ -8,10 +8,10 @@ interface BookingCardProps {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  pending: "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/35 dark:bg-amber-500/15 dark:text-amber-200",
-  confirmed: "border-teal-300 bg-teal-50 text-teal-800 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-200",
-  cancelled: "border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/35 dark:bg-rose-500/15 dark:text-rose-200",
-  completed: "border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-500/35 dark:bg-sky-500/15 dark:text-sky-200",
+  pending: "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300",
+  confirmed: "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
+  cancelled: "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300",
+  completed: "border-slate-200/60 bg-slate-500/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-300",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -22,41 +22,40 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function BookingCard({ booking, onConfirm, onCancel, onReschedule }: BookingCardProps) {
-  const statusClass = STATUS_BADGE[booking.status] ?? "border-slate-300 bg-slate-100 text-slate-800 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200";
+  const statusClass = STATUS_BADGE[booking.status] ?? "border-slate-200 bg-slate-100 text-slate-800";
   const statusLabel = STATUS_LABEL[booking.status] ?? booking.status;
 
   return (
-    <article className="dashboard-surface-2 p-3">
+    <article className="rounded-2xl border border-white/60 bg-white/60 p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-shadow hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="dashboard-title text-sm font-semibold">{booking.serviceName}</p>
-          <p className="dashboard-text-secondary mt-1 text-xs">
+          <p className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">{booking.serviceName}</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">
             {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
           </p>
         </div>
-        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass}`}>
+        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md ${statusClass}`}>
           {statusLabel}
         </span>
       </header>
 
-      <dl className="dashboard-text-secondary mt-3 grid grid-cols-1 gap-2 text-xs">
+      <dl className="mt-4 grid grid-cols-1 gap-2.5 text-xs">
         <div>
-          <dt className="dashboard-text-muted">Staff</dt>
-          <dd className="dashboard-title font-medium">{booking.staffName}</dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">Staff</dt>
+          <dd className="mt-0.5 text-[13px] font-medium text-slate-700 dark:text-slate-300">{booking.staffName}</dd>
         </div>
         <div>
-          <dt className="dashboard-text-muted">Reserva</dt>
-          <dd className="dashboard-text-secondary font-mono text-[11px]">{booking.id.slice(0, 8)}</dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">Reserva ID</dt>
+          <dd className="mt-0.5 font-mono text-[11px] font-medium text-slate-500 dark:text-slate-400">{booking.id.slice(0, 8)}</dd>
         </div>
       </dl>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="dashboard-interactive dashboard-focusable min-h-11 rounded-[var(--dashboard-radius-md)] border border-teal-300 bg-teal-50 px-3 text-xs font-semibold text-teal-800 hover:bg-teal-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-100 dark:hover:bg-teal-500/25"
-          aria-label={`Confirmar cita ${booking.id}`}
+          className="min-h-11 rounded-xl border border-[rgba(255,255,255,0.4)] bg-[var(--app-primary-gradient)] px-4 text-[13px] font-bold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Confirmar
         </button>
@@ -64,16 +63,14 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
           type="button"
           onClick={() => onCancel(booking.id)}
           disabled={booking.status === "cancelled" || booking.status === "completed"}
-          className="dashboard-interactive dashboard-focusable min-h-11 rounded-[var(--dashboard-radius-md)] border border-rose-300 bg-rose-50 px-3 text-xs font-semibold text-rose-800 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-rose-500/35 dark:bg-rose-500/15 dark:text-rose-100 dark:hover:bg-rose-500/25"
-          aria-label={`Cancelar cita ${booking.id}`}
+          className="min-h-11 rounded-xl bg-gradient-to-b from-rose-500 to-rose-600 px-4 text-[13px] font-bold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(225,29,72,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent disabled:pointer-events-none disabled:opacity-40"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="dashboard-surface-2 dashboard-interactive dashboard-focusable min-h-11 px-3 text-xs font-semibold [color:var(--dashboard-text-secondary)]"
-          aria-label={`Reprogramar cita ${booking.id}`}
+          className="min-h-11 rounded-xl border border-zinc-200/80 bg-zinc-50/50 px-4 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-sm active:scale-[0.98] dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
         >
           Reprogramar
         </button>

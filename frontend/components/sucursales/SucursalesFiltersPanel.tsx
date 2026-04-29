@@ -6,7 +6,11 @@ import { ChevronDown, MapPin, Search, SlidersHorizontal, Sparkles, X } from "luc
 
 import type { BusinessMapPoint } from "@/types";
 import type { DiscoveryFilters } from "@/components/sucursales/types";
-import { cn, glassRecipes } from "@/lib/utils";
+
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 
 type SortMode = "viewport" | "name-asc" | "name-desc" | "category";
 
@@ -46,7 +50,7 @@ function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name
   return (
     <div
       className={cn(
-        glassRecipes.floatingMuted,
+        "glass-floating-muted",
         "relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border p-0"
       )}
       style={{
@@ -214,16 +218,7 @@ function PanelBody({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
-      <header
-        className="rounded-[1.35rem] border p-4"
-        style={{
-          background:
-            "linear-gradient(155deg,color-mix(in oklab,var(--dashboard-accent) 88%,#ffffff 12%) 0%,color-mix(in oklab,var(--dashboard-accent) 72%,var(--app-primary-strong) 28%) 54%,color-mix(in oklab,var(--app-primary-strong) 80%,#0f172a 20%) 100%)",
-          borderColor: "color-mix(in oklab, var(--dashboard-accent) 66%, #ffffff 34%)",
-          boxShadow:
-            "0 0 0 1px color-mix(in oklab, var(--dashboard-accent) 62%, #ffffff 38%), 0 0 26px -8px color-mix(in oklab, var(--dashboard-accent) 72%, #0f172a 28%), 0 0 46px -18px color-mix(in oklab, var(--dashboard-accent) 66%, #0f172a 34%)",
-        }}
-      >
+      <header className="glass-panel-accent p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[0.72rem] font-semibold text-white/82">
@@ -288,7 +283,7 @@ function PanelBody({
         </div>
       </header>
 
-      <section className={cn(glassRecipes.surfaceSoft, "rounded-2xl p-3.5")}>
+      <section className={cn("glass-panel", "rounded-2xl p-3.5")}>
         <div className="mb-3 flex items-center justify-between gap-2">
           <button
             type="button"
@@ -308,7 +303,7 @@ function PanelBody({
             onClick={onClearAll}
             className={cn(
               "dashboard-focusable inline-flex min-h-9 items-center rounded-full px-3 text-[0.72rem] font-semibold text-zinc-700 dark:text-zinc-100",
-              glassRecipes.floating
+              "glass-floating"
             )}
           >
             Limpiar todo
@@ -321,7 +316,7 @@ function PanelBody({
               <span
                 key={chip}
                 className={cn(
-                  glassRecipes.floating,
+                  "glass-floating",
                   "inline-flex min-h-7 items-center px-2.5 text-[0.65rem] font-medium text-zinc-700 dark:text-zinc-100"
                 )}
               >
@@ -406,7 +401,7 @@ function PanelBody({
                         onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
                         className={cn(
                           "dashboard-focusable inline-flex min-h-8 shrink-0 items-center gap-1 px-3 text-[0.67rem] font-medium transition",
-                          glassRecipes.floating,
+                          "glass-floating",
                           active
                             ? "border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-text-primary)]"
                             : "text-zinc-700 dark:text-zinc-200"
@@ -452,7 +447,7 @@ function PanelBody({
                   onClick={() => onSelectBusiness(business.id)}
                   className={cn(
                     "dashboard-focusable dashboard-interactive w-full rounded-[1.15rem] px-2.5 py-2.5 text-left",
-                    glassRecipes.surfaceSoft,
+                    "glass-panel",
                     active
                       ? "border-[color:var(--dashboard-accent)] ring-1 ring-[color:color-mix(in_oklab,var(--dashboard-accent)_38%,transparent)]"
                       : "hover:border-zinc-300/80 dark:hover:border-zinc-600/80"
@@ -490,7 +485,7 @@ function PanelBody({
           })}
 
           {!loading && filteredItems.length === 0 ? (
-            <li className={cn(glassRecipes.surfaceSoft, "rounded-2xl border-dashed px-3 py-6 text-center text-sm text-zinc-600 dark:text-zinc-300")}>
+            <li className={cn("glass-panel", "rounded-2xl border-dashed px-3 py-6 text-center text-sm text-zinc-600 dark:text-zinc-300")}>
               {nameQuery.trim()
                 ? "No hay resultados con esta busqueda dentro del area visible."
                 : "No hay sucursales en el area visible."}
@@ -549,7 +544,7 @@ export default function SucursalesFiltersPanel({
         className={cn(
           "pointer-events-auto absolute left-4 z-[460] hidden w-[min(390px,calc(100%-2rem))] min-h-0 rounded-[1.85rem] p-4 lg:block",
           "top-[calc(env(safe-area-inset-top)+4.55rem)] h-[calc(100%-env(safe-area-inset-top)-5.55rem)]",
-          glassRecipes.surfaceStrong
+          "glass-panel-heavy"
         )}
       >
         <PanelBody
@@ -582,7 +577,7 @@ export default function SucursalesFiltersPanel({
         onClick={() => onMobileOpenChange(true)}
         className={cn(
           "dashboard-focusable pointer-events-auto fixed bottom-4 left-4 z-[800] inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-100 lg:hidden",
-          glassRecipes.floating
+          "glass-floating"
         )}
       >
         <SlidersHorizontal className="h-4 w-4" />
@@ -601,7 +596,7 @@ export default function SucursalesFiltersPanel({
         <button
           type="button"
           onClick={() => onMobileOpenChange(false)}
-          className={cn(glassRecipes.overlay, "absolute inset-0 transition", mobileOpen ? "opacity-100" : "opacity-0")}
+          className={cn("glass-overlay", "absolute inset-0 transition", mobileOpen ? "opacity-100" : "opacity-0")}
           aria-label="Cerrar filtros"
         />
 
@@ -609,7 +604,7 @@ export default function SucursalesFiltersPanel({
           className={cn(
             "absolute inset-x-4 bottom-4 top-[calc(env(safe-area-inset-top)+5.25rem)] flex min-h-0 flex-col rounded-[1.5rem] p-4 transition duration-200",
             mobileOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
-            glassRecipes.surfaceStrong
+            "glass-panel-heavy"
           )}
         >
           <div className="mb-3 flex items-center justify-end">
@@ -618,7 +613,7 @@ export default function SucursalesFiltersPanel({
               onClick={() => onMobileOpenChange(false)}
               className={cn(
                 "dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-700 dark:text-zinc-200",
-                glassRecipes.floating
+                "glass-floating"
               )}
               aria-label="Cerrar filtros"
             >

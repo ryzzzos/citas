@@ -15,10 +15,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/35 dark:bg-amber-500/15 dark:text-amber-200",
-  confirmed: "border border-teal-300 bg-teal-50 text-teal-800 dark:border-teal-500/35 dark:bg-teal-500/15 dark:text-teal-200",
-  cancelled: "border border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/35 dark:bg-rose-500/15 dark:text-rose-200",
-  completed: "border border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-500/35 dark:bg-sky-500/15 dark:text-sky-200",
+  pending: "border border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300",
+  confirmed: "border border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
+  cancelled: "border border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300",
+  completed: "border border-slate-200/60 bg-slate-500/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-300",
 };
 
 export default function DashboardPage() {
@@ -44,30 +44,30 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="dashboard-surface-1 flex min-h-[50vh] items-center justify-center">
-        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-teal-500 dark:border-slate-700 dark:border-t-teal-300" />
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--app-primary)] dark:border-slate-700 dark:border-t-blue-400" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-5 lg:space-y-6">
-      <section className="dashboard-surface-1 p-5 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700 dark:text-teal-300">Agenda Web</p>
-        <h2 className="dashboard-title mt-3 text-2xl font-semibold sm:text-3xl">
+    <div className="space-y-4 lg:space-y-6">
+      <section className="rounded-3xl border border-white/50 bg-white/60 p-6 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)] dark:text-blue-400">Agenda Web</p>
+        <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
           Hola, {user?.name}
         </h2>
-        <p className="dashboard-text-secondary mt-2 max-w-2xl text-sm leading-6">
+        <p className="mt-1.5 max-w-2xl text-[14px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
           {user?.role === "business_owner"
-            ? "Administra la operacion de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
-            : "Consulta tus proximas reservas y accede rapido al mapa de sucursales para reservar nuevos servicios."}
+            ? "Administra la operación de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
+            : "Consulta tus próximas reservas y accede rápido al mapa de sucursales para reservar nuevos servicios."}
         </p>
 
-        <div className="mt-5 flex flex-wrap gap-2.5">
+        <div className="mt-6 flex flex-wrap gap-2.5">
           {user?.role === "business_owner" ? (
             <Link
               href="/dashboard/agenda"
-              className="dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center gap-2 rounded-[var(--dashboard-radius-md)] border border-teal-300/70 bg-teal-500 px-4 text-sm font-semibold text-slate-950 hover:bg-teal-400"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.4)] bg-[var(--app-primary-gradient)] px-5 text-[13px] font-bold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98]"
             >
               <AppIcon icon={CalendarDays} />
               Abrir agenda
@@ -75,7 +75,7 @@ export default function DashboardPage() {
           ) : null}
           <Link
             href="/sucursales"
-            className="dashboard-surface-2 dashboard-interactive dashboard-focusable inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold [color:var(--dashboard-text-secondary)]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200/80 bg-zinc-50/50 px-5 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-sm active:scale-[0.98] dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
           >
             <AppIcon icon={Compass} />
             Explorar sucursales
@@ -84,63 +84,63 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="dashboard-surface-2 p-4">
-          <AppIcon icon={ClipboardList} className="dashboard-text-muted" />
-          <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Reservas</p>
-          <p className="dashboard-title mt-2 text-2xl font-semibold">{bookings.length}</p>
-          <p className="dashboard-text-secondary mt-1 text-xs">En el rango consultado</p>
+        <article className="rounded-3xl border border-white/50 bg-white/60 p-5 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+          <AppIcon icon={ClipboardList} className="text-slate-400" />
+          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Reservas</p>
+          <p className="mt-1 text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">{bookings.length}</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">En el rango consultado</p>
         </article>
-        <article className="dashboard-surface-2 p-4">
-          <AppIcon icon={Hourglass} className="text-amber-700 dark:text-amber-200" />
-          <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Pendientes</p>
-          <p className="mt-2 text-2xl font-semibold text-amber-700 dark:text-amber-200">
+        <article className="rounded-3xl border border-white/50 bg-white/60 p-5 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+          <AppIcon icon={Hourglass} className="text-amber-500" />
+          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300">Pendientes</p>
+          <p className="mt-1 text-[28px] font-bold tracking-tight text-amber-900 dark:text-amber-100">
             {bookings.filter((booking) => booking.status === "pending").length}
           </p>
-          <p className="dashboard-text-secondary mt-1 text-xs">Requieren accion</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">Requieren acción</p>
         </article>
-        <article className="dashboard-surface-2 p-4">
-          <AppIcon icon={TrendingUp} className="text-teal-700 dark:text-teal-200" />
-          <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Confirmadas</p>
-          <p className="mt-2 text-2xl font-semibold text-teal-700 dark:text-teal-200">
+        <article className="rounded-3xl border border-white/50 bg-white/60 p-5 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+          <AppIcon icon={TrendingUp} className="text-[var(--app-primary)] dark:text-blue-400" />
+          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--app-primary)] dark:text-blue-400">Confirmadas</p>
+          <p className="mt-1 text-[28px] font-bold tracking-tight text-blue-900 dark:text-blue-100">
             {bookings.filter((booking) => booking.status === "confirmed").length}
           </p>
-          <p className="dashboard-text-secondary mt-1 text-xs">Listas para atender</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">Listas para atender</p>
         </article>
-        <article className="dashboard-surface-2 p-4">
-          <AppIcon icon={CheckCircle2} className="text-sky-700 dark:text-sky-200" />
-          <p className="dashboard-text-muted text-[11px] font-semibold uppercase tracking-[0.16em]">Completadas</p>
-          <p className="mt-2 text-2xl font-semibold text-sky-700 dark:text-sky-200">
+        <article className="rounded-3xl border border-white/50 bg-white/60 p-5 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+          <AppIcon icon={CheckCircle2} className="text-slate-400" />
+          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Completadas</p>
+          <p className="mt-1 text-[28px] font-bold tracking-tight text-slate-900 dark:text-white">
             {bookings.filter((booking) => booking.status === "completed").length}
           </p>
-          <p className="dashboard-text-secondary mt-1 text-xs">Finalizadas con exito</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">Finalizadas con éxito</p>
         </article>
       </section>
 
-      <section className="dashboard-surface-1 p-5 sm:p-6">
-        <h3 className="dashboard-title text-lg font-semibold">
-          {user?.role === "business_owner" ? "Ultimas reservas" : "Mis reservas"}
+      <section className="rounded-3xl border border-white/50 bg-white/60 p-6 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+        <h3 className="text-[19px] font-bold tracking-tight text-slate-900 dark:text-white">
+          {user?.role === "business_owner" ? "Últimas reservas" : "Mis reservas"}
         </h3>
 
         {bookings.length === 0 ? (
-          <div className="dashboard-text-secondary mt-4 rounded-[var(--dashboard-radius-md)] border border-dashed border-[color:var(--dashboard-border-default)] p-8 text-center text-sm">
-            <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-2" />
-            No hay reservas aun. <Link href="/sucursales" className="dashboard-focusable rounded-sm text-teal-700 underline underline-offset-4 dark:text-teal-300">Busca una sucursal</Link>
+          <div className="mt-5 rounded-2xl border border-dashed border-zinc-300 p-8 text-center text-[14px] font-medium text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-3" />
+            No hay reservas aún. <Link href="/sucursales" className="text-[var(--app-primary)] underline underline-offset-4 dark:text-blue-400">Busca una sucursal</Link>
           </div>
         ) : (
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-5 space-y-3">
             {bookings.map((b) => (
               <li
                 key={b.id}
-                className="dashboard-surface-2 flex flex-wrap items-center justify-between gap-3 p-4"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm transition-transform hover:scale-[1.01] dark:border-zinc-800/60 dark:bg-zinc-900/50"
               >
                 <div>
-                  <p className="dashboard-title text-sm font-medium">
+                  <p className="text-[14px] font-bold tracking-tight text-slate-900 dark:text-white">
                     {b.booking_date} · {b.start_time.slice(0, 5)} - {b.end_time.slice(0, 5)}
                   </p>
-                  <p className="dashboard-text-muted text-xs">ID: {b.id.slice(0, 8)}...</p>
+                  <p className="mt-1 font-mono text-[11px] font-medium text-slate-500 dark:text-slate-400">ID: {b.id.slice(0, 8)}...</p>
                 </div>
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_COLORS[b.status] ?? STATUS_COLORS.pending}`}
+                  className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md ${STATUS_COLORS[b.status] ?? STATUS_COLORS.pending}`}
                 >
                   {STATUS_LABELS[b.status]}
                 </span>

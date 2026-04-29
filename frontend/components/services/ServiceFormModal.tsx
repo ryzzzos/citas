@@ -278,7 +278,7 @@ export default function ServiceFormModal({
                 setUploadError(null);
                 setUploadMessage("Vista previa lista. Sube la imagen para obtener la URL final.");
               }}
-              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-3 file:rounded-md file:border-0 file:bg-teal-500 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950 hover:file:bg-teal-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
             />
             <p className="dashboard-text-muted text-xs">
               Sube una imagen JPEG, PNG o WEBP de hasta 2MB. Esta es la captura principal.
@@ -312,7 +312,7 @@ export default function ServiceFormModal({
               </div>
             ) : null}
 
-            {uploadMessage ? <p className="text-xs text-teal-700 dark:text-teal-300">{uploadMessage}</p> : null}
+            {uploadMessage ? <p className="text-[12px] font-medium text-blue-700 dark:text-blue-300">{uploadMessage}</p> : null}
             {uploadError ? <p className="text-xs text-red-500">{uploadError}</p> : null}
 
             <div className="mt-2 flex flex-col gap-1">

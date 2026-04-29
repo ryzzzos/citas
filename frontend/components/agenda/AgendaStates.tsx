@@ -6,7 +6,7 @@ interface AgendaStatusProps {
 export function AgendaLoadingState() {
   return (
     <section className="dashboard-surface-1 flex min-h-[320px] items-center justify-center" aria-busy="true" aria-live="polite">
-      <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-teal-500 dark:border-slate-700 dark:border-t-teal-300" />
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--app-primary)] dark:border-slate-700 dark:border-t-blue-400" />
       <p className="sr-only">Cargando agenda</p>
     </section>
   );

@@ -60,8 +60,8 @@ Clases reutilizables en [frontend/app/globals.css](../app/globals.css):
 ## 4) Direccion de color
 
 - Base: neutros frios (slate/surface) para legibilidad.
-- Acento principal: teal para acciones primarias y foco.
-- Estados semanticos: amber (pending), teal (confirmed), rose (cancelled), sky (completed).
+- Acento principal: azul rey / marino (primary) para acciones primarias y foco.
+- Estados semánticos: amber (pending), blue (confirmed), rose (cancelled), sky (completed).
 - Los estados no dependen solo de color: mantienen etiqueta textual.
 
 ## 5) Escala tipografica y espaciado
