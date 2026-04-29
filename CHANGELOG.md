@@ -38,6 +38,17 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 ### Fixed
 - Various UI spacing and responsive bugs in the dashboard and sucursales discovery components.
 
+## [0.2.2] - 2026-04-29
+
+### Changed
+- Agenda rendering and timeline spacing: improved day column layout and mobile gutter spacing in `frontend/components/agenda/`.
+- Minor fixes in `sucursales` filters panel for consistent filter collapsing behavior.
+- Removed temporary debug script `fix_glass.js` from the tree.
+
+### Fixed
+- Corrected editor/preview synchronization in `BusinessProfileEditorPage` to avoid stale preview state after saves.
+- Small bugfixes for booking card display times and responsive wrapping.
+
 ## [0.1.7] - 2026-04-04
 
 ### Added

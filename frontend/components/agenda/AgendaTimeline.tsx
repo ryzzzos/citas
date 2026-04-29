@@ -158,11 +158,11 @@ export default function AgendaTimeline({
     >
       <div className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
-          <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
+            <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
             <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
               Hora
             </div>
-            {columns.map((column) => (
+            {columns.length > 1 && columns.map((column) => (
               <div
                 key={column.isoDate}
                 className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm ${
@@ -175,6 +175,7 @@ export default function AgendaTimeline({
                 <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">{column.dateLabel}</p>
               </div>
             ))}
+            {columns.length === 1 && <div className="sticky top-0 z-30 pointer-events-none"></div>}
 
             <div className="sticky left-0 z-20 relative bg-[inherit]">
               {hourMarkers.map((hour) => {

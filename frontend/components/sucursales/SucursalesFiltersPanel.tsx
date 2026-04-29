@@ -214,11 +214,11 @@ function PanelBody({
   }, [nameQuery, viewportItems]);
 
   const inputBaseClassName =
-    "dashboard-focusable mt-1 w-full rounded-xl border border-zinc-300/70 bg-white/80 px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 dark:border-zinc-700/80 dark:bg-zinc-900/75 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+    "dashboard-focusable mt-1 w-full rounded-lg border border-zinc-300/70 bg-white/80 px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 dark:border-zinc-700/80 dark:bg-zinc-900/75 dark:text-zinc-100 dark:placeholder:text-zinc-500";
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
-      <header className="glass-panel-accent p-4">
+      <header className="glass-panel-accent rounded-[1.35rem] p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[0.72rem] font-semibold text-white/82">
