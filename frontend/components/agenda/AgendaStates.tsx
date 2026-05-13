@@ -14,14 +14,14 @@ export function AgendaLoadingState() {
 
 export function AgendaErrorState({ message, onRetry }: AgendaStatusProps) {
   return (
-    <section className="rounded-[var(--dashboard-radius-xl)] border border-rose-300 bg-rose-50 p-5 text-rose-900 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-100" role="alert">
+    <section className="rounded-[var(--radius-xl)] border border-rose-300 bg-rose-50 p-5 text-rose-900 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-100" role="alert">
       <h3 className="text-lg font-semibold">Error al cargar agenda</h3>
       <p className="mt-2 text-sm">{message}</p>
       {onRetry ? (
         <button
           type="button"
           onClick={onRetry}
-          className="dashboard-interactive dashboard-focusable mt-4 min-h-11 rounded-[var(--dashboard-radius-md)] border border-rose-300 bg-white/80 px-4 text-sm font-semibold text-rose-800 hover:bg-white dark:border-rose-300/40 dark:bg-rose-400/10 dark:text-rose-100 dark:hover:bg-rose-400/20"
+          className="dashboard-interactive dashboard-focusable mt-4 min-h-11 rounded-[var(--radius-md)] border border-rose-300 bg-[var(--surface-3)]/ px-4 text-sm font-semibold text-rose-800 hover:bg-white dark:border-rose-300/40 dark:bg-rose-400/10 dark:text-rose-100 dark:hover:bg-rose-400/20"
         >
           Reintentar
         </button>

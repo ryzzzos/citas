@@ -29,7 +29,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <h1 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-white">
+        <h1 className="mb-6 text-2xl font-bold text-[var(--text-primary)]">
           Iniciar sesión
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -56,9 +56,9 @@ export default function LoginPage() {
             Entrar
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-zinc-500">
+        <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
           ¿No tienes cuenta?{" "}
-          <Link href="/auth/register" className="font-medium text-zinc-900 underline dark:text-white">
+          <Link href="/auth/register" className="font-medium text-zinc-900 underline ">
             Regístrate
           </Link>
         </p>

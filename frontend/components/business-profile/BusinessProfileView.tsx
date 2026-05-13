@@ -69,12 +69,12 @@ function InfoRow({
   const opensExternal = Boolean(href && href.startsWith("http"));
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-zinc-200/80 bg-zinc-50/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+    <div className="flex items-start gap-3 rounded-xl border border-[var(--border-strong)] bg-zinc-50/70 p-3 dark:border-zinc-800 dark:bg-[var(--surface-1)]/60">
       <div className="rounded-full border border-zinc-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-800">
-        <AppIcon icon={Icon} className="text-zinc-600 dark:text-zinc-300" />
+        <AppIcon icon={Icon} className="text-[var(--text-secondary)]" />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
           {label}
         </p>
         {href ? (
@@ -224,7 +224,7 @@ export default function BusinessProfileView({
         </div>
 
         <div className="relative px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
-          <div className="-mt-14 rounded-[1.75rem] border border-zinc-200/85 bg-white/95 p-4 shadow-[0_28px_55px_-44px_rgba(15,23,42,0.6)] backdrop-blur-xl dark:border-zinc-800/90 dark:bg-zinc-900/94 sm:-mt-16 sm:p-5">
+          <div className="-mt-14 rounded-[1.75rem] border border-zinc-200/85 bg-[var(--surface-3)]/ p-4 shadow-[0_28px_55px_-44px_rgba(15,23,42,0.6)] backdrop-blur-xl dark:border-zinc-800/90 dark:bg-[var(--surface-1)]/94 sm:-mt-16 sm:p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                 <Avatar logoUrl={business.logo_image_url} businessName={business.name} />
@@ -233,7 +233,7 @@ export default function BusinessProfileView({
                     <span className="rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
                       {business.category}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-3 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-zinc-700 dark:bg-[var(--surface-1)] ">
                       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                       {business.city}
                     </span>
@@ -241,7 +241,7 @@ export default function BusinessProfileView({
                   <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 md:text-[2.15rem]">
                     {business.name}
                   </h1>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">
                     {businessBio}
                   </p>
                 </div>
@@ -282,7 +282,7 @@ export default function BusinessProfileView({
                     href={whatsappHref}
                     target="_blank"
                     rel="noreferrer"
-                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition-colors hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100 dark:hover:bg-[var(--surface-2)]"
                   >
                     <AppIcon icon={MessageCircle} />
                     WhatsApp
@@ -296,8 +296,8 @@ export default function BusinessProfileView({
         <div className="px-4 pb-6 sm:px-6 sm:pb-7 lg:px-8 lg:pb-8">
           <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
             <aside className="space-y-4">
-              <section className="h-fit rounded-[1.6rem] border border-zinc-200 bg-white p-4 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-zinc-900 sm:p-5">
-                <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              <section className="h-fit rounded-[1.6rem] border border-zinc-200 bg-white p-4 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-[var(--surface-1)] sm:p-5">
+                <h2 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Informacion del negocio
                 </h2>
 
@@ -338,7 +338,7 @@ export default function BusinessProfileView({
                 </div>
               </section>
 
-              <section className="overflow-hidden rounded-[1.6rem] border border-zinc-200 bg-white shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-zinc-900">
+              <section className="overflow-hidden rounded-[1.6rem] border border-zinc-200 bg-white shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-[var(--surface-1)]">
                 <iframe
                   title={`Mapa de ${business.name}`}
                   src={mapEmbedUrl}
@@ -350,9 +350,9 @@ export default function BusinessProfileView({
             </aside>
 
             <div className="space-y-5">
-              <section className="rounded-[1.8rem] border border-zinc-200/90 bg-white/95 p-4 shadow-[0_28px_56px_-42px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-zinc-900/95 sm:p-5">
+              <section className="rounded-[1.8rem] border border-zinc-200/90 bg-[var(--surface-3)]/ p-4 shadow-[0_28px_56px_-42px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-[var(--surface-1)]/95 sm:p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                  <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
                     Servicios
                   </h2>
                   <span className="rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
@@ -367,7 +367,7 @@ export default function BusinessProfileView({
                     ))}
                   </BentoGrid>
                 ) : (
-                  <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                  <p className="text-sm leading-6 text-[var(--text-secondary)]">
                     No hay servicios activos para mostrar.
                   </p>
                 )}

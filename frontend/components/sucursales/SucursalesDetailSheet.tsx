@@ -62,7 +62,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
               className="relative aspect-[16/9]"
               style={{
                 background:
-                  "linear-gradient(144deg, color-mix(in oklab, var(--dashboard-accent) 12%, var(--dashboard-surface-2) 88%) 0%, var(--glass-bg-soft) 100%)",
+                  "linear-gradient(144deg, color-mix(in oklab, var(--app-primary) 12%, var(--surface-2) 88%) 0%, var(--glass-bg-soft) 100%)",
               }}
             >
               {canRenderCover ? (
@@ -122,7 +122,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
             ) : (
               <span
                 className="text-sm font-semibold uppercase tracking-[0.08em]"
-                style={{ color: "var(--dashboard-text-secondary)" }}
+                style={{ color: "var(--text-secondary)" }}
               >
                 {toInitials(business.name)}
               </span>
@@ -134,18 +134,18 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
       <div className="mt-10">
         <h3
           className="text-[1.35rem] font-semibold tracking-tight"
-          style={{ color: "var(--dashboard-text-primary)" }}
+          style={{ color: "var(--text-primary)" }}
         >
           {business.name}
         </h3>
 
-        <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "var(--dashboard-text-secondary)" }}>
+        <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "var(--text-secondary)" }}>
           <MapPin className="h-4 w-4" aria-hidden="true" />
           {business.address}, {business.city}
         </p>
       </div>
 
-      <p className="mt-3 text-sm leading-6" style={{ color: "var(--dashboard-text-secondary)" }}>
+      <p className="mt-3 text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
         {business.public_bio?.trim() ||
           "Descubre su propuesta de valor, explora servicios destacados y conoce la experiencia completa en su perfil publico."}
       </p>
@@ -157,7 +157,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
             "dashboard-focusable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold",
             "glass-floating"
           )}
-          style={{ color: "var(--dashboard-text-primary)" }}
+          style={{ color: "var(--text-primary)" }}
         >
           Ver perfil
           <ExternalLink className="h-4 w-4" />

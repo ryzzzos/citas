@@ -39,13 +39,13 @@ function FieldGroup({
   hint?: React.ReactNode;
 }) {
   const commonClasses =
-    "dashboard-focusable w-full rounded-[1.125rem] border border-[var(--dashboard-border-subtle)] bg-[var(--dashboard-surface-base)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--dashboard-text-primary)] placeholder-[var(--dashboard-text-muted)] transition-colors focus:border-[var(--app-primary-strong)] focus:bg-[var(--dashboard-surface-1)] dark:bg-[#090e17] dark:focus:bg-[#0f172a] disabled:opacity-60 disabled:cursor-not-allowed";
+    "dashboard-focusable w-full rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus:bg-[var(--surface-1)] disabled:opacity-60 disabled:cursor-not-allowed";
 
   return (
     <div className="flex flex-col gap-1.5 focus-within:text-[var(--app-primary-strong)] dark:focus-within:text-blue-400">
       <label
         htmlFor={id}
-        className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--dashboard-text-secondary)] transition-colors"
+        className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--text-secondary)] transition-colors"
       >
         {label}
       </label>
@@ -73,7 +73,7 @@ function FieldGroup({
         />
       )}
       {hint && (
-        <div className="ml-1 mt-0.5 text-[0.75rem] font-medium text-[var(--dashboard-text-muted)]">
+        <div className="ml-1 mt-0.5 text-[0.75rem] font-medium text-[var(--text-muted)]">
           {hint}
         </div>
       )}
@@ -101,12 +101,12 @@ function ImageUploadField({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--dashboard-text-secondary)]">
+      <span className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--text-secondary)]">
         {label}
       </span>
       <label
         className={cn(
-          "dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-dashed border-[var(--dashboard-border-default)] bg-[var(--dashboard-surface-base)] transition-colors hover:bg-[var(--dashboard-surface-2)] dark:bg-[#090e17] dark:hover:bg-[#0f172a]",
+          "dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-dashed border-[var(--border-strong)] bg-[var(--surface-2)] transition-colors hover:bg-[var(--surface-2)] dark:bg-[var(--surface-0)] dark:hover:bg-[var(--surface-1)]",
           aspectRatio,
           disabled ? "pointer-events-none opacity-60" : ""
         )}
@@ -119,7 +119,7 @@ function ImageUploadField({
             "relative z-10 flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-full px-4 py-3 text-center transition-all duration-300",
             imageUrl
               ? "border border-white/20 bg-black/50 text-white backdrop-blur-md group-hover:bg-black/60"
-              : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text-secondary)]"
+              : "text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
           )}
         >
           {uploading ? (
@@ -237,7 +237,7 @@ export default function BusinessProfileEditorPage() {
   if (!business || !previewBusiness) {
     return (
       <section className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-lg font-semibold text-[var(--dashboard-text-secondary)]">
+        <p className="text-lg font-semibold text-[var(--text-secondary)]">
           No se pudo cargar el perfil de negocio
         </p>
         <Button onClick={reload} variant="secondary" className="gap-2 rounded-full">
@@ -272,7 +272,7 @@ export default function BusinessProfileEditorPage() {
         <div
           role="presentation"
           className={cn(
-            "fixed inset-0 z-40 bg-[var(--dashboard-text-primary)]/10 backdrop-blur-sm transition-opacity duration-500 md:hidden",
+            "fixed inset-0 z-40 bg-[var(--text-primary)]/10 backdrop-blur-sm transition-opacity duration-500 md:hidden",
             isEditing ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
           onClick={() => setIsEditing(false)}
@@ -283,18 +283,18 @@ export default function BusinessProfileEditorPage() {
       {panelRendered && (
         <aside
           className={cn(
-            "pointer-events-auto absolute inset-y-0 right-0 z-50 flex w-[90vw] max-w-[440px] flex-col border-l border-[var(--dashboard-border-subtle)] bg-[var(--dashboard-surface-1)] shadow-[var(--dashboard-shadow-lg)] transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] xl:max-w-[480px]",
+            "pointer-events-auto absolute inset-y-0 right-0 z-50 flex w-[90vw] max-w-[440px] flex-col border-l border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-lg)] transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] xl:max-w-[480px]",
             isEditing ? "translate-x-0" : "translate-x-full"
           )}
           aria-hidden={!isEditing}
         >
           {/* DRAWER HEADER */}
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--dashboard-border-subtle)] px-5">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--border-strong)] px-5">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--dashboard-text-secondary)] transition-colors hover:bg-[var(--dashboard-surface-2)] active:scale-95"
+                className="dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] active:scale-95"
                 aria-label="Cerrar editor"
               >
                 <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
@@ -303,7 +303,7 @@ export default function BusinessProfileEditorPage() {
                 <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">
                   Ajustes
                 </p>
-                <h2 className="text-base font-bold tracking-tight text-[var(--dashboard-text-primary)]">
+                <h2 className="text-base font-bold tracking-tight text-[var(--text-primary)]">
                   Editar Perfil
                 </h2>
               </div>
@@ -325,7 +325,7 @@ export default function BusinessProfileEditorPage() {
               
               {/* IMAGES SECTION */}
               <section className="flex flex-col gap-4">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--dashboard-text-primary)]">
+                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
                   Identidad Visual
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -346,11 +346,11 @@ export default function BusinessProfileEditorPage() {
                 </div>
               </section>
 
-              <hr className="border-[var(--dashboard-border-subtle)]" />
+              <hr className="border-[var(--border-strong)]" />
 
               {/* INFO SECTION */}
               <section className="flex flex-col gap-5">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--dashboard-text-primary)]">
+                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
                   Información Básica
                 </h3>
                 <FieldGroup
@@ -388,7 +388,7 @@ export default function BusinessProfileEditorPage() {
                 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="slug" className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--dashboard-text-secondary)]">
+                    <label htmlFor="slug" className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--text-secondary)]">
                       Slug Público (URL)
                     </label>
                     <button
@@ -399,8 +399,8 @@ export default function BusinessProfileEditorPage() {
                       Autogenerar
                     </button>
                   </div>
-                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--dashboard-border-subtle)] bg-[var(--dashboard-surface-base)] focus-within:border-[var(--app-primary-strong)] focus-within:bg-[var(--dashboard-surface-1)] dark:bg-[#090e17] dark:focus-within:bg-[#0f172a] transition-colors">
-                    <span className="flex items-center pl-4 pr-1 text-sm font-medium text-[var(--dashboard-text-muted)]">
+                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus-within:bg-[#0f172a] transition-colors">
+                    <span className="flex items-center pl-4 pr-1 text-sm font-medium text-[var(--text-muted)]">
                       /
                     </span>
                     <input
@@ -409,7 +409,7 @@ export default function BusinessProfileEditorPage() {
                       required
                       value={draft.slug}
                       onChange={(e) => setDraftField("slug", e.target.value.toLowerCase())}
-                      className="w-full bg-transparent py-3.5 pr-4 text-[0.925rem] font-medium text-[var(--dashboard-text-primary)] outline-none"
+                      className="w-full bg-transparent py-3.5 pr-4 text-[0.925rem] font-medium text-[var(--text-primary)] outline-none"
                     />
                     <div className="flex items-center pr-2">
                       <Button
@@ -446,11 +446,11 @@ export default function BusinessProfileEditorPage() {
                 />
               </section>
 
-              <hr className="border-[var(--dashboard-border-subtle)]" />
+              <hr className="border-[var(--border-strong)]" />
 
               {/* CONTACT SECTION */}
               <section className="flex flex-col gap-5 pb-8">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--dashboard-text-primary)]">
+                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
                   Contacto
                 </h3>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -484,7 +484,7 @@ export default function BusinessProfileEditorPage() {
 
           {/* STATUS ALERTS */}
           {(error || successMessage) && (
-            <div className="mt-auto shrink-0 border-t border-[var(--dashboard-border-subtle)] bg-[var(--dashboard-surface-1)] p-4">
+            <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] bg-[var(--surface-1)] p-4">
               {error && (
                 <p className="rounded-xl bg-rose-50 p-3 text-[0.825rem] font-medium text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
                   {error}

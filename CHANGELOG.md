@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.3.0] - 2026-05-12
+
+### Added
+- Service categories feature across backend and frontend with new model, schemas, API router, migration, and dedicated UI modal/hook integration.
+- New shared UI surface abstraction (`Surface`) to standardize panel styling in dashboard modules.
+
+### Changed
+- Large dashboard visual system refactor in `frontend/app/globals.css` and related components to use unified surface tokens and consistent theme behavior.
+- Updated services flow (`ServicesPage`, `ServicesList`, `ServiceFormModal`) to support category assignment and improved interaction patterns.
+- Improved agenda, business profile, auth, onboarding, and sucursales screens for layout consistency and spacing across breakpoints.
+- Updated frontend API/type layers and package lock data to reflect service-category support.
+
+### Fixed
+- Cleaned up stale changelog typo and aligned release notes with current module structure.
+
 ## [0.2.0] - 2026-04-20
 
 ### Added

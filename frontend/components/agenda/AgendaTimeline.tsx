@@ -76,7 +76,7 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 function getBookingTone(status: AgendaBooking["status"]): string {
   if (status === "pending") return "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300";
   if (status === "confirmed") return "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300";
-  if (status === "completed") return "border-slate-200/60 bg-slate-500/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-300";
+  if (status === "completed") return "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300";
   return "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300";
 }
 
@@ -131,7 +131,7 @@ function renderEventBlock(
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-7 rounded-xl border border-white/60 bg-white/50 px-2 text-[10px] font-bold tracking-tight text-current shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white active:scale-[0.98] dark:border-white/10 dark:bg-black/20 dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] dark:hover:bg-black/40"
+          className="min-h-7 rounded-xl border border-white/60 bg-[var(--surface-3)]/ px-2 text-[10px] font-bold tracking-tight text-current shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white active:scale-[0.98] dark:border-[var(--border-strong)]  dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] dark:hover:bg-black/40"
         >
           R
         </button>
@@ -154,24 +154,24 @@ export default function AgendaTimeline({
   return (
     <section
       aria-label="Timeline de citas"
-      className="flex h-full min-h-0 flex-col rounded-3xl border border-white/50 bg-white/60 p-4 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl sm:p-5 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]"
+      className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 shadow-[var(--shadow-md)] backdrop-blur-2xl sm:p-5 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:shadow-[var(--shadow-md)]"
     >
       <div className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
             <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
-            <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Hora
             </div>
             {columns.length > 1 && columns.map((column) => (
               <div
                 key={column.isoDate}
-                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm ${
+                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm ${
                   column.isToday
                     ? "border-blue-200/60 bg-blue-500/10 text-blue-900 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-100"
-                    : "border-zinc-200/60 bg-zinc-50/70 text-slate-500 dark:border-zinc-800/60 dark:bg-zinc-900/50 dark:text-slate-400"
+                    : "border-[var(--border-strong)] bg-zinc-50/70 text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
                 }`}
               >
-                <p className="font-bold tracking-tight text-slate-900 dark:text-white">{column.dayLabel}</p>
+                <p className="font-bold tracking-tight text-[var(--text-primary)]">{column.dayLabel}</p>
                 <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">{column.dateLabel}</p>
               </div>
             ))}
@@ -183,7 +183,7 @@ export default function AgendaTimeline({
                 const top = (Number(hours) * 60 + 30) * PX_PER_MINUTE;
                 return (
                   <div key={hour} className="absolute inset-x-0" style={{ top }}>
-                    <p className="-translate-y-1/2 px-2 text-[11px] font-bold tracking-widest text-slate-400">{hour}</p>
+                    <p className="-translate-y-1/2 px-2 text-[11px] font-bold tracking-widest text-[var(--text-muted)]">{hour}</p>
                   </div>
                 );
               })}
@@ -195,7 +195,7 @@ export default function AgendaTimeline({
               return (
                 <div
                   key={column.isoDate}
-                  className="relative overflow-hidden rounded-2xl border border-zinc-200/40 bg-white/40 shadow-[inset_0_1px_rgba(255,255,255,0.2)] dark:border-zinc-800/40 dark:bg-black/10 dark:shadow-[inset_0_1px_rgba(0,0,0,0.2)]"
+                  className="relative overflow-hidden rounded-2xl border border-zinc-200/40 bg-[var(--surface-3)]/ shadow-[inset_0_1px_rgba(255,255,255,0.2)] dark:border-zinc-800/40  dark:shadow-[inset_0_1px_rgba(0,0,0,0.2)]"
                   style={{ height: canvasHeight }}
                   role="group"
                   aria-label={`${column.dayLabel} ${column.dateLabel}`}

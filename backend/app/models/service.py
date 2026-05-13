@@ -23,6 +23,10 @@ class Service(Base):
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    service_category_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("service_categories.id", ondelete="SET NULL"), nullable=True
+    )
 
     business = relationship("Business", back_populates="services")
+    category = relationship("ServiceCategory", back_populates="services", lazy="joined")
     bookings = relationship("Booking", back_populates="service", lazy="select")

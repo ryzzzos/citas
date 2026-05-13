@@ -23,6 +23,8 @@ interface ProfileDraft {
   slug: string;
   public_bio: string;
   description: string;
+  cover_image_url: string | null;
+  logo_image_url: string | null;
 }
 
 const EMPTY_DRAFT: ProfileDraft = {
@@ -36,6 +38,8 @@ const EMPTY_DRAFT: ProfileDraft = {
   slug: "",
   public_bio: "",
   description: "",
+  cover_image_url: null,
+  logo_image_url: null,
 };
 
 function toDraft(business: Business): ProfileDraft {
@@ -50,6 +54,8 @@ function toDraft(business: Business): ProfileDraft {
     slug: business.slug,
     public_bio: business.public_bio ?? "",
     description: business.description ?? "",
+    cover_image_url: business.cover_image_url ?? null,
+    logo_image_url: business.logo_image_url ?? null,
   };
 }
 

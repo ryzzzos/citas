@@ -214,7 +214,7 @@ function PanelBody({
   }, [nameQuery, viewportItems]);
 
   const inputBaseClassName =
-    "dashboard-focusable mt-1 w-full rounded-lg border border-zinc-300/70 bg-white/80 px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 dark:border-zinc-700/80 dark:bg-zinc-900/75 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+    "dashboard-focusable mt-1 w-full rounded-lg border border-zinc-300/70 bg-[var(--surface-3)]/ px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 dark:border-zinc-700/80 dark:bg-[var(--surface-1)]/75 dark:text-zinc-100 dark:placeholder:text-[var(--text-muted)]";
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
@@ -228,7 +228,7 @@ function PanelBody({
               Sucursales cercanas
             </h2>
           </div>
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/34 bg-white/16 px-3 text-[0.7rem] font-semibold text-white backdrop-blur-sm">
+          <span className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/34 bg-[var(--surface-3)]/ px-3 text-[0.7rem] font-semibold text-white backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             En vivo
           </span>
@@ -239,7 +239,7 @@ function PanelBody({
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <article className="rounded-xl border border-white/30 bg-white/15 p-3 backdrop-blur-sm">
+          <article className="rounded-xl border border-white/30 bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
             <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-white/74">
               En vista
             </p>
@@ -248,7 +248,7 @@ function PanelBody({
             </p>
           </article>
 
-          <article className="rounded-xl border border-white/30 bg-white/15 p-3 backdrop-blur-sm">
+          <article className="rounded-xl border border-white/30 bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
             <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-white/74">
               Total hallado
             </p>
@@ -274,7 +274,7 @@ function PanelBody({
           ) : null}
         </div>
 
-        <div className="mt-3 rounded-xl border border-white/28 bg-white/14 px-3 py-2 backdrop-blur-sm">
+        <div className="mt-3 rounded-xl border border-white/28 bg-[var(--surface-3)]/ px-3 py-2 backdrop-blur-sm">
           <p className="text-xs font-medium text-white/86">
             {loading
               ? "Actualizando resultados dentro del area visible..."
@@ -290,7 +290,7 @@ function PanelBody({
             onClick={onToggleFilters}
             aria-expanded={filtersExpanded}
             aria-controls={filtersRegionId}
-            className="dashboard-focusable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-100"
+            className="dashboard-focusable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-zinc-800  dark:hover:text-zinc-100"
           >
             Filtros y controles
             <ChevronDown
@@ -325,15 +325,15 @@ function PanelBody({
             ))}
           </div>
         ) : (
-          <p className="mb-3 text-[0.72rem] font-medium text-zinc-500 dark:text-zinc-400">Sin filtros activos.</p>
+          <p className="mb-3 text-[0.72rem] font-medium text-[var(--text-muted)] ">Sin filtros activos.</p>
         )}
 
         {filtersExpanded ? (
           <div id={filtersRegionId}>
-            <label className="text-xs font-semibold uppercase tracking-[0.13em] text-zinc-500 dark:text-zinc-400">
+            <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
               Buscar negocio
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-[var(--text-muted)]" />
                 <input
                   type="text"
                   value={nameQuery}
@@ -345,7 +345,7 @@ function PanelBody({
             </label>
 
             <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-zinc-500 dark:text-zinc-400">
+              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
                 Ciudad
                 <input
                   type="text"
@@ -356,7 +356,7 @@ function PanelBody({
                 />
               </label>
 
-              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-zinc-500 dark:text-zinc-400">
+              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
                 Categoria
                 <select
                   value={filters.category}
@@ -372,7 +372,7 @@ function PanelBody({
               </label>
             </div>
 
-            <label className="mt-2 block text-xs font-semibold uppercase tracking-[0.13em] text-zinc-500 dark:text-zinc-400">
+            <label className="mt-2 block text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
               Orden de lista
               <select
                 value={sortMode}
@@ -388,7 +388,7 @@ function PanelBody({
 
             {categorySummary.length > 0 ? (
               <div className="mt-3">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
                   Categorias visibles
                 </p>
                 <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -403,12 +403,12 @@ function PanelBody({
                           "dashboard-focusable inline-flex min-h-8 shrink-0 items-center gap-1 px-3 text-[0.67rem] font-medium transition",
                           "glass-floating",
                           active
-                            ? "border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-text-primary)]"
+                            ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)]"
                             : "text-zinc-700 dark:text-zinc-200"
                         )}
                       >
                         {category}
-                        <span className="text-zinc-500 dark:text-zinc-400">{count}</span>
+                        <span className="text-[var(--text-muted)] ">{count}</span>
                       </button>
                     );
                   })}
@@ -417,7 +417,7 @@ function PanelBody({
             ) : null}
           </div>
         ) : (
-          <p id={filtersRegionId} className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p id={filtersRegionId} className="text-xs text-[var(--text-muted)] ">
             Filtros contraidos. Expande para refinar resultados.
           </p>
         )}
@@ -432,7 +432,7 @@ function PanelBody({
       <section className="flex min-h-0 flex-1 flex-col">
         <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Negocios cercanos</p>
-          <p className="text-[0.66rem] font-medium uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400">
+          <p className="text-[0.66rem] font-medium uppercase tracking-[0.12em] text-[var(--text-muted)] ">
             {loading ? "Actualizando" : `${filteredItems.length} listados`}
           </p>
         </div>
@@ -449,8 +449,8 @@ function PanelBody({
                     "dashboard-focusable dashboard-interactive w-full rounded-[1.15rem] px-2.5 py-2.5 text-left",
                     "glass-panel",
                     active
-                      ? "border-[color:var(--dashboard-accent)] ring-1 ring-[color:color-mix(in_oklab,var(--dashboard-accent)_38%,transparent)]"
-                      : "hover:border-zinc-300/80 dark:hover:border-zinc-600/80"
+                      ? "border-[color:var(--app-primary)] ring-1 ring-[color:color-mix(in_oklab,var(--app-primary)_38%,transparent)]"
+                      : "hover:border-[var(--app-primary)]/80 dark:hover:border-zinc-600/80"
                   )}
                 >
                   <div className="flex items-center gap-2.5">
@@ -458,22 +458,22 @@ function PanelBody({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-[0.86rem] font-semibold leading-5 text-zinc-900 dark:text-zinc-100">
+                        <p className="truncate text-[0.86rem] font-semibold leading-5 text-[var(--text-primary)]">
                           {business.name}
                         </p>
                         {active ? (
-                          <span className="inline-flex min-h-6 items-center rounded-full border border-[color:color-mix(in_oklab,var(--dashboard-accent)_68%,#ffffff_32%)] bg-[color:color-mix(in_oklab,var(--dashboard-accent)_18%,transparent)] px-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-zinc-800 dark:text-zinc-100">
+                          <span className="inline-flex min-h-6 items-center rounded-full border border-[color:color-mix(in_oklab,var(--app-primary)_68%,#ffffff_32%)] bg-[color:color-mix(in_oklab,var(--app-primary)_18%,transparent)] px-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-zinc-800 dark:text-zinc-100">
                             Activo
                           </span>
                         ) : null}
                       </div>
 
-                      <p className="mt-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400">
+                      <p className="mt-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] ">
                         {business.category}
                       </p>
 
                       {business.public_bio?.trim() ? (
-                        <p className="mt-1 line-clamp-1 text-[0.69rem] leading-5 text-zinc-600 dark:text-zinc-300">
+                        <p className="mt-1 line-clamp-1 text-[0.69rem] leading-5 text-[var(--text-secondary)]">
                           {business.public_bio}
                         </p>
                       ) : null}
@@ -485,7 +485,7 @@ function PanelBody({
           })}
 
           {!loading && filteredItems.length === 0 ? (
-            <li className={cn("glass-panel", "rounded-2xl border-dashed px-3 py-6 text-center text-sm text-zinc-600 dark:text-zinc-300")}>
+            <li className={cn("glass-panel", "rounded-2xl border-dashed px-3 py-6 text-center text-sm text-[var(--text-secondary)]")}>
               {nameQuery.trim()
                 ? "No hay resultados con esta busqueda dentro del area visible."
                 : "No hay sucursales en el area visible."}

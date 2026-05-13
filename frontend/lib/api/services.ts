@@ -32,7 +32,10 @@ export async function listServices(
   businessId: string,
   params: ListServicesParams = {}
 ): Promise<Service[]> {
-  const query = toQueryString({ include_inactive: params.includeInactive });
+  const query = toQueryString({ 
+    include_inactive: params.includeInactive,
+    category_id: params.categoryId
+  });
   try {
     return await request<Service[]>(
       `/services/${businessId}/services${query ? `?${query}` : ""}`

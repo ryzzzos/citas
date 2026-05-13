@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
+import { cva } from "class-variance-authority";
 
 import {
   DASHBOARD_NAV_GROUPS,
@@ -17,6 +18,21 @@ interface DashboardSidebarProps {
   onCloseMobile: () => void;
 }
 
+const navLinkVariants = cva(
+  "group flex min-h-12 items-center justify-between gap-3 rounded-[var(--radius-md)] border px-3 py-2.5 transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] focus-visible:ring-offset-2",
+  {
+    variants: {
+      active: {
+        true: "bg-[var(--surface-3)] border-[var(--border-strong)] text-[var(--app-primary-strong)] shadow-[var(--shadow-md)] dark:text-[var(--app-primary)]",
+        false: "border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--surface-1)]",
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  }
+);
+
 function BadgeMark({ active }: { active: boolean }) {
   return (
     <span
@@ -24,7 +40,7 @@ function BadgeMark({ active }: { active: boolean }) {
       className={`h-2 w-2 rounded-full transition-all duration-300 ${
         active 
           ? "bg-[var(--app-primary)] shadow-[0_0_12px_var(--app-primary)] scale-110" 
-          : "bg-slate-300 dark:bg-slate-700"
+          : "bg-[var(--surface-0)] dark:bg-[var(--surface-3)]"
       }`}
     />
   );
@@ -41,7 +57,7 @@ function SidebarGroup({
 }) {
   return (
     <section aria-label={group.label}>
-      <h2 className="dashboard-text-muted px-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
+      <h2 className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
         {group.label}
       </h2>
       <ul className="mt-2 space-y-1.5">
@@ -55,18 +71,17 @@ function SidebarGroup({
                 href={item.href}
                 onClick={onItemSelect}
                 aria-current={active ? "page" : undefined}
-                className={`dashboard-interactive dashboard-focusable group flex min-h-12 items-center justify-between gap-3 rounded-[1rem] border px-3 py-2.5 transition-all duration-300 ${
-                  active
-                    ? "border-[rgba(255,255,255,0.4)] bg-[var(--glass-surface-1-bg)] text-[var(--app-primary-strong)] shadow-[0_8px_24px_-8px_rgba(37,99,235,0.15)] backdrop-blur-xl dark:border-[rgba(255,255,255,0.06)] dark:text-[var(--app-primary-soft)]"
-                    : "border-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
-                }`}
+                className={navLinkVariants({ active })}
               >
                 <span className="flex min-w-0 items-start gap-3">
-                  <AppIcon icon={ItemIcon} className={`mt-0.5 shrink-0 transition-transform duration-300 ${active ? "scale-110" : ""}`} />
+                  <AppIcon 
+                    icon={ItemIcon} 
+                    className={`mt-0.5 shrink-0 transition-transform duration-300 ${active ? "scale-110" : ""}`} 
+                  />
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">{item.label}</span>
                     {item.hint ? (
-                      <span className="dashboard-text-muted block truncate text-xs group-hover:[color:var(--dashboard-text-secondary)]">
+                      <span className="block truncate text-xs text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">
                         {item.hint}
                       </span>
                     ) : null}
@@ -86,14 +101,14 @@ function SidebarContent({ pathname, onItemSelect }: { pathname: string; onItemSe
   return (
     <>
       <div className="mb-2 px-1">
-        <div className="rounded-[1.25rem] border border-white/50 bg-white/40 p-4 shadow-[0_8px_32px_-12px_rgba(37,99,235,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)] dark:text-blue-400">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-[var(--shadow-sm)])]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)]">
             Agenda Web
           </p>
-          <p className="mt-1.5 text-[19px] font-bold tracking-tight text-slate-900 dark:text-white">
+          <p className="mt-1.5 text-[19px] font-bold tracking-tight text-[var(--text-primary)]">
             Control Center
           </p>
-          <p className="mt-2 text-[11px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+          <p className="mt-2 text-[11px] font-medium leading-relaxed text-[var(--text-muted)]">
             Gestión integral de reservas y operación diaria.
           </p>
         </div>
@@ -121,7 +136,7 @@ export default function DashboardSidebar({
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-[color:var(--dashboard-border-subtle)] bg-[color:color-mix(in_oklab,var(--dashboard-surface-base)_86%,transparent)] px-4 py-5 backdrop-blur-xl lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-5 lg:block">
         <SidebarContent pathname={pathname} onItemSelect={() => undefined} />
       </aside>
 
@@ -138,14 +153,14 @@ export default function DashboardSidebar({
 
         <aside
           id="dashboard-mobile-menu"
-          className={`absolute inset-y-0 left-0 w-[86vw] max-w-80 border-r border-[color:var(--dashboard-border-subtle)] bg-[color:var(--dashboard-surface-base)] px-4 py-5 shadow-[var(--dashboard-shadow-lg)] transition-transform duration-200 motion-reduce:transition-none ${
+          className={`absolute inset-y-0 left-0 w-[86vw] max-w-80 border-r border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-5 shadow-[var(--shadow-lg)] transition-transform duration-200 motion-reduce:transition-none ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <button
             type="button"
             onClick={onCloseMobile}
-            className="dashboard-surface-2 dashboard-interactive dashboard-focusable absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center"
+            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface-1)] text-[var(--text-secondary)] hover:bg-[var(--surface-0)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)]"
             aria-label="Cerrar menu lateral"
           >
             <AppIcon icon={X} />

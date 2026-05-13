@@ -23,6 +23,7 @@ interface FormState {
   duration: string;
   price: string;
   isActive: boolean;
+  categoryId: string;
 }
 
 const INITIAL_FORM_STATE: FormState = {
@@ -32,6 +33,7 @@ const INITIAL_FORM_STATE: FormState = {
   duration: "30",
   price: "0",
   isActive: true,
+  categoryId: "",
 };
 
 function toFormState(service?: Service | null): FormState {
@@ -46,8 +48,11 @@ function toFormState(service?: Service | null): FormState {
     duration: String(service.duration_minutes),
     price: service.price,
     isActive: service.is_active,
+    categoryId: service.service_category_id ?? "",
   };
 }
+
+import { useServiceCategories } from "@/lib/services/useServiceCategories";
 
 function isValidHttpImageUrl(value: string): boolean {
   try {
@@ -76,12 +81,20 @@ export default function ServiceFormModal({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const { categories, loading: categoriesLoading } = useServiceCategories();
+
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    setForm(toFormState(service));
+    const state = toFormState(service);
+    if (!state.categoryId && categories.length > 0) {
+      const sinCategoria = categories.find((c) => c.name === "Sin categoría");
+      state.categoryId = sinCategoria ? sinCategoria.id : categories[0].id;
+    }
+
+    setForm(state);
     setValidationError(null);
     setUploadingImage(false);
     setUploadMessage(null);
@@ -168,9 +181,15 @@ export default function ServiceFormModal({
     const imageUrl = form.imageUrl.trim();
     const duration = Number(form.duration);
     const price = Number(form.price);
+    const categoryId = form.categoryId;
 
     if (name.length < 3) {
       setValidationError("El nombre debe tener al menos 3 caracteres.");
+      return;
+    }
+
+    if (!categoryId) {
+      setValidationError("Debe seleccionar una categoría.");
       return;
     }
 
@@ -201,6 +220,7 @@ export default function ServiceFormModal({
       duration_minutes: duration,
       price: price.toFixed(2),
       is_active: form.isActive,
+      service_category_id: categoryId || null,
     });
   }
 
@@ -236,7 +256,29 @@ export default function ServiceFormModal({
           />
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="service-description" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="service-category" className="text-sm font-medium text-zinc-700 ">
+              Categoría
+            </label>
+            {categoriesLoading ? (
+              <div className="text-sm text-[var(--text-muted)]">Cargando categorías...</div>
+            ) : (
+              <select
+                id="service-category"
+                value={form.categoryId}
+                onChange={(event) => setForm((previous) => ({ ...previous, categoryId: event.target.value }))}
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+                required
+              >
+                <option value="" disabled>Seleccione una categoría</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="service-description" className="text-sm font-medium text-zinc-700 ">
               Descripcion
             </label>
             <textarea
@@ -246,13 +288,13 @@ export default function ServiceFormModal({
                 setForm((previous) => ({ ...previous, description: event.target.value }))
               }
               rows={3}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-white"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
               placeholder="Opcional"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="service-image-file" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="service-image-file" className="text-sm font-medium text-zinc-700 ">
               Imagen
             </label>
             <input
@@ -278,7 +320,7 @@ export default function ServiceFormModal({
                 setUploadError(null);
                 setUploadMessage("Vista previa lista. Sube la imagen para obtener la URL final.");
               }}
-              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-zinc-700 dark:bg-[var(--surface-1)] "
             />
             <p className="dashboard-text-muted text-xs">
               Sube una imagen JPEG, PNG o WEBP de hasta 2MB. Esta es la captura principal.
@@ -316,7 +358,7 @@ export default function ServiceFormModal({
             {uploadError ? <p className="text-xs text-red-500">{uploadError}</p> : null}
 
             <div className="mt-2 flex flex-col gap-1">
-              <label htmlFor="service-image-url" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label htmlFor="service-image-url" className="text-sm font-medium text-zinc-700 ">
                 URL manual opcional
               </label>
               <input
@@ -331,7 +373,7 @@ export default function ServiceFormModal({
                   }
                 }}
                 placeholder="https://..."
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-white"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
               />
               <p className="dashboard-text-muted text-xs">
                 Opcional. Puedes pegar una URL si no quieres subir archivo.

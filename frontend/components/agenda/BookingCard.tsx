@@ -11,7 +11,7 @@ const STATUS_BADGE: Record<string, string> = {
   pending: "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300",
   confirmed: "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
   cancelled: "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300",
-  completed: "border-slate-200/60 bg-slate-500/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-300",
+  completed: "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -26,11 +26,11 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
   const statusLabel = STATUS_LABEL[booking.status] ?? booking.status;
 
   return (
-    <article className="rounded-2xl border border-white/60 bg-white/60 p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-shadow hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
+    <article className="rounded-2xl border border-white/60 bg-[var(--surface-2)] p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-shadow hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">{booking.serviceName}</p>
-          <p className="mt-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">
+          <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
+          <p className="mt-1 text-[12px] font-medium text-[var(--text-secondary)]">
             {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
           </p>
         </div>
@@ -41,12 +41,12 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
 
       <dl className="mt-4 grid grid-cols-1 gap-2.5 text-xs">
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">Staff</dt>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Staff</dt>
           <dd className="mt-0.5 text-[13px] font-medium text-slate-700 dark:text-slate-300">{booking.staffName}</dd>
         </div>
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">Reserva ID</dt>
-          <dd className="mt-0.5 font-mono text-[11px] font-medium text-slate-500 dark:text-slate-400">{booking.id.slice(0, 8)}</dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Reserva ID</dt>
+          <dd className="mt-0.5 font-mono text-[11px] font-medium text-[var(--text-secondary)]">{booking.id.slice(0, 8)}</dd>
         </div>
       </dl>
 
@@ -70,7 +70,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-11 rounded-xl border border-zinc-200/80 bg-zinc-50/50 px-4 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-sm active:scale-[0.98] dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
+          className="min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-[var(--shadow-sm)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]  dark:hover:bg-[var(--surface-2)] dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
         >
           Reprogramar
         </button>

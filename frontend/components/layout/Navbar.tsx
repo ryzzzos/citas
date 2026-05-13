@@ -72,7 +72,7 @@ export default function Navbar() {
 
   const navItemClassName = cn(
     "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors",
-    "text-[color:var(--dashboard-text-secondary)] hover:text-[color:var(--dashboard-text-primary)]",
+    "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
     "whitespace-nowrap",
     "glass-floating"
   );
@@ -93,7 +93,7 @@ export default function Navbar() {
       >
         <Link
           href="/"
-          className="dashboard-focusable rounded-full px-1.5 text-lg font-semibold tracking-tight text-zinc-900 dark:text-white"
+          className="dashboard-focusable rounded-full px-1.5 text-lg font-semibold tracking-tight text-[var(--text-primary)]"
         >
           Agenda Web
         </Link>
@@ -101,7 +101,7 @@ export default function Navbar() {
           <AnimatedThemeToggler
             className={cn(
               "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
-              "text-[color:var(--dashboard-text-secondary)] focus-visible:ring-[color:var(--dashboard-accent)]",
+              "text-[color:var(--text-secondary)] focus-visible:ring-[color:var(--app-primary)]",
               "glass-floating-muted"
             )}
             aria-label="Cambiar tema"
@@ -111,7 +111,7 @@ export default function Navbar() {
             className={cn(
               navItemClassName,
               isBranchesRoute
-                ? "border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-text-primary)] shadow-[var(--dashboard-shadow-sm)]"
+                ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)] shadow-[var(--shadow-[var(--shadow-sm)])]"
                 : undefined
             )}
           >
@@ -133,7 +133,7 @@ export default function Navbar() {
             href="/auth/login"
             className={cn(
               "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 transition-colors",
-              "text-[color:var(--dashboard-text-primary)] hover:text-[color:var(--dashboard-text-secondary)]",
+              "text-[color:var(--text-primary)] hover:text-[color:var(--text-secondary)]",
               "whitespace-nowrap",
               "glass-floating"
             )}

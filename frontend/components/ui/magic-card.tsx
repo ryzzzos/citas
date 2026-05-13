@@ -78,7 +78,7 @@ const BentoCard = ({
           ) : null}
 
           {priceBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-zinc-900 backdrop-blur-md dark:bg-zinc-900/80 dark:text-zinc-100">
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-[var(--surface-3)]/ px-2.5 py-1 text-[11px] font-semibold text-zinc-900 backdrop-blur-md dark:bg-[var(--surface-1)]/80 dark:text-zinc-100">
               <Tag className="h-3.5 w-3.5" aria-hidden="true" />
               {priceBadge}
             </span>
@@ -87,18 +87,35 @@ const BentoCard = ({
       ) : null}
     </div>
 
-    <div className="p-4">
+    <div className="relative flex flex-1 flex-col justify-end p-4 transition-colors duration-300 group-hover:bg-black/5 dark:group-hover:bg-neutral-800/10">
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(244,244,245,0.55)_100%)] dark:bg-[linear-gradient(180deg,rgba(9,9,11,0)_0%,rgba(9,9,11,0.34)_100%)] z-0"
+        )}
+      />
+
       <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
         <Icon className="h-12 w-12 origin-left transform-gpu text-zinc-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-zinc-200" />
         <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-50">
           {name}
         </h3>
-        <p className="max-w-lg text-zinc-600 dark:text-zinc-300">{description}</p>
+        <p className="max-w-lg text-[var(--text-secondary)]">{description}</p>
       </div>
 
       <div
         className={cn(
-          "pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden"
+          "pointer-events-none z-10 flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden mt-4"
+        )}
+      >
+        <a href={href} className={ctaClass}>
+          {cta}
+          <ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" />
+        </a>
+      </div>
+
+      <div
+        className={cn(
+          "pointer-events-none z-10 absolute bottom-0 left-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex"
         )}
       >
         <a href={href} className={ctaClass}>
@@ -107,29 +124,6 @@ const BentoCard = ({
         </a>
       </div>
     </div>
-
-    <div
-      className={cn(
-        "pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex"
-      )}
-    >
-      <a href={href} className={ctaClass}>
-        {cta}
-        <ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" />
-      </a>
-    </div>
-
-    <div
-      className={cn(
-        "pointer-events-none absolute inset-x-0 bottom-0 top-48 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(244,244,245,0.55)_100%)] dark:bg-[linear-gradient(180deg,rgba(9,9,11,0)_0%,rgba(9,9,11,0.34)_100%)]"
-      )}
-    />
-
-    <div
-      className={cn(
-        "pointer-events-none absolute inset-x-0 bottom-0 top-48 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10"
-      )}
-    />
   </div>
 )
 

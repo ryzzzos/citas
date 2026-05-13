@@ -137,13 +137,13 @@ export default function PublicBusinessPage() {
   if (!business) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Negocio no encontrado</h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Negocio no encontrado</h1>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">
           Revisa el enlace o explora otras opciones en el mapa de sucursales.
         </p>
         <Link
           href="/sucursales"
-          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
         >
           Ir a sucursales
         </Link>
@@ -157,23 +157,23 @@ export default function PublicBusinessPage() {
 
       <section
         id="reserva"
-        className="mt-6 rounded-[1.8rem] border border-zinc-200 bg-white p-4 shadow-[0_30px_60px_-45px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
+        className="mt-6 rounded-[1.8rem] border border-zinc-200 bg-white p-4 shadow-[0_30px_60px_-45px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-[var(--surface-1)] sm:p-6"
       >
         <div className="mb-4 sm:mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
             Reserva online
           </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-primary)]">
             Confirma tu cita
           </h2>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
             Selecciona servicio, profesional y horario disponible para finalizar la reserva.
           </p>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-service" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="booking-service" className="text-sm font-medium text-zinc-700 ">
               Servicio
             </label>
             <select
@@ -184,7 +184,7 @@ export default function PublicBusinessPage() {
                 setSelectedSlot("");
                 setBookingError("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
             >
               <option value="">Selecciona un servicio</option>
               {services.map((service) => (
@@ -196,7 +196,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-staff" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="booking-staff" className="text-sm font-medium text-zinc-700 ">
               Profesional
             </label>
             <select
@@ -206,7 +206,7 @@ export default function PublicBusinessPage() {
                 setSelectedStaff(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
             >
               <option value="">Selecciona un profesional</option>
               {staff.map((member) => (
@@ -218,7 +218,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5 lg:col-span-2">
-            <label htmlFor="booking-date" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="booking-date" className="text-sm font-medium text-zinc-700 ">
               Fecha
             </label>
             <input
@@ -230,7 +230,7 @@ export default function PublicBusinessPage() {
                 setDate(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
             />
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function PublicBusinessPage() {
 
         {slots.length > 0 ? (
           <div className="mt-4">
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Horario</p>
+            <p className="text-sm font-medium text-zinc-700 ">Horario</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {slots.map((slot) => (
                 <button
@@ -260,7 +260,7 @@ export default function PublicBusinessPage() {
                   className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                     selectedSlot === slot
                       ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
                   }`}
                 >
                   {slot.slice(0, 5)}
@@ -271,7 +271,7 @@ export default function PublicBusinessPage() {
         ) : null}
 
         {slots.length === 0 && !slotsLoading && selectedService && selectedStaff && date ? (
-          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-4 text-sm text-[var(--text-muted)] ">
             No hay horarios disponibles para esa fecha.
           </p>
         ) : null}

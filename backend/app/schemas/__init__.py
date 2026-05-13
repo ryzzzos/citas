@@ -11,6 +11,7 @@ from app.schemas.business import (
     BusinessSlugAvailabilityRead,
     BusinessUpdate,
 )
+from app.schemas.service_category import ServiceCategoryCreate, ServiceCategoryRead, ServiceCategoryUpdate, ServiceCategoryReorder
 from app.schemas.service import ServiceCreate, ServiceRead, ServiceUpdate
 from app.schemas.staff import StaffCreate, StaffRead, StaffUpdate
 from app.schemas.schedule import ScheduleCreate, ScheduleRead

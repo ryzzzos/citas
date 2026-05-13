@@ -30,10 +30,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pageTitle = getDashboardTitle(pathname);
 
   return (
-    <div className="dashboard-app-bg h-dvh overflow-hidden [color:var(--dashboard-text-primary)]">
+    <div className="bg-[var(--surface-1)] h-dvh overflow-hidden [color:var(--text-primary)]">
       <a
         href="#dashboard-main"
-        className="sr-only z-[70] rounded-md bg-[var(--dashboard-surface-1)] px-3 py-2 text-sm shadow-[var(--dashboard-shadow-sm)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--dashboard-border-focus)]"
+        className="sr-only z-[70] rounded-md bg-[var(--surface-0)] px-3 py-2 text-sm shadow-[var(--shadow-[var(--shadow-sm)])] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary-strong)]"
       >
         Saltar al contenido principal
       </a>
@@ -42,13 +42,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="relative flex h-full flex-col lg:pl-72">
         <div className="flex h-full flex-col p-2 sm:p-3 lg:p-4">
-          <div className="dashboard-main-shell relative flex h-full min-h-0 flex-col overflow-hidden">
-            <header className="sticky top-0 z-20 border-b border-zinc-200/50 bg-white/70 backdrop-blur-2xl dark:border-zinc-800/50 dark:bg-black/50">
+
+          
+          <div className="bg-[var(--surface-2)]  border border-[var(--border-strong)] shadow-[var(--shadow-md)] rounded-[var(--radius-xl)] relative flex h-full min-h-0 flex-col overflow-hidden">
+            <header className="sticky top-0 z-20 border-b border-zinc-200/50 bg-[var(--surface-3)]/ backdrop-blur-2xl dark:border-zinc-800/50 ">
               <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-700/50 lg:hidden"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50 lg:hidden"
                   aria-label="Abrir menu lateral"
                   aria-controls="dashboard-mobile-menu"
                   aria-expanded={mobileOpen}
@@ -57,27 +59,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--app-primary)] dark:text-blue-400">Panel SaaS</p>
-                  <h1 className="truncate text-base font-bold tracking-tight text-slate-900 dark:text-white sm:text-lg">{pageTitle}</h1>
+                  <h1 className="truncate text-base font-bold tracking-tight text-slate-900  sm:text-lg">{pageTitle}</h1>
                 </div>
 
-                <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-zinc-200/60 bg-zinc-50/50 px-3 py-2 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm transition-all focus-within:border-[var(--app-primary)] focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--app-primary-soft)] md:flex dark:border-zinc-800/60 dark:bg-zinc-900/50 dark:focus-within:border-[var(--app-primary-strong)] dark:focus-within:bg-zinc-900 dark:focus-within:ring-[rgba(37,99,235,0.15)]">
+                <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus-within:border-[var(--app-primary)] focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--app-primary-soft)] md:flex dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:focus-within:border-[var(--app-primary)] dark:focus-within:bg-zinc-900 dark:focus-within:ring-[rgba(37,99,235,0.15)]">
                   <AppIcon icon={Search} className="text-zinc-400" />
                   <input
                     type="search"
                     placeholder="Buscar módulo..."
-                    className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:text-white dark:placeholder:text-zinc-500"
+                    className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none  dark:placeholder:text-[var(--text-muted)]"
                   />
                 </label>
 
                 <div className="flex items-center gap-2">
                   <AnimatedThemeToggler
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-700/50"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50"
                     aria-label="Cambiar tema"
                   />
                   <Link
                     href="/dashboard/agenda"
-                    className="hidden min-h-10 items-center gap-2 rounded-full px-4 text-[13px] font-semibold tracking-tight text-zinc-600 transition-colors hover:bg-zinc-100/80 dark:text-zinc-300 dark:hover:bg-zinc-800/80 sm:inline-flex"
+                    className="hidden min-h-10 items-center gap-2 rounded-full px-4 text-[13px] font-semibold tracking-tight text-zinc-600 transition-colors hover:bg-[var(--surface-2)]/80  dark:hover:bg-[var(--surface-2)] sm:inline-flex"
                   >
                     <AppIcon icon={CalendarDays} size="xs" />
                     Agenda

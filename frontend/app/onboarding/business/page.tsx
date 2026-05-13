@@ -116,7 +116,7 @@ export default function BusinessOnboardingPage() {
 
   if (checkingAccess) {
     return (
-      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center bg-zinc-50 dark:bg-[var(--surface-0)]">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 dark:border-zinc-700 dark:border-t-white" />
       </div>
     );
@@ -124,81 +124,81 @@ export default function BusinessOnboardingPage() {
 
   return (
     <main className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100/50 px-4 py-10 dark:from-zinc-950 dark:via-zinc-950 dark:to-blue-950/20">
-      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/80 bg-white/90 p-6 shadow-[0_25px_55px_-35px_rgba(0,0,0,0.6)] backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/85 md:p-8">
+      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/80 bg-[var(--surface-3)]/ p-6 shadow-[0_25px_55px_-35px_rgba(0,0,0,0.6)] backdrop-blur dark:border-zinc-800 dark:bg-[var(--surface-1)]/85 md:p-8">
         <p className="mb-2 inline-flex items-center rounded-full border border-amber-300/70 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-700 dark:border-amber-500/40 dark:bg-amber-400/10 dark:text-amber-200">
           Onboarding obligatorio
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white md:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)] md:text-3xl">
           Completa tu perfil de negocio
         </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-[var(--text-secondary)] ">
           Antes de usar agenda y panel de negocio, necesitas crear el perfil principal de tu negocio.
         </p>
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nombre del negocio</span>
+            <span className="text-sm font-medium text-zinc-700 ">Nombre del negocio</span>
             <input
               type="text"
               required
               value={form.name}
               onChange={(event) => setField("name", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Categoría</span>
+            <span className="text-sm font-medium text-zinc-700 ">Categoría</span>
             <input
               type="text"
               required
               value={form.category}
               onChange={(event) => setField("category", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Teléfono</span>
+            <span className="text-sm font-medium text-zinc-700 ">Teléfono</span>
             <input
               type="tel"
               required
               value={form.phone}
               onChange={(event) => setField("phone", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Correo de negocio</span>
+            <span className="text-sm font-medium text-zinc-700 ">Correo de negocio</span>
             <input
               type="email"
               required
               value={form.email}
               onChange={(event) => setField("email", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Dirección</span>
+            <span className="text-sm font-medium text-zinc-700 ">Dirección</span>
             <input
               type="text"
               required
               value={form.address}
               onChange={(event) => setField("address", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Ciudad</span>
+            <span className="text-sm font-medium text-zinc-700 ">Ciudad</span>
             <input
               type="text"
               required
               value={form.city}
               onChange={(event) => setField("city", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 

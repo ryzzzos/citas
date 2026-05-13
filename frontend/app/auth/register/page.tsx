@@ -41,7 +41,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
-        <h1 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-white">
+        <h1 className="mb-6 text-2xl font-bold text-[var(--text-primary)]">
           Crear cuenta
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -81,14 +81,14 @@ export default function RegisterPage() {
           />
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label className="text-sm font-medium text-zinc-700 ">
               Tipo de cuenta
             </label>
             <div className="flex gap-3">
               {(["customer", "business_owner"] as Role[]).map((r) => (
                 <label
                   key={r}
-                  className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+                  className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 "
                 >
                   <input
                     type="radio"
@@ -109,9 +109,9 @@ export default function RegisterPage() {
             Crear cuenta
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-zinc-500">
+        <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/auth/login" className="font-medium text-zinc-900 underline dark:text-white">
+          <Link href="/auth/login" className="font-medium text-zinc-900 underline ">
             Inicia sesión
           </Link>
         </p>

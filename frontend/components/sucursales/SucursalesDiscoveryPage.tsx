@@ -19,7 +19,7 @@ const SucursalesMapCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="relative flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.18),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.18),transparent_42%),linear-gradient(180deg,rgba(241,245,249,0.92),rgba(226,232,240,0.74))] text-sm text-zinc-600 dark:bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.2),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.8),rgba(2,6,23,0.66))] dark:text-zinc-300">
+      <div className="relative flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.18),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.18),transparent_42%),linear-gradient(180deg,rgba(241,245,249,0.92),rgba(226,232,240,0.74))] text-sm text-[var(--text-secondary)] dark:bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.2),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.8),rgba(2,6,23,0.66))] ">
         <div className={cn("glass-panel", "rounded-2xl px-4 py-3 font-medium")}>Cargando mapa...</div>
       </div>
     ),

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import ServiceFormModal from "@/components/services/ServiceFormModal";
+import ServiceCategoriesModal from "@/components/services/ServiceCategoriesModal";
 import ServicesFilters from "@/components/services/ServicesFilters";
 import ServicesHeader from "@/components/services/ServicesHeader";
 import ServicesList from "@/components/services/ServicesList";
@@ -28,6 +29,7 @@ export default function ServicesPage() {
   } = useServices();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -109,7 +111,11 @@ export default function ServicesPage() {
 
   return (
     <div className="space-y-4 lg:space-y-5">
-      <ServicesHeader services={services} onCreate={openCreateModal} />
+      <ServicesHeader 
+        services={services} 
+        onCreate={openCreateModal} 
+        onManageCategories={() => setCategoriesModalOpen(true)}
+      />
 
       <ServicesFilters filters={filters} onFiltersChange={setFilters} />
 
@@ -148,6 +154,11 @@ export default function ServicesPage() {
         onClose={closeModal}
         onSubmit={handleSubmit}
         onUploadImage={uploadImage}
+      />
+
+      <ServiceCategoriesModal 
+        open={categoriesModalOpen} 
+        onClose={() => { setCategoriesModalOpen(false); reload(); }} 
       />
     </div>
   );

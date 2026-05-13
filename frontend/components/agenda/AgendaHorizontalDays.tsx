@@ -74,14 +74,14 @@ export default function AgendaHorizontalDays({
         className="flex min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden pb-4 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar px-1"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="sticky left-0 z-10 flex min-w-max items-center bg-[var(--dashboard-bg)] pr-2">
-          <div className="flex h-[76px] flex-col items-center justify-center rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-3 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/50">
-            <AppIcon icon={CalendarDays} className="mb-1 text-zinc-500" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+        <div className="sticky left-0 z-10 flex min-w-max items-center bg-transparent pr-2">
+          <div className="flex h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 shadow-[var(--shadow-sm)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
+            <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] ">
               {anchorDate.setZone(timezone).toFormat("MMM, yyyy")}
             </span>
           </div>
-          <div className="ml-2 h-10 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+          <div className="ml-2 h-10 w-[1px] bg-[var(--border-strong)]" />
         </div>
 
         {days.map((date) => {
@@ -98,7 +98,7 @@ export default function AgendaHorizontalDays({
             btnClasses += " border-blue-400/30 bg-gradient-to-b from-blue-500 to-blue-700 font-bold shadow-[0_8px_16px_-6px_rgba(37,99,235,0.4)] text-white";
           } else {
             // Inactivo
-            btnClasses += " border-zinc-200/80 bg-white shadow-sm hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400";
+            btnClasses += " border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] hover:border-[var(--app-primary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:border-[var(--app-primary)] dark:hover:bg-[var(--surface-2)] text-[var(--text-secondary)] ";
             if (isToday) {
               btnClasses += " border-blue-200 bg-blue-50/50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400";
             }
@@ -115,7 +115,7 @@ export default function AgendaHorizontalDays({
               <span className={`text-[11px] font-semibold uppercase tracking-wider ${isSelected ? "text-blue-100" : ""}`}>
                 {dayName}
               </span>
-              <span className={`mt-1 text-xl tracking-tight ${isSelected ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}>
+              <span className={`mt-1 text-xl tracking-tight ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
                 {dayNumber}
               </span>
               {isToday && !isSelected && (
@@ -126,7 +126,7 @@ export default function AgendaHorizontalDays({
         })}
       </div>
       {/* Efectos de gradiente en los bordes para indicar más scroll */}
-      <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-[var(--dashboard-bg)] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-[var(--surface-2)] to-transparent" />
     </div>
   );
 }

@@ -1,501 +1,88 @@
 @import "tailwindcss";
+
+@source "../app";
+@source "../components";
+
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
+
 :root {
   --app-primary: #2563eb;
   --app-primary-strong: #1d4ed8;
-  --app-primary-soft: #dbeafe;
-  --app-primary-gradient: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-  --dashboard-bg: #f3f4f6;
-  --dashboard-surface-base: #f9fafb;
-  --dashboard-surface-1: #ffffff;
-  --dashboard-surface-2: #f8fafc;
-  --dashboard-text-primary: #0f172a;
-  --dashboard-text-secondary: #334155;
-  --dashboard-text-muted: #64748b;
-  --dashboard-border-subtle: #e2e8f0;
-  --dashboard-border-default: #cbd5e1;
-  --dashboard-border-focus: var(--app-primary);
-  --dashboard-accent: var(--app-primary);
-  --dashboard-accent-soft: var(--app-primary-soft);
-  --dashboard-shadow-sm: 0 8px 20px -16px rgba(15, 23, 42, 0.3);
-  --dashboard-shadow-md: 0 24px 48px -34px rgba(15, 23, 42, 0.24);
-  --dashboard-shadow-lg: 0 40px 80px -52px rgba(15, 23, 42, 0.24);
-  --dashboard-radius-sm: 0.5rem;
-  --dashboard-radius-md: 0.75rem;
-  --dashboard-radius-lg: 1rem;
-  --dashboard-radius-xl: 1.375rem;
-  --dashboard-duration-fast: 150ms;
-  --dashboard-duration-normal: 220ms;
-  --glass-surface-1-bg: rgba(255, 255, 255, 0.72);
-  --glass-surface-2-bg: rgba(248, 250, 252, 0.74);
-  --glass-floating-bg: rgba(255, 255, 255, 0.84);
-  --glass-border-soft: color-mix(in oklab, var(--dashboard-border-subtle) 86%, #ffffff 14%);
-  --glass-border-default: color-mix(in oklab, var(--dashboard-border-default) 84%, #ffffff 16%);
-  --glass-highlight: rgba(255, 255, 255, 0.46);
-  --glass-highlight-soft: rgba(255, 255, 255, 0.12);
-  --glass-backdrop: color-mix(in oklab, var(--dashboard-surface-base) 40%, #020617 60%);
-  --glass-shadow-sm: 0 12px 24px -18px rgba(15, 23, 42, 0.16);
-  --glass-shadow-md: 0 20px 38px -24px rgba(15, 23, 42, 0.2);
-  --glass-shadow-lg: 0 28px 52px -32px rgba(15, 23, 42, 0.22);
-  --glass-blur-sm: 8px;
-  --glass-blur-md: 10px;
-  --glass-blur-lg: 12px;
-  --glass-saturation-sm: 102%;
-  --glass-saturation-md: 104%;
-  --glass-saturation-lg: 106%;
-  --glass-accent-tint: color-mix(in oklab, var(--dashboard-accent) 20%, var(--dashboard-surface-1) 80%);
-  --glass-bg-soft: var(--glass-surface-1-bg);
-  --glass-bg-base: var(--glass-surface-2-bg);
-  --glass-bg-strong: var(--glass-floating-bg);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: var(--app-primary);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: color-mix(in oklab, var(--app-primary) 56%, #ffffff 44%);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* surfaces */
+  --surface-0: #dddddd;
+  --surface-1: #eeeeee;
+  --surface-2: #f9fafb;
+  --surface-3: #ffffff;
+
+
+  /* glass */
+  --glass-bg: rgba(255,255,255,0.72);
+
+  /* borders */
+  --border-soft: rgba(255,255,255,0.5);
+  --border-strong: rgb(226, 232, 240);
+  --glass-border: rgba(255,255,255,0.45);
+
+  /* shadows */
+  --shadow-sm: 0 8px 24px -8px rgba(37,99,235,0.15);
+  --shadow-md: 0 12px 32px -10px rgba(37,99,235,0.20);
+  --shadow-lg: 0 20px 48px -12px rgba(37,99,235,0.25);
+
+  --glass-shadow: 0 8px 32px -12px rgba(15,23,42,0.18);
+
+  /* text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569; /* slate-600 (mejor constraste que 500) */
+  --text-muted: #64748b; /* slate-500 (el tono que se usaba antes para los párrafos, ahora usado como muted) */
+
+  /* radius */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 1.75rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-body {
-  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
-}
 
 .dark {
   --app-primary: #60a5fa;
   --app-primary-strong: #3b82f6;
-  --app-primary-soft: #1e3a8a;
-  --app-primary-gradient: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
-  --dashboard-bg: #050911;
-  --dashboard-surface-base: #060b14;
-  --dashboard-surface-1: #0f172a;
-  --dashboard-surface-2: #131d33;
-  --dashboard-text-primary: #f8fafc;
-  --dashboard-text-secondary: #e2e8f0;
-  --dashboard-text-muted: #94a3b8;
-  --dashboard-border-subtle: #1f2937;
-  --dashboard-border-default: #334155;
-  --dashboard-border-focus: var(--app-primary);
-  --dashboard-accent: var(--app-primary);
-  --dashboard-accent-soft: var(--app-primary-soft);
-  --dashboard-shadow-sm: 0 14px 24px -20px rgba(2, 6, 23, 0.9);
-  --dashboard-shadow-md: 0 24px 52px -32px rgba(2, 6, 23, 0.92);
-  --dashboard-shadow-lg: 0 44px 84px -50px rgba(2, 6, 23, 0.95);
-  --glass-surface-1-bg: rgba(15, 23, 42, 0.78);
-  --glass-surface-2-bg: rgba(19, 29, 51, 0.8);
-  --glass-floating-bg: rgba(15, 23, 42, 0.84);
-  --glass-border-soft: color-mix(in oklab, var(--dashboard-border-subtle) 82%, #cbd5e1 18%);
-  --glass-border-default: color-mix(in oklab, var(--dashboard-border-default) 86%, #e2e8f0 14%);
-  --glass-highlight: rgba(226, 232, 240, 0.11);
-  --glass-highlight-soft: rgba(226, 232, 240, 0.035);
-  --glass-backdrop: color-mix(in oklab, var(--dashboard-surface-base) 22%, #020617 78%);
-  --glass-shadow-sm: 0 14px 26px -18px rgba(2, 6, 23, 0.5);
-  --glass-shadow-md: 0 22px 42px -24px rgba(2, 6, 23, 0.58);
-  --glass-shadow-lg: 0 30px 58px -30px rgba(2, 6, 23, 0.62);
-  --glass-saturation-sm: 101%;
-  --glass-saturation-md: 103%;
-  --glass-saturation-lg: 105%;
-  --glass-accent-tint: color-mix(in oklab, var(--dashboard-accent) 24%, var(--dashboard-surface-1) 76%);
-  --glass-bg-soft: var(--glass-surface-1-bg);
-  --glass-bg-base: var(--glass-surface-2-bg);
-  --glass-bg-strong: var(--glass-floating-bg);
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: var(--app-primary);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: color-mix(in oklab, var(--app-primary) 56%, #0f172a 44%);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+
+  /* surfaces */
+  --surface-0: #09090b;
+  --surface-1: #111113;
+  --surface-2: #18181b;
+  --surface-3: #27272a;
+
+  /* glass */
+  --glass-bg: rgba(24,24,27,0.72);
+
+  /* borders */
+  --border-soft: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
+  --glass-border: rgba(255,255,255,0.08);
+
+  /* shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-lg: 0 24px 48px rgba(0,0,0,0.45);
+
+  --glass-shadow: 0 8px 32px -12px rgba(0,0,0,0.45);
+
+  /* text */
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d8;
+  --text-muted: #a1a1aa;
 }
 
-::view-transition-old(root), ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-}
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
-}
 
-@layer components {
-  .dashboard-app-bg {
-    background-color: var(--dashboard-bg);
-    background-image:
-      radial-gradient(circle at 10% 8%, color-mix(in oklab, var(--dashboard-accent) 14%, transparent), transparent 42%),
-      radial-gradient(circle at 88% 0%, color-mix(in oklab, var(--dashboard-accent) 8%, #38bdf8 20%), transparent 38%),
-      linear-gradient(180deg, color-mix(in oklab, var(--dashboard-surface-base) 80%, #ffffff 20%) 0%, var(--dashboard-bg) 100%);
-  }
 
-  .dashboard-main-shell {
-    background: color-mix(in oklab, var(--dashboard-surface-base) 92%, transparent);
-    border: 1px solid color-mix(in oklab, var(--dashboard-border-subtle) 85%, transparent);
-    border-radius: var(--dashboard-radius-xl);
-    box-shadow: var(--dashboard-shadow-lg);
-  }
-
-  .dashboard-surface-1 {
-    background-color: color-mix(in oklab, var(--dashboard-surface-1) 88%, transparent);
-    border: 1px solid color-mix(in oklab, var(--dashboard-border-default) 64%, transparent);
-    border-radius: var(--dashboard-radius-lg);
-    box-shadow: var(--dashboard-shadow-md);
-  }
-
-  .dashboard-surface-2 {
-    background-color: color-mix(in oklab, var(--dashboard-surface-2) 92%, transparent);
-    border: 1px solid color-mix(in oklab, var(--dashboard-border-subtle) 84%, transparent);
-    border-radius: var(--dashboard-radius-md);
-    box-shadow: var(--dashboard-shadow-sm);
-  }
-
-  .dashboard-interactive {
-    transition-property: transform, opacity, box-shadow, border-color, background-color, color;
-    transition-duration: var(--dashboard-duration-normal);
-    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: transform;
-  }
-
-  .dashboard-interactive:hover {
-    border-color: color-mix(in oklab, var(--dashboard-border-default) 88%, transparent);
-  }
-
-  .dashboard-interactive:active {
-    transform: translateY(1px) scale(0.998);
-  }
-
-  .dashboard-focusable:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--dashboard-border-focus) 92%, transparent);
-    outline-offset: 2px;
-  }
-
-  .dashboard-title {
-    color: var(--dashboard-text-primary);
-    letter-spacing: -0.012em;
-  }
-
-  .dashboard-text-secondary {
-    color: var(--dashboard-text-secondary);
-  }
-
-  .dashboard-text-muted {
-    color: var(--dashboard-text-muted);
-  }
-
-  /* --- Apple UI Standard Solid Surface --- */
-  .glass-panel {
-    background: var(--dashboard-surface-1);
-    border: 1px solid var(--dashboard-border-subtle);
-    box-shadow: var(--dashboard-shadow-sm);
-    border-radius: var(--dashboard-radius-2xl);
-  }
-
-  .glass-panel-heavy {
-    background: var(--dashboard-surface-1);
-    border: 1px solid var(--dashboard-border-default);
-    box-shadow: var(--dashboard-shadow-md);
-    border-radius: var(--dashboard-radius-2xl);
-  }
-
-  /* The primary royal blue glass for map filters */
-  .glass-panel-accent {
-    background: var(--app-primary-gradient);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 32px -12px var(--app-primary-strong);
-    border-radius: var(--dashboard-radius-2xl);
-    color: #ffffff;
-  }
-  .glass-panel-accent * {
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-  }
-  .glass-panel-accent input::placeholder,
-  .glass-panel-accent input {
-    color: #ffffff !important;
-  }
-  .dark .glass-panel-accent {
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.8);
-  }
-
-  .glass-floating {
-    background: var(--dashboard-surface-1);
-    border: 1px solid var(--dashboard-border-default);
-    box-shadow: var(--dashboard-shadow-sm);
-    border-radius: 9999px;
-  }
-
-  .glass-floating-muted {
-    background: var(--dashboard-surface-2);
-    border: 1px solid var(--dashboard-border-subtle);
-    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.05);
-    border-radius: 9999px;
-  }
-  .dark .glass-floating-muted {
-    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.4);
-  }
-
-  .glass-overlay {
-    background: rgba(255, 255, 255, 0.85);
-  }
-  .dark .glass-overlay {
-    background: rgba(15, 23, 42, 0.85);
-  }
-  /* --- End Apple UI --- */
-
-  .sucursales-pin-icon,
-  .sucursales-cluster-icon {
-    background: transparent;
-    border: 0;
-  }
-
-  .sucursales-pin {
-    position: relative;
-    display: block;
-    width: 52px;
-    height: 62px;
-    transform: translateZ(0);
-    transition: transform 180ms ease, filter 180ms ease;
-  }
-
-  .sucursales-pin-marker {
-    position: absolute;
-    left: 5px;
-    top: 1px;
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    border: 1.5px solid rgba(255, 255, 255, 0.82);
-    background: linear-gradient(160deg, color-mix(in oklab, var(--app-primary) 72%, #0f172a 28%) 0%, var(--app-primary-strong) 100%);
-    box-shadow: 0 18px 30px -22px rgba(2, 6, 23, 0.76);
-  }
-
-  .sucursales-pin-marker::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -9px;
-    width: 16px;
-    height: 16px;
-    background: inherit;
-    border-right: inherit;
-    border-bottom: inherit;
-    border-radius: 0 0 5px 0;
-    transform: translateX(-50%) rotate(45deg);
-  }
-
-  .sucursales-pin-marker::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 62%);
-    pointer-events: none;
-  }
-
-  .sucursales-pin-core {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: #f8fafc;
-    z-index: 1;
-  }
-
-  .sucursales-pin-shadow {
-    position: absolute;
-    left: 16px;
-    bottom: 3px;
-    width: 20px;
-    height: 9px;
-    border-radius: 999px;
-    background: rgba(2, 6, 23, 0.28);
-    filter: blur(1.5px);
-  }
-
-  .sucursales-pin-store {
-    width: 20px;
-    height: 20px;
-    stroke-width: 2.2;
-  }
-
-  .sucursales-pin.is-selected {
-    transform: translateY(-2px) scale(1.1);
-  }
-
-  .sucursales-pin.is-selected .sucursales-pin-marker {
-    background: linear-gradient(165deg, #0f172a 0%, #1e293b 100%);
-    box-shadow: 0 24px 38px -24px rgba(2, 6, 23, 0.84);
-  }
-
-  .sucursales-pin.is-selected .sucursales-pin-core {
-    color: #f8fafc;
-  }
-
-  .sucursales-pin.is-selected .sucursales-pin-shadow {
-    width: 24px;
-    left: 14px;
-    background: rgba(2, 6, 23, 0.4);
-  }
-
-  .dark .sucursales-pin-marker {
-    border-color: rgba(15, 23, 42, 0.96);
-    background: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
-    box-shadow: 0 24px 38px -25px rgba(2, 6, 23, 0.95);
-  }
-
-  .dark .sucursales-pin-marker::after {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0) 62%);
-  }
-
-  .dark .sucursales-pin-core {
-    color: #0f172a;
-  }
-
-  .dark .sucursales-pin-shadow {
-    background: rgba(2, 6, 23, 0.46);
-  }
-
-  .dark .sucursales-pin.is-selected .sucursales-pin-marker {
-    border-color: rgba(226, 232, 240, 0.95);
-    background: linear-gradient(165deg, #0f172a 0%, #1e293b 100%);
-  }
-
-  .dark .sucursales-pin.is-selected .sucursales-pin-core {
-    color: #f8fafc;
-  }
-
-  .sucursales-cluster-bubble {
-    display: grid;
-    height: 100%;
-    width: 100%;
-    place-items: center;
-    border-radius: 999px;
-    border: 1.5px solid #ffffff;
-    background: linear-gradient(150deg, #0f172a 0%, #1e293b 100%);
-    color: #f8fafc;
-    font-size: 0.74rem;
-    font-weight: 700;
-    box-shadow: 0 18px 30px -22px rgba(2, 6, 23, 0.72);
-  }
-
-  .dark .sucursales-cluster-bubble {
-    border-color: #0f172a;
-    background: linear-gradient(150deg, var(--app-primary) 0%, var(--app-primary-strong) 100%);
-    color: #02110f;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-interactive {
-    transition-duration: 0ms;
-    animation: none;
-  }
-
-  .dashboard-interactive:active {
-    transform: none;
-  }
+body {
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
 }

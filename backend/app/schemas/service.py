@@ -16,6 +16,7 @@ class ServiceCreate(BaseModel):
     duration_minutes: int
     price: Decimal
     is_active: bool = True
+    service_category_id: uuid.UUID | None = None
 
     @field_validator("duration_minutes")
     @classmethod
@@ -66,6 +67,7 @@ class ServiceRead(BaseModel):
     duration_minutes: int
     price: Decimal
     is_active: bool
+    service_category_id: uuid.UUID | None = None
 
     model_config = {"from_attributes": True}
 
@@ -81,6 +83,7 @@ class ServiceUpdate(BaseModel):
     duration_minutes: int | None = None
     price: Decimal | None = None
     is_active: bool | None = None
+    service_category_id: uuid.UUID | None = None
 
     @field_validator("duration_minutes")
     @classmethod

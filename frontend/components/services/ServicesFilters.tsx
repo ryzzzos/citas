@@ -35,11 +35,11 @@ export default function ServicesFilters({
             }
             className="pl-10"
           />
-          <AppIcon icon={Search} className="pointer-events-none absolute left-3 top-[38px] text-zinc-400 dark:text-zinc-500" />
+          <AppIcon icon={Search} className="pointer-events-none absolute left-3 top-[38px] text-zinc-400 dark:text-[var(--text-muted)]" />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="services-status" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="services-status" className="text-sm font-medium text-zinc-700 ">
             <span className="inline-flex items-center gap-1.5">
               <AppIcon icon={ShieldCheck} />
               Estado
@@ -54,7 +54,7 @@ export default function ServicesFilters({
                 status: event.target.value as ServiceStatusFilter,
               })
             }
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
           >
             {STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
