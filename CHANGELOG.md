@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.3.1] - 2026-05-18
+
+### refactor: update styles across components for consistency and improved theming
+
+- Adjusted hover and text colors in DashboardSidebar and Navbar for better visibility.
+- Updated button and input styles in various components to align with new design tokens.
+- Enhanced ServiceCategoriesModal and ServiceFormModal with consistent text colors and hover effects.
+- Refined ServicesFilters and ServicesHeader for improved UI consistency.
+- Modified Sucursales components to utilize new color variables for better theme integration.
+- Improved Button and Input components to reflect updated color schemes.
+- General cleanup of class names for better readability and maintainability.
+
+
 ## [0.3.0] - 2026-05-12
 
 ### Added
