@@ -143,7 +143,7 @@ export default function PublicBusinessPage() {
         </p>
         <Link
           href="/sucursales"
-          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
+          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:hover:bg-[var(--surface-2)]"
         >
           Ir a sucursales
         </Link>
@@ -173,7 +173,7 @@ export default function PublicBusinessPage() {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-service" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-service" className="text-sm font-medium text-[var(--text-secondary)] ">
               Servicio
             </label>
             <select
@@ -184,7 +184,7 @@ export default function PublicBusinessPage() {
                 setSelectedSlot("");
                 setBookingError("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] dark:border-zinc-700 dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un servicio</option>
               {services.map((service) => (
@@ -196,7 +196,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-staff" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-staff" className="text-sm font-medium text-[var(--text-secondary)] ">
               Profesional
             </label>
             <select
@@ -206,7 +206,7 @@ export default function PublicBusinessPage() {
                 setSelectedStaff(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] dark:border-zinc-700 dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un profesional</option>
               {staff.map((member) => (
@@ -218,7 +218,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5 lg:col-span-2">
-            <label htmlFor="booking-date" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-date" className="text-sm font-medium text-[var(--text-secondary)] ">
               Fecha
             </label>
             <input
@@ -230,7 +230,7 @@ export default function PublicBusinessPage() {
                 setDate(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] dark:border-zinc-700 dark:bg-[var(--surface-1)]"
             />
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function PublicBusinessPage() {
 
         {slots.length > 0 ? (
           <div className="mt-4">
-            <p className="text-sm font-medium text-zinc-700 ">Horario</p>
+            <p className="text-sm font-medium text-[var(--text-secondary)] ">Horario</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {slots.map((slot) => (
                 <button
@@ -257,10 +257,10 @@ export default function PublicBusinessPage() {
                   type="button"
                   onClick={() => setSelectedSlot(slot)}
                   aria-pressed={selectedSlot === slot}
-                  className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium  ${
                     selectedSlot === slot
-                      ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
+                      ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-[var(--text-primary)]"
+                      : "border-zinc-300 bg-white text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:hover:bg-[var(--surface-2)]"
                   }`}
                 >
                   {slot.slice(0, 5)}

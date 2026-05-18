@@ -137,68 +137,68 @@ export default function BusinessOnboardingPage() {
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Nombre del negocio</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Nombre del negocio</span>
             <input
               type="text"
               required
               value={form.name}
               onChange={(event) => setField("name", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Categoría</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Categoría</span>
             <input
               type="text"
               required
               value={form.category}
               onChange={(event) => setField("category", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Teléfono</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Teléfono</span>
             <input
               type="tel"
               required
               value={form.phone}
               onChange={(event) => setField("phone", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Correo de negocio</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Correo de negocio</span>
             <input
               type="email"
               required
               value={form.email}
               onChange={(event) => setField("email", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Dirección</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Dirección</span>
             <input
               type="text"
               required
               value={form.address}
               onChange={(event) => setField("address", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm font-medium text-zinc-700 ">Ciudad</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)] ">Ciudad</span>
             <input
               type="text"
               required
               value={form.city}
               onChange={(event) => setField("city", event.target.value)}
-              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+              className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
             />
           </label>
 
@@ -211,7 +211,7 @@ export default function BusinessOnboardingPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="mt-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-[var(--text-primary)] dark:hover:bg-zinc-200"
           >
             {submitting ? "Creando negocio..." : "Crear negocio y continuar"}
           </button>

@@ -76,7 +76,7 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 function getBookingTone(status: AgendaBooking["status"]): string {
   if (status === "pending") return "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300";
   if (status === "confirmed") return "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300";
-  if (status === "completed") return "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300";
+  if (status === "completed") return "border-slate-200/60 bg-[var(--surface-1)]0/10 text-[var(--text-secondary)] shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10";
   return "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300";
 }
 
@@ -172,7 +172,7 @@ export default function AgendaTimeline({
                 }`}
               >
                 <p className="font-bold tracking-tight text-[var(--text-primary)]">{column.dayLabel}</p>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">{column.dateLabel}</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)]">{column.dateLabel}</p>
               </div>
             ))}
             {columns.length === 1 && <div className="sticky top-0 z-30 pointer-events-none"></div>}

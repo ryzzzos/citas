@@ -116,14 +116,14 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex flex-col gap-1 text-zinc-400">
-                        <button type="button" onClick={() => moveUp(idx)} disabled={idx === 0} className="hover:text-zinc-800 dark:hover:text-white disabled:opacity-30">▲</button>
-                        <button type="button" onClick={() => moveDown(idx)} disabled={idx === categories.length - 1} className="hover:text-zinc-800 dark:hover:text-white disabled:opacity-30">▼</button>
+                      <div className="flex flex-col gap-1 text-[var(--text-muted)]">
+                        <button type="button" onClick={() => moveUp(idx)} disabled={idx === 0} className="hover:text-[var(--text-primary)] dark:hover:text-white disabled:opacity-30">▲</button>
+                        <button type="button" onClick={() => moveDown(idx)} disabled={idx === categories.length - 1} className="hover:text-[var(--text-primary)] dark:hover:text-white disabled:opacity-30">▼</button>
                       </div>
                       <span className="font-medium text-[var(--text-primary)]">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(cat)} className="p-2 text-[var(--text-muted)] hover:text-zinc-900 dark:hover:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg"><Pencil size={16}/></button>
+                      <button onClick={() => startEdit(cat)} className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg"><Pencil size={16}/></button>
                       {cat.name !== "Sin categoría" && (
                         <button onClick={() => remove(cat.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg"><Trash size={16}/></button>
                       )}

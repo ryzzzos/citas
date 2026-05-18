@@ -19,13 +19,14 @@ export default function HomePage() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/auth/register"
-            className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold 
+             transition-colors hover:bg-zinc-700 dark:bg-white dark:text-[var(--text-primary)] dark:hover:bg-zinc-200"
           >
             Registra tu negocio
           </Link>
           <Link
             href="/sucursales"
-            className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-[var(--surface-2)] dark:border-zinc-700  dark:hover:bg-[var(--surface-2)]"
+            className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-zinc-700  dark:hover:bg-[var(--surface-2)]"
           >
             Explorar sucursales
           </Link>

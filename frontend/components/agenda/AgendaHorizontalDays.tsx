@@ -100,7 +100,7 @@ export default function AgendaHorizontalDays({
             // Inactivo
             btnClasses += " border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] hover:border-[var(--app-primary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:border-[var(--app-primary)] dark:hover:bg-[var(--surface-2)] text-[var(--text-secondary)] ";
             if (isToday) {
-              btnClasses += " border-blue-200 bg-blue-50/50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400";
+              btnClasses += " border-blue-200 bg-blue-50/50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20";
             }
           }
 

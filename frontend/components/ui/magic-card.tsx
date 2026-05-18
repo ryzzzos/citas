@@ -39,7 +39,7 @@ const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
 }
 
 const ctaClass =
-  "pointer-events-auto inline-flex items-center text-sm font-semibold text-zinc-900 underline underline-offset-4 transition-colors hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-200"
+  "pointer-events-auto inline-flex items-center text-sm font-semibold text-[var(--text-primary)] underline underline-offset-4 transition-colors hover:text-[var(--text-secondary)] dark:hover:text-zinc-200"
 
 const BentoCard = ({
   name,
@@ -78,7 +78,7 @@ const BentoCard = ({
           ) : null}
 
           {priceBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-[var(--surface-3)]/ px-2.5 py-1 text-[11px] font-semibold text-zinc-900 backdrop-blur-md dark:bg-[var(--surface-1)]/80 dark:text-zinc-100">
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-[var(--surface-3)]/ px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md dark:bg-[var(--surface-1)]/80">
               <Tag className="h-3.5 w-3.5" aria-hidden="true" />
               {priceBadge}
             </span>
@@ -95,8 +95,8 @@ const BentoCard = ({
       />
 
       <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="h-12 w-12 origin-left transform-gpu text-zinc-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-zinc-200" />
-        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-50">
+        <Icon className="h-12 w-12 origin-left transform-gpu text-[var(--text-secondary)] transition-all duration-300 ease-in-out group-hover:scale-75" />
+        <h3 className="text-xl font-semibold text-[var(--text-primary)]">
           {name}
         </h3>
         <p className="max-w-lg text-[var(--text-secondary)]">{description}</p>

@@ -58,7 +58,7 @@ export default function LoginPage() {
         </form>
         <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
           ¿No tienes cuenta?{" "}
-          <Link href="/auth/register" className="font-medium text-zinc-900 underline ">
+          <Link href="/auth/register" className="font-medium text-[var(--text-primary)] underline ">
             Regístrate
           </Link>
         </p>

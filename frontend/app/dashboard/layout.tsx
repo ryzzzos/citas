@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50 lg:hidden"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100/50 text-[var(--text-secondary)]  hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50 lg:hidden"
                   aria-label="Abrir menu lateral"
                   aria-controls="dashboard-mobile-menu"
                   aria-expanded={mobileOpen}
@@ -59,26 +59,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
 
                 <div className="min-w-0 flex-1">
-                  <h1 className="truncate text-base font-bold tracking-tight text-slate-900  sm:text-lg">{pageTitle}</h1>
+                  <h1 className="truncate text-base font-bold tracking-tight text-[var(--text-primary)]  sm:text-lg">{pageTitle}</h1>
                 </div>
 
                 <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus-within:border-[var(--app-primary)] focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--app-primary-soft)] md:flex dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:focus-within:border-[var(--app-primary)] dark:focus-within:bg-zinc-900 dark:focus-within:ring-[rgba(37,99,235,0.15)]">
-                  <AppIcon icon={Search} className="text-zinc-400" />
+                  <AppIcon icon={Search} className="text-[var(--text-muted)]" />
                   <input
                     type="search"
                     placeholder="Buscar módulo..."
-                    className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none  dark:placeholder:text-[var(--text-muted)]"
+                    className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none  dark:placeholder:text-[var(--text-muted)]"
                   />
                 </label>
 
                 <div className="flex items-center gap-2">
                   <AnimatedThemeToggler
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100/50 text-zinc-600 transition-colors hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100/50 text-[var(--text-secondary)]  hover:bg-zinc-200/50 dark:bg-zinc-800/50  dark:hover:bg-zinc-700/50"
                     aria-label="Cambiar tema"
                   />
                   <Link
                     href="/dashboard/agenda"
-                    className="hidden min-h-10 items-center gap-2 rounded-full px-4 text-[13px] font-semibold tracking-tight text-zinc-600 transition-colors hover:bg-[var(--surface-2)]/80  dark:hover:bg-[var(--surface-2)] sm:inline-flex"
+                    className="hidden min-h-10 items-center gap-2 rounded-full px-4 text-[13px] font-semibold tracking-tight text-[var(--text-secondary)]  hover:bg-[var(--surface-2)]/80  dark:hover:bg-[var(--surface-2)] sm:inline-flex"
                   >
                     <AppIcon icon={CalendarDays} size="xs" />
                     Agenda

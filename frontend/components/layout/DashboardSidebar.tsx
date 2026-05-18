@@ -24,7 +24,7 @@ const navLinkVariants = cva(
     variants: {
       active: {
         true: "bg-[var(--surface-3)] border-[var(--border-strong)] text-[var(--app-primary-strong)] shadow-[var(--shadow-md)] dark:text-[var(--app-primary)]",
-        false: "border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--surface-1)]",
+        false: "border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)]",
       },
     },
     defaultVariants: {

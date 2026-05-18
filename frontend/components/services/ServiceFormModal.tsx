@@ -256,7 +256,7 @@ export default function ServiceFormModal({
           />
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="service-category" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="service-category" className="text-sm font-medium text-[var(--text-secondary)] ">
               Categoría
             </label>
             {categoriesLoading ? (
@@ -266,7 +266,7 @@ export default function ServiceFormModal({
                 id="service-category"
                 value={form.categoryId}
                 onChange={(event) => setForm((previous) => ({ ...previous, categoryId: event.target.value }))}
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:focus:border-white"
                 required
               >
                 <option value="" disabled>Seleccione una categoría</option>
@@ -278,7 +278,7 @@ export default function ServiceFormModal({
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="service-description" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="service-description" className="text-sm font-medium text-[var(--text-secondary)] ">
               Descripcion
             </label>
             <textarea
@@ -288,13 +288,13 @@ export default function ServiceFormModal({
                 setForm((previous) => ({ ...previous, description: event.target.value }))
               }
               rows={3}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
               placeholder="Opcional"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="service-image-file" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="service-image-file" className="text-sm font-medium text-[var(--text-secondary)] ">
               Imagen
             </label>
             <input
@@ -320,7 +320,7 @@ export default function ServiceFormModal({
                 setUploadError(null);
                 setUploadMessage("Vista previa lista. Sube la imagen para obtener la URL final.");
               }}
-              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-zinc-700 dark:bg-[var(--surface-1)] "
+              className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-zinc-700 dark:bg-[var(--surface-1)] "
             />
             <p className="dashboard-text-muted text-xs">
               Sube una imagen JPEG, PNG o WEBP de hasta 2MB. Esta es la captura principal.
@@ -358,7 +358,7 @@ export default function ServiceFormModal({
             {uploadError ? <p className="text-xs text-red-500">{uploadError}</p> : null}
 
             <div className="mt-2 flex flex-col gap-1">
-              <label htmlFor="service-image-url" className="text-sm font-medium text-zinc-700 ">
+              <label htmlFor="service-image-url" className="text-sm font-medium text-[var(--text-secondary)] ">
                 URL manual opcional
               </label>
               <input
@@ -373,7 +373,7 @@ export default function ServiceFormModal({
                   }
                 }}
                 placeholder="https://..."
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-[var(--text-primary)] placeholder-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-[var(--surface-1)]  dark:placeholder-zinc-500 dark:focus:border-white"
               />
               <p className="dashboard-text-muted text-xs">
                 Opcional. Puedes pegar una URL si no quieres subir archivo.

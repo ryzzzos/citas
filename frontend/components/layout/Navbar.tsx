@@ -71,7 +71,7 @@ export default function Navbar() {
   }
 
   const navItemClassName = cn(
-    "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors",
+    "inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 py-1.5",
     "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
     "whitespace-nowrap",
     "glass-floating"
@@ -86,9 +86,9 @@ export default function Navbar() {
     >
       <div
         className={cn(
-          "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-[1.35rem] px-3.5 sm:px-6",
+          "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-[var(--radius-sm)] px-3.5 sm:px-6",
           isMapRoute ? "w-full max-w-[78rem]" : "w-full max-w-6xl",
-          "glass-panel"
+          "bg-[var(--surface-glass)] shadow-[shadow-[var(--shadow-md)]] backdrop-blur border border-[var(--border-strong)]",
         )}
       >
         <Link
@@ -100,7 +100,7 @@ export default function Navbar() {
         <nav className="flex items-center gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <AnimatedThemeToggler
             className={cn(
-              "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
+              "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full  focus-visible:outline-none focus-visible:ring-2",
               "text-[color:var(--text-secondary)] focus-visible:ring-[color:var(--app-primary)]",
               "glass-floating-muted"
             )}
@@ -132,7 +132,7 @@ export default function Navbar() {
           <Link
             href="/auth/login"
             className={cn(
-              "dashboard-focusable inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 transition-colors",
+              "inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 ",
               "text-[color:var(--text-primary)] hover:text-[color:var(--text-secondary)]",
               "whitespace-nowrap",
               "glass-floating"

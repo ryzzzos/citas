@@ -300,7 +300,7 @@ export default function BusinessProfileEditorPage() {
                 <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
               </button>
               <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">
+                <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--app-primary)]">
                   Ajustes
                 </p>
                 <h2 className="text-base font-bold tracking-tight text-[var(--text-primary)]">
@@ -394,7 +394,7 @@ export default function BusinessProfileEditorPage() {
                     <button
                       type="button"
                       onClick={suggestSlugFromName}
-                      className="text-[0.7rem] font-bold uppercase tracking-widest text-[var(--app-primary)] underline underline-offset-4 hover:brightness-110 active:scale-95 dark:text-blue-400"
+                      className="text-[0.7rem] font-bold uppercase tracking-widest text-[var(--app-primary)] underline underline-offset-4 hover:brightness-110 active:scale-95"
                     >
                       Autogenerar
                     </button>

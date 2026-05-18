@@ -11,7 +11,7 @@ const STATUS_BADGE: Record<string, string> = {
   pending: "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300",
   confirmed: "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
   cancelled: "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300",
-  completed: "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300",
+  completed: "border-slate-200/60 bg-[var(--surface-1)]0/10 text-[var(--text-secondary)] shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -22,7 +22,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function BookingCard({ booking, onConfirm, onCancel, onReschedule }: BookingCardProps) {
-  const statusClass = STATUS_BADGE[booking.status] ?? "border-slate-200 bg-slate-100 text-slate-800";
+  const statusClass = STATUS_BADGE[booking.status] ?? "border-slate-200 bg-slate-100 text-[var(--text-primary)]";
   const statusLabel = STATUS_LABEL[booking.status] ?? booking.status;
 
   return (
@@ -42,7 +42,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
       <dl className="mt-4 grid grid-cols-1 gap-2.5 text-xs">
         <div>
           <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Staff</dt>
-          <dd className="mt-0.5 text-[13px] font-medium text-slate-700 dark:text-slate-300">{booking.staffName}</dd>
+          <dd className="mt-0.5 text-[13px] font-medium text-[var(--text-secondary)]">{booking.staffName}</dd>
         </div>
         <div>
           <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Reserva ID</dt>
@@ -70,7 +70,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-[var(--shadow-sm)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]  dark:hover:bg-[var(--surface-2)] dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
+          className="min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 text-[13px] font-bold tracking-tight text-[var(--text-secondary)] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-[var(--shadow-sm)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]  dark:hover:bg-[var(--surface-2)] dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
         >
           Reprogramar
         </button>

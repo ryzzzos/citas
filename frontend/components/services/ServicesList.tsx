@@ -32,7 +32,7 @@ function ServiceThumbnail({ service }: { service: Service }) {
   if (!service.image_url || imageError) {
     return (
       <div
-        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--surface-0)] text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:bg-[var(--surface-0)] dark:text-[var(--text-muted)]"
+        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--surface-0)] text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] dark:bg-[var(--surface-0)] dark:text-[var(--text-muted)]"
         aria-label={service.image_url ? "No se pudo cargar la imagen del servicio" : "Servicio sin imagen"}
       >
         Sin
@@ -129,8 +129,8 @@ export default function ServicesList({
                     </div>
                   </div>
                 </td>
-                <td className="border-y border-[var(--border-strong)] bg-zinc-50/80 px-5 py-4 align-middle text-[14px] font-semibold text-slate-600 backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]/60 dark:text-slate-300">{service.duration_minutes} min</td>
-                <td className="border-y border-[var(--border-strong)] bg-zinc-50/80 px-5 py-4 align-middle text-[14px] font-semibold text-slate-600 backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]/60 dark:text-slate-300">{formatPrice(service.price)}</td>
+                <td className="border-y border-[var(--border-strong)] bg-zinc-50/80 px-5 py-4 align-middle text-[14px] font-semibold text-[var(--text-secondary)] backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]/60">{service.duration_minutes} min</td>
+                <td className="border-y border-[var(--border-strong)] bg-zinc-50/80 px-5 py-4 align-middle text-[14px] font-semibold text-[var(--text-secondary)] backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]/60">{formatPrice(service.price)}</td>
                 <td className="border-y border-[var(--border-strong)] bg-zinc-50/80 px-5 py-4 align-middle backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]/60">
                   <span
                     className={`inline-flex rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md ${

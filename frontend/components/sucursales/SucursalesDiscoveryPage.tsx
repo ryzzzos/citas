@@ -298,7 +298,7 @@ export default function SucursalesDiscoveryPage() {
   }, [detailDismissed, items, selectedBusinessId, viewportItems]);
 
   return (
-    <main className="relative h-[100dvh] min-h-screen w-full overflow-hidden bg-[radial-gradient(circle_at_16%_8%,rgba(20,184,166,0.12),transparent_46%),radial-gradient(circle_at_90%_2%,rgba(56,189,248,0.1),transparent_40%),linear-gradient(180deg,rgba(248,250,252,0.62),rgba(226,232,240,0.26))] dark:bg-[radial-gradient(circle_at_16%_8%,rgba(20,184,166,0.16),transparent_48%),radial-gradient(circle_at_90%_2%,rgba(56,189,248,0.1),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.46),rgba(2,6,23,0.16))]">
+    <main className="relative h-[100dvh] min-h-screen w-full overflow-hidden">
       <section className="absolute inset-0">
         <SucursalesMapCanvas
           businesses={items}

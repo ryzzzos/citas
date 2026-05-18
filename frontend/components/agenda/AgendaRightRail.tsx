@@ -39,7 +39,7 @@ export default function AgendaRightRail({ total, pending, confirmed, nextBooking
               <li key={booking.id} className="rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-transform hover:scale-[1.02] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                 <p className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
                 <p className="mt-1 text-[13px] font-medium text-[var(--text-secondary)]">{booking.staffName}</p>
-                <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">
+                <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)]">
                   {booking.startAt.toFormat("dd LLL HH:mm")} - {booking.endAt.toFormat("HH:mm")}
                 </p>
               </li>

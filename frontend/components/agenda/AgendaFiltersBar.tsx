@@ -92,7 +92,7 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
             value={filters.query}
             onChange={(event) => onFiltersChange({ ...filters, query: event.target.value })}
             placeholder="ID, estado, staff, servicio..."
-            className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] placeholder:text-zinc-400 shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:placeholder:text-[var(--text-muted)] dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
+            className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:placeholder:text-[var(--text-muted)] dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
           />
         </label>
       </div>

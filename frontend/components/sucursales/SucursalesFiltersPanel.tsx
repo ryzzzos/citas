@@ -69,7 +69,7 @@ function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name
           onError={() => setErroredLogoUrl(logoUrl)}
         />
       ) : (
-        <span className="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-slate-600 dark:text-slate-200">
+        <span className="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
           {toInitials(name)}
         </span>
       )}
@@ -214,45 +214,45 @@ function PanelBody({
   }, [nameQuery, viewportItems]);
 
   const inputBaseClassName =
-    "dashboard-focusable mt-1 w-full rounded-lg border border-zinc-300/70 bg-[var(--surface-3)]/ px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 dark:border-zinc-700/80 dark:bg-[var(--surface-1)]/75 dark:text-zinc-100 dark:placeholder:text-[var(--text-muted)]";
+    "mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:placeholder:text-[var(--text-muted)]";
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4">
-      <header className="glass-panel-accent rounded-[1.35rem] p-4">
+    <div className="flex h-full min-h-0 flex-col gap-4 bg-[var(--surface-glass)] sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] backdrop-blur-lg">
+      <header className="bg-[var(--surface-3)] rounded-[var(--radius-md)] p-4 shadow-[var(--shadow-sm)] border border-[var(--border-strong)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[0.72rem] font-semibold text-white/82">
+            <p className="text-[0.72rem] font-semibold text-[var(--text-secondary)] uppercase tracking-[0.12em]">
               Descubrimiento en mapa
             </p>
-            <h2 className="mt-2 text-[1.45rem] font-semibold tracking-tight text-white">
+            <h2 className="mt-2 text-[1.45rem] font-semibold tracking-tight text-[var(--text-primary)]">
               Sucursales cercanas
             </h2>
           </div>
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/34 bg-[var(--surface-3)]/ px-3 text-[0.7rem] font-semibold text-white backdrop-blur-sm">
+          <span className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 text-[0.7rem] font-semibold text-[var(--text-secondary)] backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             En vivo
           </span>
         </div>
 
-        <p className="mt-2 text-sm leading-6 text-white/84">
+        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
           Ajusta filtros, mueve el mapa y compara negocios activos dentro del area visible.
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <article className="rounded-xl border border-white/30 bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-white/74">
+          <article className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
               En vista
             </p>
-            <p className="mt-1 text-lg font-semibold tracking-tight text-white">
+            <p className="mt-1 text-lg font-semibold tracking-tight text-[var(--text-primary)]">
               {loading ? "..." : filteredViewportCount}
             </p>
           </article>
 
-          <article className="rounded-xl border border-white/30 bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-white/74">
+          <article className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)]/ p-3 backdrop-blur-sm">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
               Total hallado
             </p>
-            <p className="mt-1 text-lg font-semibold tracking-tight text-white">{total}</p>
+            <p className="mt-1 text-lg font-semibold tracking-tight text-[var(--text-primary)]">{total}</p>
           </article>
         </div>
 
@@ -261,25 +261,17 @@ function PanelBody({
             type="button"
             onClick={onRequestUserLocation}
             disabled={requestingLocation}
-            className="dashboard-focusable inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-white/34 bg-black/18 px-4 text-[0.72rem] font-semibold text-white transition hover:bg-black/28 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-[0.72rem] font-semibold text-[var(--text-primary)] transition hover:bg-[var(--surface-2)] disabled:cursor-not-allowed disabled:opacity-70"
           >
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             {requestingLocation ? "Ubicando..." : hasUserLocation ? "Actualizar mi ubicacion" : "Usar mi ubicacion"}
           </button>
 
           {locationError ? (
-            <div className="rounded-xl border border-amber-300/65 bg-black/22 px-3 py-2 text-[0.69rem] text-white/96">
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-[0.69rem] text-[var(--text-primary)]">
               {locationError}
             </div>
           ) : null}
-        </div>
-
-        <div className="mt-3 rounded-xl border border-white/28 bg-[var(--surface-3)]/ px-3 py-2 backdrop-blur-sm">
-          <p className="text-xs font-medium text-white/86">
-            {loading
-              ? "Actualizando resultados dentro del area visible..."
-              : `${filteredItems.length} resultados visibles en el area activa`}
-          </p>
         </div>
       </header>
 
@@ -290,7 +282,7 @@ function PanelBody({
             onClick={onToggleFilters}
             aria-expanded={filtersExpanded}
             aria-controls={filtersRegionId}
-            className="dashboard-focusable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-zinc-800  dark:hover:text-zinc-100"
+            className="dashboard-focusable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]  dark:hover:text-zinc-100"
           >
             Filtros y controles
             <ChevronDown
@@ -302,7 +294,7 @@ function PanelBody({
             type="button"
             onClick={onClearAll}
             className={cn(
-              "dashboard-focusable inline-flex min-h-9 items-center rounded-full px-3 text-[0.72rem] font-semibold text-zinc-700 dark:text-zinc-100",
+              "dashboard-focusable inline-flex min-h-9 items-center rounded-full px-3 text-[0.72rem] font-semibold text-[var(--text-secondary)]",
               "glass-floating"
             )}
           >
@@ -317,7 +309,7 @@ function PanelBody({
                 key={chip}
                 className={cn(
                   "glass-floating",
-                  "inline-flex min-h-7 items-center px-2.5 text-[0.65rem] font-medium text-zinc-700 dark:text-zinc-100"
+                  "inline-flex min-h-7 items-center px-2.5 text-[0.65rem] font-medium text-[var(--text-secondary)]"
                 )}
               >
                 {chip}
@@ -333,7 +325,7 @@ function PanelBody({
             <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
               Buscar negocio
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 dark:text-[var(--text-muted)]" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)] dark:text-[var(--text-muted)]" />
                 <input
                   type="text"
                   value={nameQuery}
@@ -400,11 +392,11 @@ function PanelBody({
                         type="button"
                         onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
                         className={cn(
-                          "dashboard-focusable inline-flex min-h-8 shrink-0 items-center gap-1 px-3 text-[0.67rem] font-medium transition",
+                          "inline-flex min-h-8 shrink-0 items-center gap-1 px-3 text-[0.67rem] font-medium transition",
                           "glass-floating",
                           active
                             ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)]"
-                            : "text-zinc-700 dark:text-zinc-200"
+                            : "text-[var(--text-secondary)]"
                         )}
                       >
                         {category}
@@ -431,7 +423,7 @@ function PanelBody({
 
       <section className="flex min-h-0 flex-1 flex-col">
         <div className="mb-2 flex items-center justify-between gap-2 px-1">
-          <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Negocios cercanos</p>
+          <p className="text-sm font-semibold text-[var(--text-primary)]">Negocios cercanos</p>
           <p className="text-[0.66rem] font-medium uppercase tracking-[0.12em] text-[var(--text-muted)] ">
             {loading ? "Actualizando" : `${filteredItems.length} listados`}
           </p>
@@ -446,10 +438,9 @@ function PanelBody({
                   type="button"
                   onClick={() => onSelectBusiness(business.id)}
                   className={cn(
-                    "dashboard-focusable dashboard-interactive w-full rounded-[1.15rem] px-2.5 py-2.5 text-left",
-                    "glass-panel",
+                    "w-full rounded-[var(--radius-md)] px-2.5 py-2.5 text-left",
                     active
-                      ? "border-[color:var(--app-primary)] ring-1 ring-[color:color-mix(in_oklab,var(--app-primary)_38%,transparent)]"
+                      ? "border-[var(--border-strong)] bg-[var(surface-3)] shadow-[var(--shadow-md)]"
                       : "hover:border-[var(--app-primary)]/80 dark:hover:border-zinc-600/80"
                   )}
                 >
@@ -462,7 +453,7 @@ function PanelBody({
                           {business.name}
                         </p>
                         {active ? (
-                          <span className="inline-flex min-h-6 items-center rounded-full border border-[color:color-mix(in_oklab,var(--app-primary)_68%,#ffffff_32%)] bg-[color:color-mix(in_oklab,var(--app-primary)_18%,transparent)] px-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-zinc-800 dark:text-zinc-100">
+                          <span className="inline-flex min-h-6 items-center rounded-full border border-[color:color-mix(in_oklab,var(--app-primary)_68%,#ffffff_32%)] bg-[color:color-mix(in_oklab,var(--app-primary)_18%,transparent)] px-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-primary)]">
                             Activo
                           </span>
                         ) : null}
@@ -576,14 +567,14 @@ export default function SucursalesFiltersPanel({
         type="button"
         onClick={() => onMobileOpenChange(true)}
         className={cn(
-          "dashboard-focusable pointer-events-auto fixed bottom-4 left-4 z-[800] inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold text-zinc-700 dark:text-zinc-100 lg:hidden",
+          "dashboard-focusable pointer-events-auto fixed bottom-4 left-4 z-[800] inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold text-[var(--text-secondary)] lg:hidden",
           "glass-floating"
         )}
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filtros
         {activeFiltersCount > 0 ? (
-          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-zinc-900 px-1 text-[0.63rem] font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
+          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-zinc-900 px-1 text-[0.63rem] font-semibold text-white dark:bg-zinc-100 dark:text-[var(--text-primary)]">
             {activeFiltersCount}
           </span>
         ) : null}
@@ -612,7 +603,7 @@ export default function SucursalesFiltersPanel({
               type="button"
               onClick={() => onMobileOpenChange(false)}
               className={cn(
-                "dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-700 dark:text-zinc-200",
+                "dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)]",
                 "glass-floating"
               )}
               aria-label="Cerrar filtros"
