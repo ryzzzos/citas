@@ -55,7 +55,7 @@ Frontend: http://localhost:3000
 
 ## First Release Snapshot
 
-Current baseline: `v0.1.0`
+Current baseline: `v0.3.1`
 
 ## Business Onboarding Flow (Mandatory)
 
