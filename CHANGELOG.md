@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.3.1] - 2026-05-18
+
+### Chore
+- Reorganized and normalized CHANGELOG.md entries to maintain correct semantic versioning order (newest to oldest).
+- Updated package.json versioning to reflect current release baseline.
+
 ## [0.3.0] - 2026-05-12
 
 ### Added
@@ -18,6 +24,31 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ### Fixed
 - Cleaned up stale changelog typo and aligned release notes with current module structure.
+
+## [0.2.2] - 2026-04-29
+
+### Changed
+- Agenda rendering and timeline spacing: improved day column layout and mobile gutter spacing in `frontend/components/agenda/`.
+- Minor fixes in `sucursales` filters panel for consistent filter collapsing behavior.
+- Removed temporary debug script `fix_glass.js` from the tree.
+
+### Fixed
+- Corrected editor/preview synchronization in `BusinessProfileEditorPage` to avoid stale preview state after saves.
+- Small bugfixes for booking card display times and responsive wrapping.
+
+## [0.2.1] - 2026-04-28
+
+### Added
+- Small improvements to the agenda UI and timeline rendering to improve readability and mobile spacing.
+- New UI components and form controls: `Button`, `Input`, and `AppIcon` refinements.
+
+### Changed
+- Refinements to `BusinessProfileEditorPage` and profile preview behavior for a smoother edit/preview flow.
+- Dashboard layout and navigation tweaks to improve focus on profile and services pages.
+- Replaced `frontend/lib/utils.ts` with localized utility functions in components (removed global util file).
+
+### Fixed
+- Various UI spacing and responsive bugs in the dashboard and sucursales discovery components.
 
 ## [0.2.0] - 2026-04-20
 
@@ -38,31 +69,6 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 - Removed legacy marketplace pages under `frontend/app/marketplace/` in favor of the new route and discovery structure.
 - Removed outdated business profile resolver helper and old showcase component.
 - Removed stale project context document in `docs/project_context.md`.
-
-## [0.2.1] - 2026-04-28
-
-### Added
-- Small improvements to the agenda UI and timeline rendering to improve readability and mobile spacing.
-- New UI components and form controls: `Button`, `Input`, and `AppIcon` refinements.
-
-### Changed
-- Refinements to `BusinessProfileEditorPage` and profile preview behavior for a smoother edit/preview flow.
-- Dashboard layout and navigation tweaks to improve focus on profile and services pages.
-- Replaced `frontend/lib/utils.ts` with localized utility functions in components (removed global util file).
-
-### Fixed
-- Various UI spacing and responsive bugs in the dashboard and sucursales discovery components.
-
-## [0.2.2] - 2026-04-29
-
-### Changed
-- Agenda rendering and timeline spacing: improved day column layout and mobile gutter spacing in `frontend/components/agenda/`.
-- Minor fixes in `sucursales` filters panel for consistent filter collapsing behavior.
-- Removed temporary debug script `fix_glass.js` from the tree.
-
-### Fixed
-- Corrected editor/preview synchronization in `BusinessProfileEditorPage` to avoid stale preview state after saves.
-- Small bugfixes for booking card display times and responsive wrapping.
 
 ## [0.1.7] - 2026-04-04
 
