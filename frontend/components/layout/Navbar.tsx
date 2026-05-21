@@ -100,7 +100,7 @@ export default function Navbar() {
         <nav className="flex items-center gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <AnimatedThemeToggler
             className={cn(
-              "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full  focus-visible:outline-none focus-visible:ring-2",
+              "dashboard-focusable inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2",
               "text-[color:var(--text-secondary)] focus-visible:ring-[color:var(--app-primary)]",
               "glass-floating-muted"
             )}

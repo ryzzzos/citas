@@ -11,7 +11,6 @@ function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-
 type SortMode = "viewport" | "name-asc" | "name-desc" | "category";
 
 interface SucursalesFiltersPanelProps {
@@ -50,26 +49,22 @@ function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name
   return (
     <div
       className={cn(
-        "glass-floating-muted",
-        "relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border p-0"
+        "bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-3)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]",
+        "relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-xl)]"
       )}
-      style={{
-        borderColor: "var(--glass-border-default)",
-        backgroundColor: "var(--glass-bg-soft)",
-      }}
     >
       {canRenderLogo ? (
         <Image
           src={logoUrl as string}
           alt={`Logo de ${name}`}
           fill
-          sizes="44px"
+          sizes="56px"
           className="object-cover"
           unoptimized
           onError={() => setErroredLogoUrl(logoUrl)}
         />
       ) : (
-        <span className="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)] dark:text-[var(--text-secondary)]">
+        <span className="text-[0.7rem] font-bold uppercase tracking-[0.05em] text-[var(--app-primary)]">
           {toInitials(name)}
         </span>
       )}
@@ -82,9 +77,7 @@ function PanelBody({
   onFiltersChange,
   items,
   viewportItems,
-  total,
   loading,
-  error,
   selectedBusinessId,
   onSelectBusiness,
   requestingLocation,
@@ -99,24 +92,11 @@ function PanelBody({
   onToggleFilters,
   filtersRegionId,
   onClearAll,
-}: {
-  filters: DiscoveryFilters;
-  onFiltersChange: (nextFilters: DiscoveryFilters) => void;
-  items: BusinessMapPoint[];
-  viewportItems: BusinessMapPoint[];
-  total: number;
-  loading: boolean;
-  error: string | null;
-  selectedBusinessId: string | null;
-  onSelectBusiness: (businessId: string) => void;
-  requestingLocation: boolean;
-  hasUserLocation: boolean;
-  locationError: string | null;
-  onRequestUserLocation: () => void;
+}: Omit<SucursalesFiltersPanelProps, "mobileOpen" | "onMobileOpenChange" | "error" | "total"> & {
   nameQuery: string;
-  onNameQueryChange: (value: string) => void;
+  onNameQueryChange: (val: string) => void;
   sortMode: SortMode;
-  onSortModeChange: (mode: SortMode) => void;
+  onSortModeChange: (val: SortMode) => void;
   filtersExpanded: boolean;
   onToggleFilters: () => void;
   filtersRegionId: string;
@@ -132,47 +112,16 @@ function PanelBody({
 
   const categorySummary = useMemo(() => {
     const counts = new Map<string, number>();
-
     for (const item of items) {
       counts.set(item.category, (counts.get(item.category) ?? 0) + 1);
     }
-
     return Array.from(counts.entries())
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"))
       .slice(0, CATEGORY_PREVIEW_LIMIT);
   }, [items]);
 
-  const activeContext = useMemo(() => {
-    const chips: string[] = [];
-
-    if (filters.city.trim()) {
-      chips.push(`Ciudad: ${filters.city.trim()}`);
-    }
-
-    if (filters.category.trim()) {
-      chips.push(`Categoria: ${filters.category.trim()}`);
-    }
-
-    if (nameQuery.trim()) {
-      chips.push(`Nombre: ${nameQuery.trim()}`);
-    }
-
-    if (sortMode !== "viewport") {
-      const labelsBySort: Record<Exclude<SortMode, "viewport">, string> = {
-        "name-asc": "Nombre A-Z",
-        "name-desc": "Nombre Z-A",
-        category: "Categoria",
-      };
-
-      chips.push(`Orden: ${labelsBySort[sortMode]}`);
-    }
-
-    return chips;
-  }, [filters.category, filters.city, nameQuery, sortMode]);
-
   const filteredItems = useMemo(() => {
     const normalizedQuery = nameQuery.trim().toLocaleLowerCase("es");
-
     let nextItems =
       normalizedQuery.length === 0
         ? items
@@ -181,255 +130,192 @@ function PanelBody({
             return searchable.includes(normalizedQuery);
           });
 
-    if (sortMode === "viewport") {
-      return nextItems;
-    }
+    if (sortMode === "viewport") return nextItems;
 
     nextItems = [...nextItems];
-
     if (sortMode === "name-asc") {
       nextItems.sort((a, b) => a.name.localeCompare(b.name, "es"));
       return nextItems;
     }
-
     if (sortMode === "name-desc") {
       nextItems.sort((a, b) => b.name.localeCompare(a.name, "es"));
       return nextItems;
     }
-
     nextItems.sort((a, b) => a.category.localeCompare(b.category, "es") || a.name.localeCompare(b.name, "es"));
     return nextItems;
   }, [items, nameQuery, sortMode]);
 
-  const filteredViewportCount = useMemo(() => {
-    const normalizedQuery = nameQuery.trim().toLocaleLowerCase("es");
-    if (normalizedQuery.length === 0) {
-      return viewportItems.length;
-    }
-
-    return viewportItems.filter((business) => {
-      const searchable = `${business.name} ${business.category} ${business.city}`.toLocaleLowerCase("es");
-      return searchable.includes(normalizedQuery);
-    }).length;
-  }, [nameQuery, viewportItems]);
-
-  const inputBaseClassName =
-    "mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:placeholder:text-[var(--text-muted)]";
-
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 bg-[var(--surface-glass)] sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] backdrop-blur-lg">
-      <header className="bg-[var(--surface-3)] rounded-[var(--radius-md)] p-4 shadow-[var(--shadow-sm)] border border-[var(--border-strong)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[0.72rem] font-semibold text-[var(--text-secondary)] uppercase tracking-[0.12em]">
-              Descubrimiento en mapa
-            </p>
-            <h2 className="mt-2 text-[1.45rem] font-semibold tracking-tight text-[var(--text-primary)]">
-              Sucursales cercanas
-            </h2>
-          </div>
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 text-[0.7rem] font-semibold text-[var(--text-secondary)] backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            En vivo
-          </span>
+    <div className="flex h-full min-h-0 flex-col gap-4 p-1">
+      {/* QUICK SEARCH & CONTROLS */}
+      <header className="shrink-0 flex flex-col gap-3">
+        <div className="flex flex-col mb-1 px-1">
+          <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)] flex items-center gap-2">
+            Descubre lugares <Sparkles className="h-5 w-5 text-[var(--app-primary)]" />
+          </h2>
+          <p className="text-[0.8rem] text-[var(--text-muted)] mt-0.5">Encuentra los mejores negocios cerca de ti</p>
         </div>
 
-        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-          Ajusta filtros, mueve el mapa y compara negocios activos dentro del area visible.
-        </p>
-
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <article className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 backdrop-blur-sm">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
-              En vista
-            </p>
-            <p className="mt-1 text-lg font-semibold tracking-tight text-[var(--text-primary)]">
-              {loading ? "..." : filteredViewportCount}
-            </p>
-          </article>
-
-          <article className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 backdrop-blur-sm">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
-              Total hallado
-            </p>
-            <p className="mt-1 text-lg font-semibold tracking-tight text-[var(--text-primary)]">{total}</p>
-          </article>
+        <div className="relative group">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--app-primary)] opacity-70 group-focus-within:opacity-100 transition-opacity" />
+          <input
+            type="text"
+            value={nameQuery}
+            onChange={(event) => onNameQueryChange(event.target.value)}
+            placeholder="¿Qué estás buscando hoy?"
+            className="w-full rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] py-4 pl-11 pr-12 text-[0.92rem] font-medium text-[var(--text-primary)] shadow-[var(--shadow-sm)] outline-none transition-all duration-300 focus:border-[var(--app-primary)] focus:ring-4 focus:ring-[var(--app-primary)]/10 placeholder:text-[var(--text-muted)] hover:shadow-[var(--shadow-md)]"
+          />
+          {nameQuery.trim() && (
+            <button
+              type="button"
+              onClick={() => onNameQueryChange("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--surface-1)] rounded-full p-1 transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        <div className="mt-3 flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={onRequestUserLocation}
-            disabled={requestingLocation}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-[0.72rem] font-semibold text-[var(--text-primary)] transition hover:bg-[var(--surface-2)] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            {requestingLocation ? "Ubicando..." : hasUserLocation ? "Actualizar mi ubicacion" : "Usar mi ubicacion"}
-          </button>
-
-          {locationError ? (
-            <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-[0.69rem] text-[var(--text-primary)]">
-              {locationError}
-            </div>
-          ) : null}
-        </div>
-      </header>
-
-      <section className={cn("glass-panel", "rounded-2xl p-3.5")}>
-        <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-1">
           <button
             type="button"
             onClick={onToggleFilters}
             aria-expanded={filtersExpanded}
             aria-controls={filtersRegionId}
-            className="dashboard-focusable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)]"
-          >
-            Filtros y controles
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${filtersExpanded ? "rotate-180" : "rotate-0"}`}
-              aria-hidden="true"
-            />
-          </button>
-          <button
-            type="button"
-            onClick={onClearAll}
             className={cn(
-              "dashboard-focusable inline-flex min-h-9 items-center rounded-full px-3 text-[0.72rem] font-semibold text-[var(--text-secondary)]",
-              "glass-floating"
+              "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-[0.8rem] font-bold transition-all duration-300 shadow-[var(--shadow-sm)]",
+              filtersExpanded
+                ? "bg-[var(--app-primary)] text-white shadow-[var(--shadow-md)] scale-[1.02]"
+                : "bg-[var(--surface-3)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)]"
             )}
           >
-            Limpiar todo
+            <SlidersHorizontal className="h-4 w-4" />
+            Filtros
           </button>
+
+          <button
+            type="button"
+            onClick={onRequestUserLocation}
+            disabled={requestingLocation}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-[0.8rem] font-bold transition-all duration-300 disabled:opacity-70 shadow-[var(--shadow-sm)]",
+              hasUserLocation
+                ? "bg-[color-mix(in_oklab,var(--app-primary)_15%,transparent)] text-[var(--app-primary-strong)] border border-[var(--app-primary)]/30"
+                : "bg-[var(--surface-3)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)]"
+            )}
+          >
+            <MapPin className="h-4 w-4" />
+            {requestingLocation ? "Buscando..." : hasUserLocation ? "Cerca de mí" : "Ubicación"}
+          </button>
+
+          {(filters.category || filters.city || sortMode !== "viewport") ? (
+            <button
+              type="button"
+              onClick={onClearAll}
+              className="inline-flex shrink-0 items-center rounded-full bg-[var(--surface-2)] border border-[var(--border-strong)] px-3.5 py-2.5 text-[0.75rem] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-3)] transition-colors shadow-sm"
+            >
+              Limpiar
+            </button>
+          ) : null}
         </div>
+      </header>
 
-        {activeContext.length > 0 ? (
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {activeContext.map((chip) => (
-              <span
-                key={chip}
-                className={cn(
-                  "glass-floating",
-                  "inline-flex min-h-7 items-center px-2.5 text-[0.65rem] font-medium text-[var(--text-secondary)]"
-                )}
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="mb-3 text-[0.72rem] font-medium text-[var(--text-muted)] ">Sin filtros activos.</p>
+      {/* EXPANDABLE FILTERS */}
+      <div
+        id={filtersRegionId}
+        className={cn(
+          "shrink-0 flex flex-col overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          filtersExpanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
         )}
+      >
+        <div className="rounded-[var(--radius-xl)] bg-[var(--surface-3)] border border-[var(--border-strong)] p-4 shadow-[var(--shadow-md)] grid grid-cols-1 sm:grid-cols-2 gap-4 mx-1">
+          <label className="text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+            Ciudad
+            <input
+              type="text"
+              value={filters.city}
+              onChange={(event) => onFiltersChange({ ...filters, city: event.target.value })}
+              placeholder="Ej: Santiago"
+              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] placeholder:text-[var(--text-muted)]"
+            />
+          </label>
 
-        {filtersExpanded ? (
-          <div id={filtersRegionId}>
-            <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
-              Buscar negocio
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)] dark:text-[var(--text-muted)]" />
-                <input
-                  type="text"
-                  value={nameQuery}
-                  onChange={(event) => onNameQueryChange(event.target.value)}
-                  placeholder="Nombre, categoria o ciudad"
-                  className={`${inputBaseClassName} pl-9`}
-                />
+          <label className="text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+            Categoría
+            <select
+              value={filters.category}
+              onChange={(event) => onFiltersChange({ ...filters, category: event.target.value })}
+              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] cursor-pointer"
+            >
+              {categories.map((category) => (
+                <option key={category || "all"} value={category}>
+                  {category || "Todas"}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="sm:col-span-2 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+            Ordenar por
+            <select
+              value={sortMode}
+              onChange={(event) => onSortModeChange(event.target.value as SortMode)}
+              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] cursor-pointer"
+            >
+              <option value="viewport">Visibles en el mapa (Recomendado)</option>
+              <option value="name-asc">Nombre A-Z</option>
+              <option value="name-desc">Nombre Z-A</option>
+              <option value="category">Categoría</option>
+            </select>
+          </label>
+
+          {categorySummary.length > 0 && (
+            <div className="sm:col-span-2 mt-2">
+              <div className="flex flex-wrap gap-2">
+                {categorySummary.map(([category, count]) => {
+                  const active = filters.category === category;
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[0.75rem] font-bold transition-all duration-200",
+                        active
+                          ? "bg-[var(--app-primary)] text-white shadow-[var(--shadow-sm)] scale-105"
+                          : "bg-[var(--surface-1)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+                      )}
+                    >
+                      {category} <span className="opacity-70 ml-0.5 text-[0.65rem] bg-black/10 px-1.5 rounded-full">{count}</span>
+                    </button>
+                  );
+                })}
               </div>
-            </label>
-
-            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
-                Ciudad
-                <input
-                  type="text"
-                  value={filters.city}
-                  onChange={(event) => onFiltersChange({ ...filters, city: event.target.value })}
-                  placeholder="Ej: Santiago"
-                  className={inputBaseClassName}
-                />
-              </label>
-
-              <label className="text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
-                Categoria
-                <select
-                  value={filters.category}
-                  onChange={(event) => onFiltersChange({ ...filters, category: event.target.value })}
-                  className={inputBaseClassName}
-                >
-                  {categories.map((category) => (
-                    <option key={category || "all"} value={category}>
-                      {category || "Todas"}
-                    </option>
-                  ))}
-                </select>
-              </label>
             </div>
+          )}
+        </div>
+      </div>
 
-            <label className="mt-2 block text-xs font-semibold uppercase tracking-[0.13em] text-[var(--text-muted)] ">
-              Orden de lista
-              <select
-                value={sortMode}
-                onChange={(event) => onSortModeChange(event.target.value as SortMode)}
-                className={inputBaseClassName}
-              >
-                <option value="viewport">Cerca de mi</option>
-                <option value="name-asc">Nombre A-Z</option>
-                <option value="name-desc">Nombre Z-A</option>
-                <option value="category">Categoria</option>
-              </select>
-            </label>
+      {locationError && (
+        <div className="shrink-0 rounded-[var(--radius-md)] border border-[var(--color-error)] bg-[color-mix(in_oklab,var(--color-error)_10%,transparent)] px-4 py-3 text-[0.8rem] font-medium text-[var(--color-error)] mx-1 shadow-[var(--shadow-sm)]">
+          {locationError}
+        </div>
+      )}
 
-            {categorySummary.length > 0 ? (
-              <div className="mt-3">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
-                  Categorias visibles
-                </p>
-                <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {categorySummary.map(([category, count]) => {
-                    const active = filters.category === category;
-                    return (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
-                        className={cn(
-                          "inline-flex min-h-8 shrink-0 items-center gap-1 px-3 text-[0.67rem] font-medium transition",
-                          "glass-floating",
-                          active
-                            ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)]"
-                            : "text-[var(--text-secondary)]"
-                        )}
-                      >
-                        {category}
-                        <span className="text-[var(--text-muted)] ">{count}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <p id={filtersRegionId} className="text-xs text-[var(--text-muted)] ">
-            Filtros contraidos. Expande para refinar resultados.
+      {/* RESULTS LIST */}
+      <section className="flex min-h-0 flex-1 flex-col rounded-[var(--radius-xl)] bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] mx-1 mt-1 overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[var(--border-strong)] px-5 py-4 shrink-0 bg-[var(--surface-2)]/50">
+          <p className="text-[0.85rem] font-bold uppercase tracking-[0.1em] text-[var(--text-primary)]">
+            Resultados
           </p>
-        )}
-
-        {error ? (
-          <div className="mt-3 rounded-xl border border-[var(--color-error)] bg-[var(--surface-3)] px-3 py-2 text-xs text-[var(--color-error)]">
-            {error}
+          <div className="inline-flex items-center rounded-full bg-[var(--surface-3)] px-3 py-1 shadow-sm border border-[var(--border-strong)]">
+            <span className="text-[0.7rem] font-bold text-[var(--app-primary)]">
+              {loading ? "..." : `${filteredItems.length} negocios`}
+            </span>
           </div>
-        ) : null}
-      </section>
-
-      <section className="flex min-h-0 flex-1 flex-col">
-        <div className="mb-2 flex items-center justify-between gap-2 px-1">
-          <p className="text-sm font-semibold text-[var(--text-primary)]">Negocios cercanos</p>
-          <p className="text-[0.66rem] font-medium uppercase tracking-[0.12em] text-[var(--text-muted)] ">
-            {loading ? "Actualizando" : `${filteredItems.length} listados`}
-          </p>
         </div>
 
-        <ul className="h-full min-h-0 space-y-2 overflow-y-auto pr-1">
+        <ul className="h-full min-h-0 flex-1 overflow-y-auto p-2.5 space-y-2">
           {filteredItems.map((business) => {
             const active = selectedBusinessId === business.id;
             return (
@@ -438,36 +324,34 @@ function PanelBody({
                   type="button"
                   onClick={() => onSelectBusiness(business.id)}
                   className={cn(
-                    "w-full rounded-[var(--radius-md)] px-2.5 py-2.5 text-left",
+                    "w-full rounded-[var(--radius-lg)] p-3 text-left transition-all duration-300 group",
                     active
-                      ? "border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)]"
-                      : "hover:border-[var(--app-primary)] dark:hover:border-[var(--border-strong)]"
+                      ? "bg-[var(--surface-1)] border-2 border-[var(--app-primary)] shadow-[var(--shadow-sm)]"
+                      : "bg-[var(--surface-3)] border-2 border-transparent hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]"
                   )}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-4">
                     <BusinessProfileAvatar logoUrl={business.logo_image_url} name={business.name} />
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-[0.86rem] font-semibold leading-5 text-[var(--text-primary)]">
+                        <p className="truncate text-[1rem] font-bold text-[var(--text-primary)] group-hover:text-[var(--app-primary)] transition-colors">
                           {business.name}
                         </p>
-                        {active ? (
-                          <span className="inline-flex min-h-6 items-center rounded-full border border-[var(--app-primary)] bg-[var(--surface-3)] px-2 text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-primary)]">
-                            Activo
+                        {active && (
+                          <span className="shrink-0 inline-flex items-center justify-center h-5 px-2 rounded-full bg-[var(--app-primary)] text-white text-[0.6rem] font-bold tracking-wider uppercase shadow-[var(--shadow-sm)]">
+                            Viendo
                           </span>
-                        ) : null}
+                        )}
                       </div>
 
-                      <p className="mt-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] ">
+                      <p className="mt-0.5 text-[0.75rem] font-bold uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                         {business.category}
                       </p>
 
-                      {business.public_bio?.trim() ? (
-                        <p className="mt-1 line-clamp-1 text-[0.69rem] leading-5 text-[var(--text-secondary)]">
-                          {business.public_bio}
-                        </p>
-                      ) : null}
+                      <p className="mt-1 truncate text-[0.8rem] text-[var(--text-muted)] flex items-center gap-1">
+                        <MapPin className="h-3 w-3" /> {business.city} • {business.address}
+                      </p>
                     </div>
                   </div>
                 </button>
@@ -476,10 +360,18 @@ function PanelBody({
           })}
 
           {!loading && filteredItems.length === 0 ? (
-            <li className={cn("glass-panel", "rounded-2xl border-dashed px-3 py-6 text-center text-sm text-[var(--text-secondary)]")}>
-              {nameQuery.trim()
-                ? "No hay resultados con esta busqueda dentro del area visible."
-                : "No hay sucursales en el area visible."}
+            <li className="flex flex-col items-center justify-center p-10 text-center gap-4">
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-[var(--surface-2)] border-2 border-dashed border-[var(--border-strong)]">
+                <Search className="h-6 w-6 text-[var(--text-muted)] opacity-50" />
+              </div>
+              <div>
+                <p className="text-[0.95rem] font-bold text-[var(--text-primary)]">Sin resultados</p>
+                <p className="text-[0.8rem] text-[var(--text-secondary)] mt-1 max-w-[200px] mx-auto">
+                  {nameQuery.trim()
+                    ? "No encontramos nada con esa búsqueda."
+                    : "Intenta mover el mapa a otra zona."}
+                </p>
+              </div>
             </li>
           ) : null}
         </ul>
@@ -531,11 +423,12 @@ export default function SucursalesFiltersPanel({
 
   return (
     <>
+      {/* DESKTOP ASIDE */}
       <aside
         className={cn(
-          "pointer-events-auto absolute left-4 z-[460] hidden w-[min(390px,calc(100%-2rem))] min-h-0 rounded-[1.85rem] p-4 lg:block",
-          "top-[calc(env(safe-area-inset-top)+4.55rem)] h-[calc(100%-env(safe-area-inset-top)-5.55rem)]",
-          "glass-panel-heavy"
+          "pointer-events-auto absolute left-6 z-[460] hidden w-[min(420px,calc(100%-3rem))] min-h-0 rounded-[var(--radius-xl)] p-4 lg:flex flex-col",
+          "top-[calc(env(safe-area-inset-top)+6.5rem)] h-[calc(100%-env(safe-area-inset-top)-8.5rem)]",
+          "bg-[var(--surface-glass)] backdrop-blur-3xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
         )}
       >
         <PanelBody
@@ -543,9 +436,7 @@ export default function SucursalesFiltersPanel({
           onFiltersChange={onFiltersChange}
           items={items}
           viewportItems={viewportItems}
-          total={total}
           loading={loading}
-          error={error}
           selectedBusinessId={selectedBusinessId}
           onSelectBusiness={onSelectBusiness}
           requestingLocation={requestingLocation}
@@ -563,64 +454,64 @@ export default function SucursalesFiltersPanel({
         />
       </aside>
 
+      {/* MOBILE TRIGGER */}
       <button
         type="button"
         onClick={() => onMobileOpenChange(true)}
         className={cn(
-          "dashboard-focusable pointer-events-auto fixed bottom-4 left-4 z-[800] inline-flex min-h-11 items-center gap-2 px-4 text-sm font-semibold text-[var(--text-secondary)] lg:hidden",
-          "glass-floating"
+          "dashboard-focusable pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 z-[800] inline-flex min-h-14 items-center gap-2.5 rounded-full px-6 text-[0.9rem] font-bold text-[var(--text-primary)] lg:hidden",
+          "bg-[var(--surface-glass)] backdrop-blur-2xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)] transition-transform active:scale-95"
         )}
       >
-        <SlidersHorizontal className="h-4 w-4" />
-        Filtros
-        {activeFiltersCount > 0 ? (
-          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--app-primary-strong)] px-1 text-[0.63rem] font-semibold text-[var(--surface-3)] dark:bg-[var(--app-primary)] dark:text-[var(--surface-3)]">
+        <Search className="h-5 w-5 text-[var(--app-primary)]" />
+        Explorar lugares
+        {activeFiltersCount > 0 && (
+          <span className="ml-1 grid h-6 min-w-6 place-items-center rounded-full bg-[var(--app-primary)] px-2 text-[0.7rem] font-bold text-white shadow-sm">
             {activeFiltersCount}
           </span>
-        ) : null}
+        )}
       </button>
 
+      {/* MOBILE DRAWER */}
       <div
-        className={`fixed inset-0 z-[900] transition ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-[900] transition-opacity duration-300 ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
         aria-hidden={!mobileOpen}
       >
         <button
           type="button"
           onClick={() => onMobileOpenChange(false)}
-          className={cn("glass-overlay", "absolute inset-0 transition", mobileOpen ? "opacity-100" : "opacity-0")}
+          className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity"
           aria-label="Cerrar filtros"
         />
 
         <section
           className={cn(
-            "absolute inset-x-4 bottom-4 top-[calc(env(safe-area-inset-top)+5.25rem)] flex min-h-0 flex-col rounded-[1.5rem] p-4 transition duration-200",
-            mobileOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
-            "glass-panel-heavy"
+            "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+5rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-4 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            mobileOpen ? "translate-y-0" : "translate-y-12",
+            "bg-[var(--surface-glass)] backdrop-blur-3xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
           )}
         >
-          <div className="mb-3 flex items-center justify-end">
+          <div className="mb-4 flex items-center justify-end shrink-0">
             <button
               type="button"
               onClick={() => onMobileOpenChange(false)}
               className={cn(
-                "dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)]",
-                "glass-floating"
+                "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--text-secondary)]",
+                "bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-all"
               )}
               aria-label="Cerrar filtros"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="min-h-0 flex-1 pb-[max(env(safe-area-inset-bottom),0.25rem)]">
+          <div className="min-h-0 flex-1 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
             <PanelBody
               filters={filters}
               onFiltersChange={onFiltersChange}
               items={items}
               viewportItems={viewportItems}
-              total={total}
               loading={loading}
-              error={error}
               selectedBusinessId={selectedBusinessId}
               onSelectBusiness={onSelectBusiness}
               requestingLocation={requestingLocation}

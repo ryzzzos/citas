@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.3.3] - 2026-05-21
+
+### Changed
+- Redesigned `SucursalesFiltersPanel` to be more consumer-friendly (B2C), breaking away from corporate dashboard aesthetics. Lowered positioning to give the navbar breathing room.
+- Replaced `next-themes` and `disableTransitionOnChange` hacks with a fully custom, native View Transitions API implementation for Dark Mode toggling (`animated-theme-toggler.tsx`). This natively handles the clip-path expansion and prevents the browser's default crossfade.
+- Replaced custom shadows with standard `globals.css` tokens (`var(--glass-shadow)`, `var(--shadow-md)`) across the map filter panel.
+
 ## [0.3.2] - 2026-05-21
 
 ### Fixed

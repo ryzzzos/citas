@@ -11,7 +11,6 @@ function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-
 interface SucursalesDetailSheetProps {
   business: BusinessMapPoint | null;
   onClose: () => void;
@@ -44,122 +43,96 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
   return (
     <section
       className={cn(
-        "pointer-events-auto fixed bottom-4 left-4 right-4 z-[500] rounded-[1.85rem] p-4 lg:bottom-[max(env(safe-area-inset-bottom),1.25rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[420px] lg:max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-6rem)] lg:overflow-y-auto",
-        "glass-panel-heavy"
+        "pointer-events-auto fixed bottom-4 left-4 right-4 z-[500] flex flex-col overflow-hidden rounded-[var(--radius-xl)]",
+        "bg-[var(--surface-glass)] backdrop-blur-2xl shadow-[var(--shadow-lg)] border border-[var(--border-soft)]",
+        "lg:bottom-[max(env(safe-area-inset-bottom),1.5rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[400px]"
       )}
-      aria-label="Detalle de sucursal"
+      aria-label={`Detalle de sucursal: ${business.name}`}
     >
-      <div className="relative">
-        <div
-          className="relative rounded-[1.35rem] border p-1"
-          style={{
-            borderColor: "var(--glass-border-default)",
-            backgroundColor: "var(--glass-bg-base)",
-          }}
+      <div className="relative h-48 w-full bg-[var(--surface-2)] shrink-0">
+        {canRenderCover ? (
+          <Image
+            src={business.cover_image_url as string}
+            alt={`Portada de ${business.name}`}
+            fill
+            sizes="(max-width: 1024px) 100vw, 400px"
+            className="object-cover"
+            unoptimized
+            onError={() => setErroredCoverUrl(business.cover_image_url)}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-3)]" />
+        )}
+
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+
+        <button
+          type="button"
+          onClick={onClose}
+          className={cn(
+            "absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full",
+            "bg-black/30 text-white backdrop-blur-md transition-colors hover:bg-black/50"
+          )}
+          aria-label="Cerrar detalle"
         >
-          <div className="relative overflow-hidden rounded-[1.1rem]">
-            <div
-              className="relative aspect-[16/9]"
-              style={{
-                background:
-                  "linear-gradient(144deg, color-mix(in oklab, var(--app-primary) 12%, var(--surface-2) 88%) 0%, var(--glass-bg-soft) 100%)",
-              }}
-            >
-              {canRenderCover ? (
-                <Image
-                  src={business.cover_image_url as string}
-                  alt={`Portada de ${business.name}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 420px"
-                  className="object-cover object-center"
-                  unoptimized
-                  onError={() => setErroredCoverUrl(business.cover_image_url)}
-                />
-              ) : null}
+          <X className="h-4 w-4" />
+        </button>
 
-              <div className="absolute inset-0 bg-[var(--surface-glass)]" />
-
-              <div className="absolute left-3 top-3 inline-flex min-h-8 items-center rounded-full border border-[color:var(--glass-border)] bg-[var(--surface-glass)] px-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)]">
-                {business.category}
-              </div>
-
-              <button
-                type="button"
-                onClick={onClose}
-                className={cn(
-                  "dashboard-focusable absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-primary)]",
-                  "glass-floating"
-                )}
-                aria-label="Cerrar detalle"
-              >
-                <X className="h-4 w-4" />
-              </button>
-
-            </div>
-          </div>
-
+        <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3">
           <div
             className={cn(
-              "glass-floating-muted",
-              "absolute -bottom-10 left-5 grid h-[4.75rem] w-[4.75rem] place-items-center overflow-hidden rounded-full border-2 p-0",
-              "shadow-[var(--glass-shadow)]"
+              "relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)]",
+              "bg-[var(--surface-3)] shadow-sm border border-[var(--border-soft)]"
             )}
-            style={{
-              borderColor: "var(--dashboard-bg)",
-              backgroundColor: "var(--glass-bg-soft)",
-            }}
           >
             {canRenderLogo ? (
               <Image
                 src={business.logo_image_url as string}
                 alt={`Logo de ${business.name}`}
                 fill
-                sizes="72px"
+                sizes="56px"
                 className="object-cover"
                 unoptimized
                 onError={() => setErroredLogoUrl(business.logo_image_url)}
               />
             ) : (
-              <span
-                className="text-sm font-semibold uppercase tracking-[0.08em]"
-                style={{ color: "var(--text-secondary)" }}
-              >
+              <span className="text-sm font-semibold uppercase text-[var(--text-secondary)]">
                 {toInitials(business.name)}
               </span>
             )}
           </div>
+          <div className="flex-1 pb-1">
+            <span className="inline-block rounded-full bg-white/20 px-2 py-0.5 text-[0.65rem] font-medium tracking-wide text-white backdrop-blur-md mb-1.5 uppercase">
+              {business.category}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="mt-10">
-        <h3
-          className="text-[1.35rem] font-semibold tracking-tight"
-          style={{ color: "var(--text-primary)" }}
-        >
+      <div className="flex flex-col p-5">
+        <h3 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
           {business.name}
         </h3>
 
-        <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: "var(--text-secondary)" }}>
-          <MapPin className="h-4 w-4" aria-hidden="true" />
-          {business.address}, {business.city}
+        <p className="mt-1.5 flex items-center gap-1.5 text-[0.85rem] font-medium text-[var(--text-secondary)]">
+          <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className="truncate">{business.address}, {business.city}</span>
         </p>
-      </div>
 
-      <p className="mt-3 text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
-        {business.public_bio?.trim() ||
-          "Descubre su propuesta de valor, explora servicios destacados y conoce la experiencia completa en su perfil publico."}
-      </p>
+        <p className="mt-4 text-[0.85rem] leading-relaxed text-[var(--text-muted)] line-clamp-3">
+          {business.public_bio?.trim() ||
+            "Descubre su propuesta de valor, explora servicios destacados y conoce la experiencia completa en su perfil publico."}
+        </p>
 
-      <div className="mt-4">
         <Link
           href={`/${business.slug}`}
           className={cn(
-            "dashboard-focusable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold",
-            "glass-floating"
+            "mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-full",
+            "bg-[var(--app-primary)] text-white shadow-sm transition-opacity hover:opacity-90"
           )}
-          style={{ color: "var(--text-primary)" }}
         >
-          Ver perfil
+          <span className="text-[0.85rem] font-semibold">Ver perfil de la sucursal</span>
           <ExternalLink className="h-4 w-4" />
         </Link>
       </div>

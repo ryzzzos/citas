@@ -46,8 +46,9 @@ agenda-web/
 
 ## Design Context
 
-- Design should feel elegant, calm, and polished, with a slight Apple-inspired influence.
-- Prioritize simplicity, strong typography hierarchy, balanced whitespace, and restrained color usage.
+- Design should feel elegant, calm, polished, and **consumer-friendly** (B2C), with a strong Apple-inspired influence.
+- **CRITICAL:** Avoid "corporate" or rigid internal-dashboard aesthetics (e.g., cramped headers, excessive greys). The UI must feel human, welcoming, and vibrant for end-users.
+- Prioritize simplicity, strong typography hierarchy, balanced whitespace (let components breathe), and restrained but intentional color usage (relying strictly on `globals.css` variables).
 - Use subtle animations and transitions to reinforce clarity, not decoration.
 - Keep components consistent and reusable to preserve visual coherence as features scale.
 

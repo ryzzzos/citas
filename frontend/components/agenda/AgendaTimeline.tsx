@@ -93,7 +93,7 @@ function renderEventBlock(
   return (
     <article
       key={booking.id}
-      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[var(--shadow-md)] backdrop-blur-xl transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[var(--shadow-lg)] ${getBookingTone(
+      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[var(--shadow-md)] transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[var(--shadow-lg)] ${getBookingTone(
         booking.status
       )}`}
       style={{
@@ -154,18 +154,18 @@ export default function AgendaTimeline({
   return (
     <section
       aria-label="Timeline de citas"
-      className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 shadow-[var(--shadow-md)] backdrop-blur-2xl sm:p-5 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:shadow-[var(--shadow-md)]"
+      className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] sm:p-5 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
     >
       <div className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
             <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
-            <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="sticky left-0 top-0 z-40 bg-[inherit] px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
               Hora
             </div>
             {columns.length > 1 && columns.map((column) => (
               <div
                 key={column.isoDate}
-                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-sm)] backdrop-blur-sm ${
+                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-sm)] ${
                   column.isToday
                     ? "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)]"
                     : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
@@ -195,7 +195,7 @@ export default function AgendaTimeline({
               return (
                 <div
                   key={column.isoDate}
-                  className="relative overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)]"
+                  className="relative overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
                   style={{ height: canvasHeight }}
                   role="group"
                   aria-label={`${column.dayLabel} ${column.dateLabel}`}
