@@ -200,7 +200,7 @@ export default function BusinessProfileView({
       <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)]  shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
         <div className="relative isolate">
           {!business.cover_image_url || coverError ? (
-            <div className="aspect-[20/8] w-full bg-[linear-gradient(140deg,var(--app-primary)_0%,var(--app-primary-strong)_100%)] lg:aspect-[24/8]" />
+            <div className="aspect-[20/8] w-full lg:aspect-[24/8]" />
           ) : (
             <Image
               src={business.cover_image_url}
@@ -213,8 +213,6 @@ export default function BusinessProfileView({
             />
           )}
 
-          <div className="absolute inset-0 bg-[var(--surface-glass)]" />
-          <div className="absolute inset-0 bg-[var(--surface-glass)]" />
           <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)] backdrop-blur-md">
               <Store className="h-3.5 w-3.5" aria-hidden="true" />

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+
+## [0.3.2] - 2026-05-21
+
+### Fixed
+- I make little corrections to agenda for better experience 
+- i centralized changelog so it could  be organized by version
+
+
 ## [0.3.1] - 2026-05-18
 
 ### Chore

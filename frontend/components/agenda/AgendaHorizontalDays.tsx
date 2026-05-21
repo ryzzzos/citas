@@ -68,21 +68,22 @@ export default function AgendaHorizontalDays({
   }, []);
 
   return (
-    <div className="relative mb-2">
+    <div className="relative mb-2 flex">
+      <div className="flex min-w-max shrink-0 items-center pr-2 pb-4 pt-1">
+        <div className="flex h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 shadow-[var(--shadow-sm)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
+          <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)]" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] ">
+            {anchorDate.setZone(timezone).toFormat("MMM, yyyy")}
+          </span>
+        </div>
+        <div className="ml-2 h-10 w-[1px] bg-[var(--border-strong)]" />
+      </div>
+
       <div 
         ref={containerRef}
-        className="flex min-w-0 items-center gap-2 overflow-x-auto overflow-y-hidden pb-4 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar px-1"
+        className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overflow-y-hidden pb-4 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar px-1"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="sticky left-0 z-10 flex min-w-max items-center bg-transparent pr-2">
-          <div className="flex h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 shadow-[var(--shadow-sm)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-            <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)]" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] ">
-              {anchorDate.setZone(timezone).toFormat("MMM, yyyy")}
-            </span>
-          </div>
-          <div className="ml-2 h-10 w-[1px] bg-[var(--border-strong)]" />
-        </div>
 
         {days.map((date) => {
           const isSelected = date.hasSame(anchorDate, "day");
@@ -125,6 +126,7 @@ export default function AgendaHorizontalDays({
           );
         })}
       </div>
+      <div className="pointer-events-none absolute left-0 top-0 bottom-4 w-12 bg-gradient-to-r from-[var(--surface-2)] to-transparent dark:from-[var(--surface-1)]" />
       {/* Efectos de gradiente en los bordes para indicar más scroll */}
       <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-[var(--surface-2)] to-transparent" />
     </div>
