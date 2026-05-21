@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import { useTheme } from "next-themes";
 
 import SucursalesMapMarkers from "@/components/sucursales/SucursalesMapMarkers";
 import type { BusinessMapPoint } from "@/types";
@@ -62,15 +63,19 @@ function FocusBusinessController({
 }) {
   const map = useMap();
 
+  const id = focusBusiness?.id;
+  const lat = focusBusiness?.latitude;
+  const lng = focusBusiness?.longitude;
+
   useEffect(() => {
-    if (!focusBusiness) {
+    if (!id || lat === undefined || lng === undefined) {
       return;
     }
 
-    map.flyTo([focusBusiness.latitude, focusBusiness.longitude], Math.max(map.getZoom(), 14), {
+    map.flyTo([lat, lng], Math.max(map.getZoom(), 14), {
       duration: 0.35,
     });
-  }, [focusBusiness, map]);
+  }, [id, lat, lng, map]);
 
   return null;
 }
@@ -104,7 +109,16 @@ export default function SucursalesMapCanvas({
   onSelectBusiness,
   onViewportChange,
 }: SucursalesMapCanvasProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  
+  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <MapContainer
@@ -121,7 +135,7 @@ export default function SucursalesMapCanvas({
         maxNativeZoom={19}
         maxZoom={22}
         keepBuffer={8}
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution={attribution}
       />
 
       <ViewportReporter onViewportChange={onViewportChange} />

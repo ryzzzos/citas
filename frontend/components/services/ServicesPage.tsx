@@ -32,6 +32,7 @@ export default function ServicesPage() {
   const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const mode = useMemo(() => (editingService ? "edit" : "create"), [editingService]);
 
@@ -117,21 +118,26 @@ export default function ServicesPage() {
         onManageCategories={() => setCategoriesModalOpen(true)}
       />
 
-      <ServicesFilters filters={filters} onFiltersChange={setFilters} />
+      <ServicesFilters 
+        filters={filters} 
+        onFiltersChange={setFilters} 
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
       {actionError ? (
-        <p className="border border-[var(--color-error)] bg-[var(--surface-2)] p-3 text-sm text-[var(--color-error)]">
+        <p className="rounded-lg border border-[var(--color-error)] bg-[var(--color-error)]/10 p-3 text-sm text-[var(--color-error)]">
           {actionError}
         </p>
       ) : null}
 
       {filteredServices.length === 0 ? (
-        <section className="bg-[var(--surface-1)] p-10 text-center">
-          <p className="text-lg font-semibold">No hay servicios para este filtro</p>
-          <p className="mt-2 text-sm">
-            Ajusta la busqueda o crea un nuevo servicio para comenzar.
+        <section className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-12 text-center shadow-[var(--shadow-sm)]">
+          <p className="text-[16px] font-semibold tracking-tight text-[var(--text-primary)]">No hay servicios para este filtro</p>
+          <p className="mt-1 text-[14px] text-[var(--text-muted)]">
+            Ajusta la búsqueda o crea un nuevo servicio para comenzar.
           </p>
-          <Button onClick={openCreateModal} className="mt-4">
+          <Button onClick={openCreateModal} className="mt-6 shadow-[var(--shadow-sm)] border border-[var(--border-soft)]">
             Crear servicio
           </Button>
         </section>
@@ -139,6 +145,7 @@ export default function ServicesPage() {
         <ServicesList
           services={filteredServices}
           disabled={saving}
+          viewMode={viewMode}
           onEdit={openEditModal}
           onToggleActive={handleToggle}
           onDelete={handleDelete}

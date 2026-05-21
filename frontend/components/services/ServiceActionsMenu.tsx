@@ -1,4 +1,5 @@
-import Button from "@/components/ui/Button";
+import { Pencil, Power, PowerOff, Trash2 } from "lucide-react";
+import AppIcon from "@/components/ui/AppIcon";
 import type { Service } from "@/types";
 
 interface ServiceActionsMenuProps {
@@ -17,34 +18,43 @@ export default function ServiceActionsMenu({
   onDelete,
 }: ServiceActionsMenuProps) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
-      <Button
+    <div className="flex items-center gap-1">
+      <button
         type="button"
-        variant="secondary"
         disabled={disabled}
         onClick={() => onEdit(service)}
-        className="rounded-lg px-3 py-1.5 text-xs"
+        className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--app-primary)] disabled:opacity-50"
+        title="Editar servicio"
+        aria-label="Editar servicio"
       >
-        Editar
-      </Button>
-      <Button
+        <AppIcon icon={Pencil} size="sm" />
+      </button>
+
+      <button
         type="button"
-        variant="secondary"
         disabled={disabled}
         onClick={() => onToggleActive(service)}
-        className="rounded-lg px-3 py-1.5 text-xs"
+        className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50 ${
+          service.is_active 
+            ? "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--color-pending)]" 
+            : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--color-info)]"
+        }`}
+        title={service.is_active ? "Desactivar servicio" : "Activar servicio"}
+        aria-label={service.is_active ? "Desactivar servicio" : "Activar servicio"}
       >
-        {service.is_active ? "Desactivar" : "Activar"}
-      </Button>
-      <Button
+        <AppIcon icon={service.is_active ? PowerOff : Power} size="sm" />
+      </button>
+
+      <button
         type="button"
-        variant="danger"
         disabled={disabled}
         onClick={() => onDelete(service)}
-        className="rounded-lg px-3 py-1.5 text-xs"
+        className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--color-error)] disabled:opacity-50"
+        title="Eliminar servicio"
+        aria-label="Eliminar servicio"
       >
-        Eliminar
-      </Button>
+        <AppIcon icon={Trash2} size="sm" />
+      </button>
     </div>
   );
 }

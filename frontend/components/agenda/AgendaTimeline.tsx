@@ -67,7 +67,7 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
       booking,
       lane,
       laneCount,
-      top: current.start * PX_PER_MINUTE,
+      top: current.start * PX_PER_MINUTE,                                                       
       height: Math.max(40, (current.end - current.start) * PX_PER_MINUTE),
     };
   });

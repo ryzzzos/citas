@@ -26,7 +26,7 @@ type ClusterProperties = {
 };
 
 const STORE_ICON_SVG = [
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sucursales-pin-store" aria-hidden="true">',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">',
   '<path d="M2 9h1a1 1 0 0 1 1 1v5" />',
   '<path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />',
   '<path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />',
@@ -34,21 +34,34 @@ const STORE_ICON_SVG = [
 ].join("");
 
 function createPinIcon(selected: boolean): L.DivIcon {
+  const bgClass = selected ? 'bg-[var(--app-primary)] text-white' : 'bg-[var(--surface-3)] text-[var(--app-primary)]';
+  const ringClass = selected ? 'ring-4 ring-[var(--app-primary)]/20 shadow-[var(--shadow-md)]' : 'ring-1 ring-[var(--border-strong)] shadow-[var(--shadow-md)]';
+  const arrowColor = selected ? 'border-t-[var(--app-primary)]' : 'border-t-[var(--surface-3)]';
+
   return L.divIcon({
-    className: "sucursales-pin-icon",
-    iconSize: [52, 62],
-    iconAnchor: [26, 50],
-    html: `<span class="sucursales-pin ${selected ? "is-selected" : ""}"><span class="sucursales-pin-marker"><span class="sucursales-pin-core">${STORE_ICON_SVG}</span></span><span class="sucursales-pin-shadow"></span></span>`,
+    className: "bg-transparent border-none",
+    iconSize: [40, 48],
+    iconAnchor: [20, 48],
+    html: `
+      <div class="relative flex items-center justify-center w-10 h-10 ${bgClass} rounded-full ${ringClass} transition-all duration-300 transform ${selected ? 'scale-110 z-50' : 'hover:scale-105'} cursor-pointer">
+        ${STORE_ICON_SVG}
+        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent ${arrowColor} drop-shadow-sm"></div>
+      </div>
+    `,
   });
 }
 
 function createClusterIcon(count: number): L.DivIcon {
   const size = count >= 100 ? 52 : count >= 20 ? 46 : 40;
   return L.divIcon({
-    className: "sucursales-cluster-icon",
+    className: "bg-transparent border-none",
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
-    html: `<span class="sucursales-cluster-bubble">${count}</span>`,
+    html: `
+      <div class="flex items-center justify-center w-full h-full bg-[var(--app-primary)] text-white rounded-full shadow-[var(--shadow-md)] ring-[5px] ring-white/90 dark:ring-[var(--surface-1)]/90 text-[14px] font-bold transition-transform hover:scale-110 cursor-pointer">
+        ${count}
+      </div>
+    `,
   });
 }
 

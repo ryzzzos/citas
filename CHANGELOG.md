@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.3.4] - 2026-05-21
+
+### Changed
+- Complete premium redesign of `ServiceCategoriesModal` and `ServiceFormModal` using glassmorphism backdrops, separated layout cards, and iOS-like switches.
+- Refactored Map Markers (`SucursalesMapMarkers`) into high-resolution, responsive Tailwind CSS components with interactive hover and selected states.
+- Implemented a custom CSS-filtered dark mode for OpenStreetMap tiles to provide a nighttime viewing experience without losing contrast on roads and topography.
+
+### Fixed
+- Resolved a bug in the `SucursalesMapCanvas` where the map would forcefully lock back to the selected business after panning, by decoupling the camera focus controller from the array reference updates.
+
 ## [0.3.3] - 2026-05-21
 
 ### Changed

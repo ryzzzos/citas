@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { BriefcaseBusiness, CircleCheckBig, CircleOff, Plus } from "lucide-react";
+import { BriefcaseBusiness, CircleCheckBig, CircleOff, Plus, Tags } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import type { Service } from "@/types";
 
@@ -14,52 +14,64 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
   const inactiveCount = services.length - activeCount;
 
   return (
-    <header className="overflow-hidden rounded-[--radius-lg] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-sm)] lg:p-8">
-      <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
-        <div className="relative z-10">
-          <h2 className="mt-1 text-3xl font-bold tracking-tight text-[var(--text-primary)] lg:text-4xl">Mis servicios</h2>
-          <p className="mt-2 max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
-            Crea, edita y controla la disponibilidad de los servicios y precios de tu negocio en tiempo real.
+    <header className="flex flex-col gap-6">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">Mis servicios</h2>
+          <p className="mt-1.5 max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
+            Gestiona tu catálogo de servicios, precios y disponibilidad.
           </p>
         </div>
 
-        <div className="flex gap-3">
-          <Button variant="secondary" onClick={onManageCategories} className="relative z-10 min-h-12 shrink-0 rounded-full px-6 shadow-[var(--shadow-sm)] transition-all hover:scale-[1.02] active:scale-[0.98]">
-            <span className="font-bold tracking-tight">Categorías</span>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Button 
+            variant="secondary" 
+            onClick={onManageCategories} 
+            className="flex-1 sm:flex-none relative min-h-11 rounded-full px-5 shadow-[var(--shadow-sm)] transition-all active:scale-[0.98] border border-[var(--border-strong)] bg-[var(--surface-3)] hover:bg-[var(--surface-2)]"
+          >
+            <AppIcon icon={Tags} className="mr-2 text-[var(--text-secondary)]" size="sm" />
+            <span className="font-semibold text-[13px] tracking-tight text-[var(--text-primary)]">Categorías</span>
           </Button>
 
-          <Button onClick={onCreate} className="relative z-10 min-h-12 shrink-0 rounded-full px-6 shadow-[var(--shadow-md)] transition-all hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]">
+          <Button 
+            onClick={onCreate} 
+            className="flex-1 sm:flex-none relative min-h-11 rounded-full px-5 shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] border border-[var(--border-soft)]"
+          >
             <AppIcon icon={Plus} className="mr-2" size="sm" />
-            <span className="font-bold tracking-tight">Nuevo servicio</span>
+            <span className="font-semibold text-[13px] tracking-tight">Nuevo</span>
           </Button>
         </div>
       </div>
 
-      <div className="relative z-10 mt-8 grid gap-4 grid-cols-1 xs:grid-cols-2 lg:grid-cols-3">
-        <article className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:border-[var(--app-primary)] hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:hover:border-[var(--app-primary)] dark:hover:bg-[var(--surface-2)]">
-          <div className="flex items-center justify-between">
-            <AppIcon icon={BriefcaseBusiness} className="text-[var(--text-muted)] transition-colors group-hover:text-[var(--app-primary)] dark:text-[var(--text-secondary)]" />
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)]">Total</p>
+      <div className="grid gap-3 grid-cols-1 xs:grid-cols-2 lg:grid-cols-3">
+        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-secondary)]">
+              <AppIcon icon={BriefcaseBusiness} size="sm" />
+            </div>
+            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Total de servicios</p>
           </div>
-          <p className="mt-4 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{services.length}</p>
+          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{services.length}</p>
         </article>
 
-        <article className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-info)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] backdrop-blur-md transition-all hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-md)]">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[var(--surface-glass)] blur-2xl" />
-          <div className="flex items-center justify-between">
-            <AppIcon icon={CircleCheckBig} className="text-[var(--app-primary)]" />
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--app-primary)]">Activos</p>
+        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
+           <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)]">
+              <AppIcon icon={CircleCheckBig} size="sm" />
+            </div>
+            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Activos</p>
           </div>
-          <p className="mt-4 text-4xl font-bold tracking-tight text-[var(--color-info)]">{activeCount}</p>
+          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{activeCount}</p>
         </article>
 
-        <article className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-pending)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] backdrop-blur-md transition-all hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-md)]">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[var(--surface-glass)] blur-2xl" />
-          <div className="flex items-center justify-between">
-             <AppIcon icon={CircleOff} className="text-[var(--color-pending)]" />
-             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-pending)]">Inactivos</p>
+        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
+           <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-pending)] text-[var(--surface-3)]">
+              <AppIcon icon={CircleOff} size="sm" />
+            </div>
+            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Inactivos</p>
           </div>
-          <p className="mt-4 text-4xl font-bold tracking-tight text-[var(--color-pending)]">{inactiveCount}</p>
+          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{inactiveCount}</p>
         </article>
       </div>
     </header>
