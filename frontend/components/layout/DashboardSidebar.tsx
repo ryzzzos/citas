@@ -24,7 +24,7 @@ const navLinkVariants = cva(
     variants: {
       active: {
         true: "bg-[var(--surface-3)] border-[var(--border-strong)] text-[var(--app-primary-strong)] shadow-[var(--shadow-md)] dark:text-[var(--app-primary)]",
-        false: "border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--surface-1)]",
+        false: "border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)]",
       },
     },
     defaultVariants: {
@@ -101,7 +101,7 @@ function SidebarContent({ pathname, onItemSelect }: { pathname: string; onItemSe
   return (
     <>
       <div className="mb-2 px-1">
-        <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-[var(--shadow-sm)])]">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)]">
             Agenda Web
           </p>
@@ -147,7 +147,7 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={onCloseMobile}
-          className={`absolute inset-0 bg-slate-950/45 transition duration-200 motion-reduce:transition-none ${mobileOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-[var(--surface-0)]/45 transition duration-200 motion-reduce:transition-none ${mobileOpen ? "opacity-100" : "opacity-0"}`}
           aria-label="Cerrar menu lateral"
         />
 

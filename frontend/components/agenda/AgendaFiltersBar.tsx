@@ -34,7 +34,7 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
           <select
             value={filters.status}
             onChange={(event) => onFiltersChange(updateStatus(filters, event.target.value as AgendaFilters["status"]))}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
+            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
           >
             {STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -52,7 +52,7 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
           <select
             value={filters.staffId}
             onChange={(event) => onFiltersChange({ ...filters, staffId: event.target.value })}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
+            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
           >
             <option value="all">Todo el staff</option>
             {staff.map((member) => (
@@ -71,7 +71,7 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
           <select
             value={filters.serviceId}
             onChange={(event) => onFiltersChange({ ...filters, serviceId: event.target.value })}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
+            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
           >
             <option value="all">Todos los servicios</option>
             {services.map((service) => (
@@ -92,7 +92,7 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
             value={filters.query}
             onChange={(event) => onFiltersChange({ ...filters, query: event.target.value })}
             placeholder="ID, estado, staff, servicio..."
-            className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] placeholder:text-zinc-400 shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[var(--app-primary-soft)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]  dark:placeholder:text-[var(--text-muted)] dark:focus:border-[var(--app-primary)] dark:focus:bg-zinc-900 dark:focus:ring-[rgba(37,99,235,0.15)]"
+            className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:placeholder:text-[var(--text-muted)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
           />
         </label>
       </div>

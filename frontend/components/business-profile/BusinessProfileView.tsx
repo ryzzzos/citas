@@ -69,8 +69,8 @@ function InfoRow({
   const opensExternal = Boolean(href && href.startsWith("http"));
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-[var(--border-strong)] bg-zinc-50/70 p-3 dark:border-zinc-800 dark:bg-[var(--surface-1)]/60">
-      <div className="rounded-full border border-zinc-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-800">
+    <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
+      <div className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
         <AppIcon icon={Icon} className="text-[var(--text-secondary)]" />
       </div>
       <div className="min-w-0">
@@ -82,12 +82,12 @@ function InfoRow({
             href={href}
             target={opensExternal ? "_blank" : undefined}
             rel={opensExternal ? "noreferrer" : undefined}
-            className="dashboard-focusable mt-1 inline-flex break-all text-sm leading-6 text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-100 dark:decoration-zinc-600 dark:hover:decoration-zinc-300"
+            className="dashboard-focusable mt-1 inline-flex break-all text-sm leading-6 text-[var(--text-primary)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--text-secondary)] dark:decoration-[var(--border-strong)] dark:hover:decoration-[var(--text-secondary)]"
           >
             {value}
           </Link>
         ) : (
-          <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-200">{value}</p>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">{value}</p>
         )}
       </div>
     </div>
@@ -99,7 +99,7 @@ function Avatar({ logoUrl, businessName }: { logoUrl: string | null; businessNam
 
   if (!logoUrl || logoError) {
     return (
-      <div className="flex h-24 w-24 items-center justify-center rounded-[1.65rem] border-4 border-white bg-zinc-800 text-3xl font-semibold text-white shadow-[0_20px_40px_-28px_rgba(15,23,42,0.75)] dark:border-zinc-900 dark:bg-zinc-200 dark:text-zinc-900 sm:h-28 sm:w-28 md:h-32 md:w-32">
+      <div className="flex h-24 w-24 items-center justify-center rounded-[1.65rem] border-4 border-[var(--border-strong)] bg-[var(--surface-1)] text-3xl font-semibold text-[var(--surface-3)] shadow-[var(--shadow-lg)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-0)] dark:text-[var(--text-primary)] sm:h-28 sm:w-28 md:h-32 md:w-32">
         {businessName.slice(0, 1).toUpperCase()}
       </div>
     );
@@ -111,7 +111,7 @@ function Avatar({ logoUrl, businessName }: { logoUrl: string | null; businessNam
       alt={`Logo de ${businessName}`}
       width={128}
       height={128}
-      className="h-24 w-24 rounded-[1.65rem] border-4 border-white object-cover shadow-[0_20px_40px_-28px_rgba(15,23,42,0.75)] dark:border-zinc-900 sm:h-28 sm:w-28 md:h-32 md:w-32"
+      className="h-24 w-24 rounded-[1.65rem] border-4 border-[var(--border-strong)] object-cover shadow-[var(--shadow-lg)] dark:border-[var(--border-strong)] sm:h-28 sm:w-28 md:h-32 md:w-32"
       unoptimized
       onError={() => setLogoError(true)}
     />
@@ -189,7 +189,7 @@ export default function BusinessProfileView({
             unoptimized
           />
         ) : (
-          <div className="h-full w-full max-w-[17rem] rounded-3xl bg-[radial-gradient(circle_at_80%_20%,rgba(20,184,166,0.18),transparent_40%),radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.2),transparent_38%)]" />
+          <div className="h-full w-full max-w-[17rem] rounded-3xl bg-[var(--surface-glass)]" />
         ),
       };
     });
@@ -197,10 +197,10 @@ export default function BusinessProfileView({
 
   return (
     <section className="space-y-5">
-      <article className="overflow-hidden rounded-[2rem] border border-zinc-200/90 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] shadow-[0_40px_80px_-60px_rgba(15,23,42,0.58)] dark:border-zinc-800 dark:bg-[linear-gradient(180deg,#0b1220_0%,#060b14_100%)]">
+      <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)]  shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
         <div className="relative isolate">
           {!business.cover_image_url || coverError ? (
-            <div className="aspect-[20/8] w-full bg-[linear-gradient(140deg,#314f78_0%,#286c80_42%,#3f6da7_100%)] lg:aspect-[24/8]" />
+            <div className="aspect-[20/8] w-full bg-[linear-gradient(140deg,var(--app-primary)_0%,var(--app-primary-strong)_100%)] lg:aspect-[24/8]" />
           ) : (
             <Image
               src={business.cover_image_url}
@@ -213,10 +213,10 @@ export default function BusinessProfileView({
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/25 to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.28),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[var(--surface-glass)]" />
+          <div className="absolute inset-0 bg-[var(--surface-glass)]" />
           <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-black/35 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)] backdrop-blur-md">
               <Store className="h-3.5 w-3.5" aria-hidden="true" />
               Perfil verificado
             </span>
@@ -224,21 +224,21 @@ export default function BusinessProfileView({
         </div>
 
         <div className="relative px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
-          <div className="-mt-14 rounded-[1.75rem] border border-zinc-200/85 bg-[var(--surface-3)]/ p-4 shadow-[0_28px_55px_-44px_rgba(15,23,42,0.6)] backdrop-blur-xl dark:border-zinc-800/90 dark:bg-[var(--surface-1)]/94 sm:-mt-16 sm:p-5">
+          <div className="-mt-14 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-glass)] p-4 shadow-[var(--shadow-md)] backdrop-blur-md dark:border-[var(--border-strong)] dark:bg-[var(--surface-glass)] sm:-mt-16 sm:p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                 <Avatar logoUrl={business.logo_image_url} businessName={business.name} />
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                    <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                       {business.category}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-zinc-700 dark:bg-[var(--surface-1)] ">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] ">
                       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                       {business.city}
                     </span>
                   </div>
-                  <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 md:text-[2.15rem]">
+                  <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem]">
                     {business.name}
                   </h1>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">
@@ -252,7 +252,7 @@ export default function BusinessProfileView({
                   <button
                     type="button"
                     onClick={onToggleEditing}
-                    className="dashboard-focusable dashboard-interactive inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-zinc-300 bg-zinc-100 px-4 text-sm font-semibold text-zinc-700 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
                   >
                     <AppIcon icon={Pencil} />
                     {isEditing ? "Cerrar editor" : "Editar perfil"}
@@ -262,7 +262,7 @@ export default function BusinessProfileView({
                 {mode === "dashboard-preview" ? (
                   <Link
                     href={publicProfileHref}
-                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
                   >
                     Ver perfil publico
                     <ExternalLink className="h-4 w-4" aria-hidden="true" />
@@ -270,24 +270,13 @@ export default function BusinessProfileView({
                 ) : hasActiveServices ? (
                   <Link
                     href={bookingHref}
-                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
                   >
                     Reservar ahora
                     <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 ) : null}
 
-                {whatsappHref ? (
-                  <Link
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 transition-colors hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100 dark:hover:bg-[var(--surface-2)]"
-                  >
-                    <AppIcon icon={MessageCircle} />
-                    WhatsApp
-                  </Link>
-                ) : null}
               </div>
             </div>
           </div>
@@ -296,7 +285,7 @@ export default function BusinessProfileView({
         <div className="px-4 pb-6 sm:px-6 sm:pb-7 lg:px-8 lg:pb-8">
           <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
             <aside className="space-y-4">
-              <section className="h-fit rounded-[1.6rem] border border-zinc-200 bg-white p-4 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-[var(--surface-1)] sm:p-5">
+              <section className="h-fit rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
                 <h2 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Informacion del negocio
                 </h2>
@@ -319,7 +308,7 @@ export default function BusinessProfileView({
                       href={whatsappHref}
                       target="_blank"
                       rel="noreferrer"
-                      className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
                     >
                       <AppIcon icon={MessageCircle} />
                       Contactar por WhatsApp
@@ -329,7 +318,7 @@ export default function BusinessProfileView({
                   {phoneHref ? (
                     <Link
                       href={phoneHref}
-                      className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-zinc-300 bg-zinc-100 px-4 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
                     >
                       <AppIcon icon={Phone} />
                       Llamar ahora
@@ -338,7 +327,7 @@ export default function BusinessProfileView({
                 </div>
               </section>
 
-              <section className="overflow-hidden rounded-[1.6rem] border border-zinc-200 bg-white shadow-[0_20px_45px_-38px_rgba(15,23,42,0.52)] dark:border-zinc-800 dark:bg-[var(--surface-1)]">
+              <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                 <iframe
                   title={`Mapa de ${business.name}`}
                   src={mapEmbedUrl}
@@ -350,12 +339,12 @@ export default function BusinessProfileView({
             </aside>
 
             <div className="space-y-5">
-              <section className="rounded-[1.8rem] border border-zinc-200/90 bg-[var(--surface-3)]/ p-4 shadow-[0_28px_56px_-42px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-[var(--surface-1)]/95 sm:p-5">
+              <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                   <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
                     Servicios
                   </h2>
-                  <span className="rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                  <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                     Magic Card
                   </span>
                 </div>

@@ -77,9 +77,9 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
                 />
               ) : null}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/52 via-black/20 to-black/8" />
+              <div className="absolute inset-0 bg-[var(--surface-glass)]" />
 
-              <div className="absolute left-3 top-3 inline-flex min-h-8 items-center rounded-full border border-[color:var(--glass-border-soft)] bg-black/28 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white">
+              <div className="absolute left-3 top-3 inline-flex min-h-8 items-center rounded-full border border-[color:var(--glass-border)] bg-[var(--surface-glass)] px-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)]">
                 {business.category}
               </div>
 
@@ -87,7 +87,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
                 type="button"
                 onClick={onClose}
                 className={cn(
-                  "dashboard-focusable absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-100",
+                  "dashboard-focusable absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-primary)]",
                   "glass-floating"
                 )}
                 aria-label="Cerrar detalle"
@@ -102,7 +102,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
             className={cn(
               "glass-floating-muted",
               "absolute -bottom-10 left-5 grid h-[4.75rem] w-[4.75rem] place-items-center overflow-hidden rounded-full border-2 p-0",
-              "shadow-[0_22px_38px_-22px_rgba(2,6,23,0.74)]"
+              "shadow-[var(--glass-shadow)]"
             )}
             style={{
               borderColor: "var(--dashboard-bg)",

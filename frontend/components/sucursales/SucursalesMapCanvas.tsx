@@ -133,9 +133,9 @@ export default function SucursalesMapCanvas({
           center={[userLocation.latitude, userLocation.longitude]}
           radius={8}
           pathOptions={{
-            color: "#0f172a",
+            color: "var(--text-primary)",
             weight: 2,
-            fillColor: "#f8fafc",
+            fillColor: "var(--surface-3)",
             fillOpacity: 0.95,
           }}
         >

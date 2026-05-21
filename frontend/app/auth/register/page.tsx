@@ -81,14 +81,14 @@ export default function RegisterPage() {
           />
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700 ">
+            <label className="text-sm font-medium text-[var(--text-secondary)] ">
               Tipo de cuenta
             </label>
             <div className="flex gap-3">
               {(["customer", "business_owner"] as Role[]).map((r) => (
                 <label
                   key={r}
-                  className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 "
+                  className="flex cursor-pointer items-center gap-2 text-sm text-[var(--text-secondary)] "
                 >
                   <input
                     type="radio"
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                     value={r}
                     checked={form.role === r}
                     onChange={() => set("role", r)}
-                    className="accent-zinc-900"
+                    className="accent-[var(--app-primary-strong)]"
                   />
                   {r === "customer" ? "Cliente" : "Negocio"}
                 </label>
@@ -104,14 +104,14 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
           <Button type="submit" isLoading={loading} className="mt-2 w-full">
             Crear cuenta
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/auth/login" className="font-medium text-zinc-900 underline ">
+          <Link href="/auth/login" className="font-medium text-[var(--text-primary)] underline ">
             Inicia sesión
           </Link>
         </p>

@@ -19,7 +19,7 @@ const SucursalesMapCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="relative flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.18),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.18),transparent_42%),linear-gradient(180deg,rgba(241,245,249,0.92),rgba(226,232,240,0.74))] text-sm text-[var(--text-secondary)] dark:bg-[radial-gradient(circle_at_14%_10%,rgba(20,184,166,0.2),transparent_44%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.8),rgba(2,6,23,0.66))] ">
+      <div className="relative flex h-full w-full items-center justify-center bg-[var(--surface-2)] text-sm text-[var(--text-secondary)] dark:bg-[var(--surface-0)]">
         <div className={cn("glass-panel", "rounded-2xl px-4 py-3 font-medium")}>Cargando mapa...</div>
       </div>
     ),
@@ -298,7 +298,7 @@ export default function SucursalesDiscoveryPage() {
   }, [detailDismissed, items, selectedBusinessId, viewportItems]);
 
   return (
-    <main className="relative h-[100dvh] min-h-screen w-full overflow-hidden bg-[radial-gradient(circle_at_16%_8%,rgba(20,184,166,0.12),transparent_46%),radial-gradient(circle_at_90%_2%,rgba(56,189,248,0.1),transparent_40%),linear-gradient(180deg,rgba(248,250,252,0.62),rgba(226,232,240,0.26))] dark:bg-[radial-gradient(circle_at_16%_8%,rgba(20,184,166,0.16),transparent_48%),radial-gradient(circle_at_90%_2%,rgba(56,189,248,0.1),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.46),rgba(2,6,23,0.16))]">
+    <main className="relative h-[100dvh] min-h-screen w-full overflow-hidden">
       <section className="absolute inset-0">
         <SucursalesMapCanvas
           businesses={items}

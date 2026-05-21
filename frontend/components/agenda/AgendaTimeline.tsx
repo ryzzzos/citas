@@ -74,10 +74,10 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 }
 
 function getBookingTone(status: AgendaBooking["status"]): string {
-  if (status === "pending") return "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300";
-  if (status === "confirmed") return "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300";
-  if (status === "completed") return "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300";
-  return "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300";
+  if (status === "pending") return "border-[var(--color-pending)] bg-[var(--surface-3)] text-[var(--color-pending)] shadow-[var(--shadow-sm)]";
+  if (status === "confirmed") return "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)] shadow-[var(--shadow-sm)]";
+  if (status === "completed") return "border-[var(--color-success)] bg-[var(--surface-3)] text-[var(--color-success)] shadow-[var(--shadow-sm)]";
+  return "border-[var(--color-error)] bg-[var(--surface-3)] text-[var(--color-error)] shadow-[var(--shadow-sm)]";
 }
 
 function renderEventBlock(
@@ -93,7 +93,7 @@ function renderEventBlock(
   return (
     <article
       key={booking.id}
-      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] ${getBookingTone(
+      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[var(--shadow-md)] backdrop-blur-xl transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[var(--shadow-lg)] ${getBookingTone(
         booking.status
       )}`}
       style={{
@@ -116,7 +116,7 @@ function renderEventBlock(
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="min-h-7 rounded-xl border border-[rgba(255,255,255,0.4)] bg-[var(--app-primary-gradient)] px-2 text-[10px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-7 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-2 text-[10px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Ok
         </button>
@@ -124,14 +124,14 @@ function renderEventBlock(
           type="button"
           onClick={() => onCancel(booking.id)}
           disabled={booking.status === "cancelled" || booking.status === "completed"}
-          className="min-h-7 rounded-xl border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent bg-gradient-to-b from-rose-500 to-rose-600 px-2 text-[10px] font-bold tracking-tight text-white shadow-[0_2px_8px_-2px_rgba(225,29,72,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-7 rounded-xl border border-[var(--border-soft)] bg-[var(--color-error)] px-2 text-[10px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           X
         </button>
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-7 rounded-xl border border-white/60 bg-[var(--surface-3)]/ px-2 text-[10px] font-bold tracking-tight text-current shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white active:scale-[0.98] dark:border-[var(--border-strong)]  dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] dark:hover:bg-black/40"
+          className="min-h-7 rounded-xl border border-[var(--border-soft)] bg-[var(--surface-3)] px-2 text-[10px] font-bold tracking-tight text-current shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all hover:bg-[var(--surface-2)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:hover:bg-[var(--surface-2)]"
         >
           R
         </button>
@@ -165,14 +165,14 @@ export default function AgendaTimeline({
             {columns.length > 1 && columns.map((column) => (
               <div
                 key={column.isoDate}
-                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-[var(--shadow-sm)])] backdrop-blur-sm ${
+                className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-sm)] backdrop-blur-sm ${
                   column.isToday
-                    ? "border-blue-200/60 bg-blue-500/10 text-blue-900 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-100"
-                    : "border-[var(--border-strong)] bg-zinc-50/70 text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
+                    ? "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)]"
+                    : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
                 }`}
               >
                 <p className="font-bold tracking-tight text-[var(--text-primary)]">{column.dayLabel}</p>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">{column.dateLabel}</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)]">{column.dateLabel}</p>
               </div>
             ))}
             {columns.length === 1 && <div className="sticky top-0 z-30 pointer-events-none"></div>}
@@ -195,7 +195,7 @@ export default function AgendaTimeline({
               return (
                 <div
                   key={column.isoDate}
-                  className="relative overflow-hidden rounded-2xl border border-zinc-200/40 bg-[var(--surface-3)]/ shadow-[inset_0_1px_rgba(255,255,255,0.2)] dark:border-zinc-800/40  dark:shadow-[inset_0_1px_rgba(0,0,0,0.2)]"
+                  className="relative overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)]"
                   style={{ height: canvasHeight }}
                   role="group"
                   aria-label={`${column.dayLabel} ${column.dateLabel}`}
@@ -206,7 +206,7 @@ export default function AgendaTimeline({
                     return (
                       <div
                         key={`${column.isoDate}-${hour}`}
-                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-200 dark:border-zinc-800"
+                        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-[var(--border-strong)]"
                         style={{ top }}
                         aria-hidden="true"
                       />

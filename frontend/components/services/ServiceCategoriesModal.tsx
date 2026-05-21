@@ -60,7 +60,7 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[var(--surface-0)]/50 p-4">
       <div className="dashboard-surface-1 w-full max-w-xl p-5 sm:p-6 flex flex-col max-h-[90vh]">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
@@ -98,7 +98,7 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
             <p className="text-[var(--text-muted)]">No tienes categorías aún.</p>
           ) : (
             categories.map((cat, idx) => (
-              <div key={cat.id} className="flex flex-col border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-[var(--surface-3)]">
+               <div key={cat.id} className="flex flex-col border border-[var(--border-strong)] rounded-xl p-3 bg-[var(--surface-3)] dark:border-[var(--border-strong)]">
                 {editingId === cat.id ? (
                    <form onSubmit={(e) => handleUpdate(e, cat)} className="flex gap-2">
                      <Input 
@@ -116,16 +116,16 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex flex-col gap-1 text-zinc-400">
-                        <button type="button" onClick={() => moveUp(idx)} disabled={idx === 0} className="hover:text-zinc-800 dark:hover:text-white disabled:opacity-30">▲</button>
-                        <button type="button" onClick={() => moveDown(idx)} disabled={idx === categories.length - 1} className="hover:text-zinc-800 dark:hover:text-white disabled:opacity-30">▼</button>
+                      <div className="flex flex-col gap-1 text-[var(--text-muted)]">
+                        <button type="button" onClick={() => moveUp(idx)} disabled={idx === 0} className="hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)] disabled:opacity-30">▲</button>
+                        <button type="button" onClick={() => moveDown(idx)} disabled={idx === categories.length - 1} className="hover:text-[var(--text-primary)] dark:hover:text-[var(--text-primary)] disabled:opacity-30">▼</button>
                       </div>
                       <span className="font-medium text-[var(--text-primary)]">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(cat)} className="p-2 text-[var(--text-muted)] hover:text-zinc-900 dark:hover:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg"><Pencil size={16}/></button>
+                      <button onClick={() => startEdit(cat)} className="rounded-lg bg-[var(--surface-2)] p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:bg-[var(--surface-1)] dark:hover:text-[var(--text-primary)]"><Pencil size={16}/></button>
                       {cat.name !== "Sin categoría" && (
-                        <button onClick={() => remove(cat.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg"><Trash size={16}/></button>
+                        <button onClick={() => remove(cat.id)} className="rounded-lg p-2 text-[var(--color-error)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-1)]"><Trash size={16}/></button>
                       )}
                     </div>
                   </div>

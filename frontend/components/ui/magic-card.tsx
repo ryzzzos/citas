@@ -39,7 +39,7 @@ const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
 }
 
 const ctaClass =
-  "pointer-events-auto inline-flex items-center text-sm font-semibold text-zinc-900 underline underline-offset-4 transition-colors hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-200"
+  "pointer-events-auto inline-flex items-center text-sm font-semibold text-[var(--text-primary)] underline underline-offset-4 transition-colors hover:text-[var(--text-secondary)] dark:hover:text-[var(--text-primary)]"
 
 const BentoCard = ({
   name,
@@ -57,8 +57,8 @@ const BentoCard = ({
     key={name}
     className={cn(
       "group relative col-span-3 flex min-h-[27rem] flex-col justify-between overflow-hidden rounded-xl",
-      "bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-      "dark:bg-background transform-gpu dark:[border:1px_solid_rgba(255,255,255,.1)]",
+      "bg-[var(--surface-3)] shadow-[var(--shadow-md)]",
+      "dark:bg-[var(--surface-3)] transform-gpu border border-[var(--border-strong)]",
       className
     )}
     {...props}
@@ -71,14 +71,14 @@ const BentoCard = ({
       {(durationBadge || priceBadge) ? (
         <div className="absolute left-6 top-6 flex flex-wrap gap-2">
           {durationBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-md">
+            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md">
               <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
               {durationBadge}
             </span>
           ) : null}
 
           {priceBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/45 bg-[var(--surface-3)]/ px-2.5 py-1 text-[11px] font-semibold text-zinc-900 backdrop-blur-md dark:bg-[var(--surface-1)]/80 dark:text-zinc-100">
+            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--glass-border)] bg-[var(--surface-3)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md dark:bg-[var(--surface-1)]">
               <Tag className="h-3.5 w-3.5" aria-hidden="true" />
               {priceBadge}
             </span>
@@ -87,16 +87,16 @@ const BentoCard = ({
       ) : null}
     </div>
 
-    <div className="relative flex flex-1 flex-col justify-end p-4 transition-colors duration-300 group-hover:bg-black/5 dark:group-hover:bg-neutral-800/10">
+    <div className="relative flex flex-1 flex-col justify-end p-4 transition-colors duration-300 group-hover:bg-[var(--surface-glass)] dark:group-hover:bg-[var(--surface-glass)]">
       <div
         className={cn(
-          "pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(244,244,245,0.55)_100%)] dark:bg-[linear-gradient(180deg,rgba(9,9,11,0)_0%,rgba(9,9,11,0.34)_100%)] z-0"
+          "pointer-events-none absolute inset-0 bg-[var(--surface-glass)] dark:bg-[var(--surface-glass)] z-0"
         )}
       />
 
       <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="h-12 w-12 origin-left transform-gpu text-zinc-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-zinc-200" />
-        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-50">
+        <Icon className="h-12 w-12 origin-left transform-gpu text-[var(--text-secondary)] transition-all duration-300 ease-in-out group-hover:scale-75" />
+        <h3 className="text-xl font-semibold text-[var(--text-primary)]">
           {name}
         </h3>
         <p className="max-w-lg text-[var(--text-secondary)]">{description}</p>

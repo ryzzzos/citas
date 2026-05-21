@@ -8,10 +8,10 @@ interface BookingCardProps {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  pending: "border-amber-200/60 bg-amber-500/10 text-amber-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300",
-  confirmed: "border-blue-200/60 bg-blue-500/10 text-blue-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
-  cancelled: "border-rose-200/60 bg-rose-500/10 text-rose-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300",
-  completed: "border-slate-200/60 bg-[var(--surface-1)]0/10 text-slate-700 shadow-[inset_0_1px_rgba(255,255,255,0.4)] dark:border-slate-500/30 dark:bg-[var(--surface-1)]0/10 dark:text-slate-300",
+  pending: "border-[var(--color-pending)] bg-[var(--surface-3)] text-[var(--color-pending)] shadow-[var(--shadow-sm)]",
+  confirmed: "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)] shadow-[var(--shadow-sm)]",
+  cancelled: "border-[var(--color-error)] bg-[var(--surface-3)] text-[var(--color-error)] shadow-[var(--shadow-sm)]",
+  completed: "border-[var(--color-success)] bg-[var(--surface-3)] text-[var(--color-success)] shadow-[var(--shadow-sm)]",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -22,11 +22,11 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function BookingCard({ booking, onConfirm, onCancel, onReschedule }: BookingCardProps) {
-  const statusClass = STATUS_BADGE[booking.status] ?? "border-slate-200 bg-slate-100 text-slate-800";
+  const statusClass = STATUS_BADGE[booking.status] ?? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-primary)]";
   const statusLabel = STATUS_LABEL[booking.status] ?? booking.status;
 
   return (
-    <article className="rounded-2xl border border-white/60 bg-[var(--surface-2)] p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-shadow hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.15)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
+    <article className="rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-2)] p-4 shadow-[var(--shadow-md)] backdrop-blur-xl transition-shadow hover:shadow-[var(--shadow-lg)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
@@ -42,7 +42,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
       <dl className="mt-4 grid grid-cols-1 gap-2.5 text-xs">
         <div>
           <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Staff</dt>
-          <dd className="mt-0.5 text-[13px] font-medium text-slate-700 dark:text-slate-300">{booking.staffName}</dd>
+          <dd className="mt-0.5 text-[13px] font-medium text-[var(--text-secondary)]">{booking.staffName}</dd>
         </div>
         <div>
           <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">Reserva ID</dt>
@@ -55,7 +55,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="min-h-11 rounded-xl border border-[rgba(255,255,255,0.4)] bg-[var(--app-primary-gradient)] px-4 text-[13px] font-bold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-11 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-4 text-[13px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Confirmar
         </button>
@@ -63,14 +63,14 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
           type="button"
           onClick={() => onCancel(booking.id)}
           disabled={booking.status === "cancelled" || booking.status === "completed"}
-          className="min-h-11 rounded-xl bg-gradient-to-b from-rose-500 to-rose-600 px-4 text-[13px] font-bold tracking-tight text-white shadow-[0_4px_14px_-6px_rgba(225,29,72,0.4),inset_0_1px_rgba(255,255,255,0.25)] transition-all hover:brightness-110 active:scale-[0.98] border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-11 rounded-xl bg-[var(--color-error)] px-4 text-[13px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] border border-[var(--border-soft)] disabled:pointer-events-none disabled:opacity-40"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={() => onReschedule(booking.id)}
-          className="min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 text-[13px] font-bold tracking-tight text-zinc-700 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05),inset_0_1px_rgba(255,255,255,0.5)] backdrop-blur-sm transition-all hover:bg-white hover:shadow-[var(--shadow-sm)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]  dark:hover:bg-[var(--surface-2)] dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)]"
+          className="min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 text-[13px] font-bold tracking-tight text-[var(--text-secondary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)]"
         >
           Reprogramar
         </button>

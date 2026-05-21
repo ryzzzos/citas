@@ -42,7 +42,7 @@ function FieldGroup({
     "dashboard-focusable w-full rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus:bg-[var(--surface-1)] disabled:opacity-60 disabled:cursor-not-allowed";
 
   return (
-    <div className="flex flex-col gap-1.5 focus-within:text-[var(--app-primary-strong)] dark:focus-within:text-blue-400">
+    <div className="flex flex-col gap-1.5 focus-within:text-[var(--app-primary-strong)] dark:focus-within:text-[var(--app-primary)]">
       <label
         htmlFor={id}
         className="ml-1 text-[0.8rem] font-semibold tracking-wide text-[var(--text-secondary)] transition-colors"
@@ -118,7 +118,7 @@ function ImageUploadField({
           className={cn(
             "relative z-10 flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-full px-4 py-3 text-center transition-all duration-300",
             imageUrl
-              ? "border border-white/20 bg-black/50 text-white backdrop-blur-md group-hover:bg-black/60"
+              ? "border border-[var(--glass-border)] bg-[var(--surface-glass)] text-[var(--text-primary)] backdrop-blur-md group-hover:bg-[var(--surface-glass)]"
               : "text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
           )}
         >
@@ -300,7 +300,7 @@ export default function BusinessProfileEditorPage() {
                 <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
               </button>
               <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--app-primary)] dark:text-blue-400">
+                <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--app-primary)]">
                   Ajustes
                 </p>
                 <h2 className="text-base font-bold tracking-tight text-[var(--text-primary)]">
@@ -394,12 +394,12 @@ export default function BusinessProfileEditorPage() {
                     <button
                       type="button"
                       onClick={suggestSlugFromName}
-                      className="text-[0.7rem] font-bold uppercase tracking-widest text-[var(--app-primary)] underline underline-offset-4 hover:brightness-110 active:scale-95 dark:text-blue-400"
+                      className="text-[0.7rem] font-bold uppercase tracking-widest text-[var(--app-primary)] underline underline-offset-4 hover:brightness-110 active:scale-95"
                     >
                       Autogenerar
                     </button>
                   </div>
-                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus-within:bg-[#0f172a] transition-colors">
+                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus-within:bg-[var(--surface-1)] transition-colors">
                     <span className="flex items-center pl-4 pr-1 text-sm font-medium text-[var(--text-muted)]">
                       /
                     </span>
@@ -424,12 +424,12 @@ export default function BusinessProfileEditorPage() {
                     </div>
                   </div>
                   {slugAvailable === true && (
-                    <p className="ml-1 flex items-center gap-1 mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    <p className="ml-1 mt-1 flex items-center gap-1 text-xs font-semibold text-[var(--color-success)]">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Slug disponible
                     </p>
                   )}
                   {slugAvailable === false && (
-                    <p className="ml-1 flex items-center gap-1 mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
+                    <p className="ml-1 mt-1 flex items-center gap-1 text-xs font-semibold text-[var(--color-error)]">
                       <X className="h-3.5 w-3.5" /> Slug no disponible o inválido
                     </p>
                   )}
@@ -486,12 +486,12 @@ export default function BusinessProfileEditorPage() {
           {(error || successMessage) && (
             <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] bg-[var(--surface-1)] p-4">
               {error && (
-                <p className="rounded-xl bg-rose-50 p-3 text-[0.825rem] font-medium text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+                <p className="rounded-xl bg-[var(--surface-3)] p-3 text-[0.825rem] font-medium text-[var(--color-error)]">
                   {error}
                 </p>
               )}
               {successMessage && (
-                <p className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-[0.825rem] font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                <p className="flex items-center gap-2 rounded-xl bg-[var(--surface-3)] p-3 text-[0.825rem] font-medium text-[var(--color-success)]">
                   <CheckCircle2 className="h-4 w-4 shrink-0" /> {successMessage}
                 </p>
               )}

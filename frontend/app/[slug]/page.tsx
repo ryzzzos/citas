@@ -129,7 +129,7 @@ export default function PublicBusinessPage() {
   if (loading) {
     return (
       <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 dark:border-zinc-700 dark:border-t-zinc-200" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)] dark:border-[var(--border-strong)] dark:border-t-[var(--app-primary)]" />
       </div>
     );
   }
@@ -143,7 +143,7 @@ export default function PublicBusinessPage() {
         </p>
         <Link
           href="/sucursales"
-          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
+          className="dashboard-focusable mt-5 inline-flex min-h-11 items-center rounded-full border border-[var(--border-strong)] px-4 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:hover:bg-[var(--surface-2)]"
         >
           Ir a sucursales
         </Link>
@@ -157,7 +157,7 @@ export default function PublicBusinessPage() {
 
       <section
         id="reserva"
-        className="mt-6 rounded-[1.8rem] border border-zinc-200 bg-white p-4 shadow-[0_30px_60px_-45px_rgba(15,23,42,0.55)] dark:border-zinc-800 dark:bg-[var(--surface-1)] sm:p-6"
+        className="mt-6 rounded-[1.8rem] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-lg)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)] sm:p-6"
       >
         <div className="mb-4 sm:mb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
@@ -173,7 +173,7 @@ export default function PublicBusinessPage() {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-service" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-service" className="text-sm font-medium text-[var(--text-secondary)] ">
               Servicio
             </label>
             <select
@@ -184,7 +184,7 @@ export default function PublicBusinessPage() {
                 setSelectedSlot("");
                 setBookingError("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+               className="dashboard-focusable min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-sm text-[var(--text-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un servicio</option>
               {services.map((service) => (
@@ -196,7 +196,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="booking-staff" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-staff" className="text-sm font-medium text-[var(--text-secondary)] ">
               Profesional
             </label>
             <select
@@ -206,7 +206,7 @@ export default function PublicBusinessPage() {
                 setSelectedStaff(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+               className="dashboard-focusable min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-sm text-[var(--text-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un profesional</option>
               {staff.map((member) => (
@@ -218,7 +218,7 @@ export default function PublicBusinessPage() {
           </div>
 
           <div className="flex flex-col gap-1.5 lg:col-span-2">
-            <label htmlFor="booking-date" className="text-sm font-medium text-zinc-700 ">
+            <label htmlFor="booking-date" className="text-sm font-medium text-[var(--text-secondary)] ">
               Fecha
             </label>
             <input
@@ -230,7 +230,7 @@ export default function PublicBusinessPage() {
                 setDate(event.target.value);
                 setSelectedSlot("");
               }}
-              className="dashboard-focusable min-h-11 rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-100"
+               className="dashboard-focusable min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-sm text-[var(--text-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             />
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function PublicBusinessPage() {
 
         {slots.length > 0 ? (
           <div className="mt-4">
-            <p className="text-sm font-medium text-zinc-700 ">Horario</p>
+            <p className="text-sm font-medium text-[var(--text-secondary)] ">Horario</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {slots.map((slot) => (
                 <button
@@ -257,10 +257,10 @@ export default function PublicBusinessPage() {
                   type="button"
                   onClick={() => setSelectedSlot(slot)}
                   aria-pressed={selectedSlot === slot}
-                  className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium  ${
                     selectedSlot === slot
-                      ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-[var(--surface-2)] dark:border-zinc-700 dark:bg-[var(--surface-1)] dark:text-zinc-200 dark:hover:bg-[var(--surface-2)]"
+                      ? "border-[var(--app-primary-strong)] bg-[var(--app-primary-strong)] text-[var(--surface-3)] dark:border-[var(--app-primary)] dark:bg-[var(--app-primary)] dark:text-[var(--surface-3)]"
+                      : "border-[var(--border-strong)] bg-[var(--surface-3)] text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)] dark:hover:bg-[var(--surface-2)]"
                   }`}
                 >
                   {slot.slice(0, 5)}
@@ -277,7 +277,7 @@ export default function PublicBusinessPage() {
         ) : null}
 
         {bookingError ? (
-          <div className="mt-4 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-200">
+          <div className="mt-4 rounded-xl border border-[var(--color-error)] bg-[var(--surface-3)] p-3 text-sm text-[var(--color-error)]">
             <p>{bookingError}</p>
             <Link href="/sucursales" className="dashboard-focusable mt-2 inline-flex underline underline-offset-4">
               Volver al mapa de sucursales

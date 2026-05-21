@@ -51,14 +51,14 @@ export default function LoginPage() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
           <Button type="submit" isLoading={loading} className="mt-2 w-full">
             Entrar
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
           ¿No tienes cuenta?{" "}
-          <Link href="/auth/register" className="font-medium text-zinc-900 underline ">
+          <Link href="/auth/register" className="font-medium text-[var(--text-primary)] underline ">
             Regístrate
           </Link>
         </p>

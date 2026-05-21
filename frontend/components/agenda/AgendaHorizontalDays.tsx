@@ -91,16 +91,16 @@ export default function AgendaHorizontalDays({
           const dayNumber = date.toFormat("d");
 
           let btnClasses =
-            "snap-center flex min-w-[72px] h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-950 px-2";
+            "snap-center flex min-w-[72px] h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:ring-offset-2 dark:focus:ring-offset-[var(--surface-0)] px-2";
 
           if (isSelected) {
             // Azul Rey Premium para el seleccionado
-            btnClasses += " border-blue-400/30 bg-gradient-to-b from-blue-500 to-blue-700 font-bold shadow-[0_8px_16px_-6px_rgba(37,99,235,0.4)] text-white";
+            btnClasses += " border-[var(--app-primary)] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] font-bold shadow-[var(--shadow-md)] text-[var(--surface-3)]";
           } else {
             // Inactivo
             btnClasses += " border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] hover:border-[var(--app-primary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:border-[var(--app-primary)] dark:hover:bg-[var(--surface-2)] text-[var(--text-secondary)] ";
             if (isToday) {
-              btnClasses += " border-blue-200 bg-blue-50/50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400";
+              btnClasses += " border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)]";
             }
           }
 
@@ -112,14 +112,14 @@ export default function AgendaHorizontalDays({
               data-selected={isSelected}
               className={btnClasses}
             >
-              <span className={`text-[11px] font-semibold uppercase tracking-wider ${isSelected ? "text-blue-100" : ""}`}>
+              <span className={`text-[11px] font-semibold uppercase tracking-wider ${isSelected ? "text-[var(--surface-3)]" : ""}`}>
                 {dayName}
               </span>
-              <span className={`mt-1 text-xl tracking-tight ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+              <span className={`mt-1 text-xl tracking-tight ${isSelected ? "text-[var(--surface-3)]" : "text-[var(--text-primary)]"}`}>
                 {dayNumber}
               </span>
               {isToday && !isSelected && (
-                <div className="absolute bottom-2 h-1 w-1 rounded-full bg-blue-600 dark:bg-blue-400" />
+                <div className="absolute bottom-2 h-1 w-1 rounded-full bg-[var(--app-primary)]" />
               )}
             </button>
           );

@@ -94,14 +94,14 @@ export default function ServicesPage() {
   if (loading) {
     return (
       <div className="dashboard-surface-1 flex min-h-[50vh] items-center justify-center">
-        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--app-primary)] dark:border-slate-700 dark:border-t-blue-400" />
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)] dark:border-[var(--border-strong)] dark:border-t-[var(--app-primary)]" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <section className="dashboard-surface-1 flex min-h-[50vh] flex-col items-center justify-center gap-3 p-6 text-center">
+      <section className="bg-[var(--surface-1)] flex min-h-[50vh] flex-col items-center justify-center gap-3 p-6 text-center">
         <p className="dashboard-title text-lg font-semibold">No se pudieron cargar tus servicios</p>
         <p className="dashboard-text-secondary max-w-lg text-sm">{error}</p>
         <Button onClick={reload}>Reintentar</Button>
@@ -120,15 +120,15 @@ export default function ServicesPage() {
       <ServicesFilters filters={filters} onFiltersChange={setFilters} />
 
       {actionError ? (
-        <p className="dashboard-surface-2 border-red-300/60 p-3 text-sm text-red-600 dark:border-red-500/40 dark:text-red-300">
+        <p className="border border-[var(--color-error)] bg-[var(--surface-2)] p-3 text-sm text-[var(--color-error)]">
           {actionError}
         </p>
       ) : null}
 
       {filteredServices.length === 0 ? (
-        <section className="dashboard-surface-1 p-10 text-center">
-          <p className="dashboard-title text-lg font-semibold">No hay servicios para este filtro</p>
-          <p className="dashboard-text-secondary mt-2 text-sm">
+        <section className="bg-[var(--surface-1)] p-10 text-center">
+          <p className="text-lg font-semibold">No hay servicios para este filtro</p>
+          <p className="mt-2 text-sm">
             Ajusta la busqueda o crea un nuevo servicio para comenzar.
           </p>
           <Button onClick={openCreateModal} className="mt-4">

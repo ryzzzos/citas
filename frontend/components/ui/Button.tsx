@@ -17,11 +17,11 @@ export default function Button({
     "inline-flex items-center justify-center rounded-full px-5 py-2 font-semibold tracking-tight transition-all focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
   const variants = {
     primary:
-      "bg-[var(--app-primary-gradient)] text-dark shadow-[0_4px_14px_-6px_rgba(37,99,235,0.4),inset_0_1px_rgba(255,255,255,0.25)] hover:brightness-110 border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent",
+      "bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] shadow-[var(--shadow-md)] hover:brightness-110 border border-[var(--border-soft)]",
     secondary:
-      "border border-zinc-200 bg-[var(--surface-3)]/ text-zinc-900 shadow-[var(--shadow-sm)] backdrop-blur-sm hover:bg-[var(--surface-2)]/80 dark:border-zinc-800 dark:bg-[var(--surface-1)]/70  dark:hover:bg-[var(--surface-2)]",
+      "border border-[var(--border-strong)] bg-[var(--surface-3)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)] dark:hover:bg-[var(--surface-2)]",
     danger:
-      "bg-gradient-to-b from-red-500 to-red-600 text-white shadow-[0_4px_14px_-6px_rgba(220,38,38,0.4),inset_0_1px_rgba(255,255,255,0.2)] hover:brightness-110 border border-t-[rgba(255,255,255,0.1)] border-b-[rgba(0,0,0,0.1)] border-x-transparent",
+      "bg-[var(--color-error)] text-[var(--surface-3)] shadow-[var(--shadow-md)] hover:brightness-110 border border-[var(--border-soft)]",
   };
   return (
     <button

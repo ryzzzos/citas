@@ -5,7 +5,7 @@ export default function HomePage() {
     <main className="flex min-h-[calc(100vh-3.5rem)] flex-col">
       {/* Hero */}
       <section className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center">
-        <span className="rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1 text-xs font-medium text-[var(--text-secondary)] dark:border-zinc-700 dark:bg-[var(--surface-1)] ">
+        <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-1 text-xs font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)] ">
           Plataforma SaaS de gestión de agenda
         </span>
         <h1 className="max-w-2xl text-5xl font-bold tracking-tight text-[var(--text-primary)]">
@@ -19,13 +19,14 @@ export default function HomePage() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/auth/register"
-            className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="rounded-full bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-6 py-3 text-sm font-semibold text-[var(--surface-3)]
+             transition-colors hover:brightness-110"
           >
             Registra tu negocio
           </Link>
           <Link
             href="/sucursales"
-            className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-[var(--surface-2)] dark:border-zinc-700  dark:hover:bg-[var(--surface-2)]"
+            className="rounded-full border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:hover:bg-[var(--surface-2)]"
           >
             Explorar sucursales
           </Link>
@@ -33,7 +34,7 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-20 dark:border-zinc-800 dark:bg-[var(--surface-0)]">
+      <section className="border-t border-[var(--border-soft)] bg-[var(--surface-2)] px-4 py-20 dark:border-[var(--border-strong)] dark:bg-[var(--surface-0)]">
         <div className="mx-auto grid max-w-5xl gap-8 sm:grid-cols-3">
           {[
             {
@@ -54,7 +55,7 @@ export default function HomePage() {
           ].map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-[var(--surface-1)]"
+               className="rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             >
               <h3 className="mb-2 font-semibold text-[var(--text-primary)]">
                 {f.title}
