@@ -136,12 +136,13 @@ export default function AgendaPage() {
               </div>
             </div>
 
-            <div className="min-h-0 overflow-y-auto pr-1">
+            <div className="min-h-0 pr-1 h-full">
               <AgendaRightRail
                 total={enrichedBookings.length}
                 pending={enrichedBookings.filter((booking) => booking.status === "pending").length}
                 confirmed={enrichedBookings.filter((booking) => booking.status === "confirmed").length}
-                nextBookings={nextBookings}
+                completed={enrichedBookings.filter((booking) => booking.status === "completed").length}
+                cancelled={enrichedBookings.filter((booking) => booking.status === "cancelled").length}
               />
             </div>
           </>

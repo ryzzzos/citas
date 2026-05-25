@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { DateTime } from "luxon";
 import type { AgendaBooking, AgendaDayColumn } from "@/lib/agenda/types";
 
 interface AgendaTimelineProps {
@@ -74,10 +76,10 @@ function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
 }
 
 function getBookingTone(status: AgendaBooking["status"]): string {
-  if (status === "pending") return "border-[var(--color-pending)] bg-[var(--surface-3)] text-[var(--color-pending)] shadow-[var(--shadow-sm)]";
-  if (status === "confirmed") return "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)] shadow-[var(--shadow-sm)]";
-  if (status === "completed") return "border-[var(--color-success)] bg-[var(--surface-3)] text-[var(--color-success)] shadow-[var(--shadow-sm)]";
-  return "border-[var(--color-error)] bg-[var(--surface-3)] text-[var(--color-error)] shadow-[var(--shadow-sm)]";
+  if (status === "pending") return "border-l-4 border-l-[var(--color-pending)] border-[var(--border-strong)] bg-[color-mix(in_srgb,var(--color-pending)_10%,var(--surface-3))] dark:bg-[color-mix(in_srgb,var(--color-pending)_18%,var(--surface-3))] text-[var(--color-pending)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)]";
+  if (status === "confirmed") return "border-l-4 border-l-[var(--color-info)] border-[var(--border-strong)] bg-[color-mix(in_srgb,var(--color-info)_10%,var(--surface-3))] dark:bg-[color-mix(in_srgb,var(--color-info)_18%,var(--surface-3))] text-[var(--color-info)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)]";
+  if (status === "completed") return "border-l-4 border-l-[var(--color-success)] border-[var(--border-strong)] bg-[color-mix(in_srgb,var(--color-success)_10%,var(--surface-3))] dark:bg-[color-mix(in_srgb,var(--color-success)_18%,var(--surface-3))] text-[var(--color-success)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)]";
+  return "border-l-4 border-l-[var(--color-error)] border-[var(--border-strong)] bg-[color-mix(in_srgb,var(--color-error)_10%,var(--surface-3))] dark:bg-[color-mix(in_srgb,var(--color-error)_18%,var(--surface-3))] text-[var(--color-error)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)]";
 }
 
 function renderEventBlock(
@@ -93,7 +95,7 @@ function renderEventBlock(
   return (
     <article
       key={booking.id}
-      className={`absolute group overflow-hidden rounded-2xl border p-2.5 shadow-[var(--shadow-md)] transition-all hover:z-10 hover:scale-[1.02] hover:shadow-[var(--shadow-lg)] ${getBookingTone(
+      className={`absolute group overflow-hidden rounded-2xl border-solid p-2.5 transition-all hover:z-10 hover:scale-[1.01] ${getBookingTone(
         booking.status
       )}`}
       style={{
@@ -105,7 +107,7 @@ function renderEventBlock(
       role="article"
       aria-label={`${booking.serviceName} ${booking.startAt.toFormat("HH:mm")} a ${booking.endAt.toFormat("HH:mm")}`}
     >
-      <p className="truncate text-[13px] font-bold leading-tight tracking-tight">{booking.serviceName}</p>
+      <p className="truncate text-[13px] font-bold leading-tight tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
       <p className="mt-1 text-[11px] font-medium text-current/80">
         {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
       </p>
@@ -140,6 +142,27 @@ function renderEventBlock(
   );
 }
 
+function CurrentTimeLine() {
+  const [now, setNow] = useState(DateTime.local());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(DateTime.local()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const top = (now.hour * 60 + now.minute) * PX_PER_MINUTE;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 z-30 flex items-center"
+      style={{ top }}
+    >
+      <div className="absolute left-0 h-[7px] w-[7px] -translate-x-[3px] rounded-full bg-[var(--app-primary)] shadow-[0_0_6px_var(--app-primary)]" />
+      <div className="h-[2px] w-full bg-[var(--app-primary)] opacity-80 shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
+    </div>
+  );
+}
+
 export default function AgendaTimeline({
   columns,
   bookingsByDay,
@@ -167,12 +190,15 @@ export default function AgendaTimeline({
                 key={column.isoDate}
                 className={`sticky top-0 z-30 rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-sm)] ${
                   column.isToday
-                    ? "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)]"
+                    ? "border-[var(--app-primary)] bg-[color-mix(in_srgb,var(--app-primary)_8%,var(--surface-3))] text-[var(--app-primary)]"
                     : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
                 }`}
               >
-                <p className="font-bold tracking-tight text-[var(--text-primary)]">{column.dayLabel}</p>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)]">{column.dateLabel}</p>
+                <div className="flex items-center justify-between">
+                  <p className={`font-bold tracking-tight ${column.isToday ? "text-[var(--app-primary-strong)] dark:text-[var(--app-primary)]" : "text-[var(--text-primary)]"}`}>{column.dayLabel}</p>
+                  {column.isToday && <span className="rounded-full bg-[var(--app-primary)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--surface-3)]">Hoy</span>}
+                </div>
+                <p className={`text-[11px] font-bold uppercase tracking-widest ${column.isToday ? "text-[var(--app-primary)]" : "text-[var(--app-primary)]"}`}>{column.dateLabel}</p>
               </div>
             ))}
             {columns.length === 1 && <div className="sticky top-0 z-30 pointer-events-none"></div>}
@@ -180,7 +206,8 @@ export default function AgendaTimeline({
             <div className="sticky left-0 z-20 relative bg-[inherit]">
               {hourMarkers.map((hour) => {
                 const [hours] = hour.split(":");
-                const top = (Number(hours) * 60 + 30) * PX_PER_MINUTE;
+                // Posicionar la etiqueta exactamente en la línea de la hora, no a la mitad (+30)
+                const top = Number(hours) * 60 * PX_PER_MINUTE;
                 return (
                   <div key={hour} className="absolute inset-x-0" style={{ top }}>
                     <p className="-translate-y-1/2 px-2 text-[11px] font-bold tracking-widest text-[var(--text-muted)]">{hour}</p>
@@ -212,6 +239,8 @@ export default function AgendaTimeline({
                       />
                     );
                   })}
+
+                  {column.isToday && <CurrentTimeLine />}
 
                   {positioned.map((item) => renderEventBlock(item, onConfirm, onCancel, onReschedule))}
                 </div>

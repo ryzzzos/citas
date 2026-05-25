@@ -8,10 +8,10 @@ interface BookingCardProps {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  pending: "border-[var(--color-pending)] bg-[var(--surface-3)] text-[var(--color-pending)] shadow-[var(--shadow-sm)]",
-  confirmed: "border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)] shadow-[var(--shadow-sm)]",
-  cancelled: "border-[var(--color-error)] bg-[var(--surface-3)] text-[var(--color-error)] shadow-[var(--shadow-sm)]",
-  completed: "border-[var(--color-success)] bg-[var(--surface-3)] text-[var(--color-success)] shadow-[var(--shadow-sm)]",
+  pending: "border-[var(--color-pending)] bg-[color-mix(in_srgb,var(--color-pending)_12%,var(--surface-3))] text-[var(--color-pending)] shadow-[var(--shadow-sm)]",
+  confirmed: "border-[var(--color-info)] bg-[color-mix(in_srgb,var(--color-info)_12%,var(--surface-3))] text-[var(--color-info)] shadow-[var(--shadow-sm)]",
+  cancelled: "border-[var(--color-error)] bg-[color-mix(in_srgb,var(--color-error)_12%,var(--surface-3))] text-[var(--color-error)] shadow-[var(--shadow-sm)]",
+  completed: "border-[var(--color-success)] bg-[color-mix(in_srgb,var(--color-success)_12%,var(--surface-3))] text-[var(--color-success)] shadow-[var(--shadow-sm)]",
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -21,12 +21,19 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Completada",
 };
 
+function getCardTone(status: string) {
+  if (status === "pending") return "border-l-[var(--color-pending)] bg-[color-mix(in_srgb,var(--color-pending)_4%,var(--surface-3))]";
+  if (status === "confirmed") return "border-l-[var(--color-info)] bg-[color-mix(in_srgb,var(--color-info)_4%,var(--surface-3))]";
+  if (status === "completed") return "border-l-[var(--color-success)] bg-[color-mix(in_srgb,var(--color-success)_4%,var(--surface-3))]";
+  return "border-l-[var(--color-error)] bg-[color-mix(in_srgb,var(--color-error)_4%,var(--surface-3))]";
+}
+
 export default function BookingCard({ booking, onConfirm, onCancel, onReschedule }: BookingCardProps) {
   const statusClass = STATUS_BADGE[booking.status] ?? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-primary)]";
   const statusLabel = STATUS_LABEL[booking.status] ?? booking.status;
 
   return (
-    <article className="rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-2)] p-4 shadow-[var(--shadow-md)] backdrop-blur-xl transition-shadow hover:shadow-[var(--shadow-lg)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
+    <article className={`rounded-2xl border-solid border-l-4 border-r-[var(--border-strong)] border-y-[var(--border-strong)] p-4 shadow-[var(--shadow-md)] transition-shadow hover:shadow-[var(--shadow-lg)] ${getCardTone(booking.status)}`}>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
@@ -34,7 +41,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
             {booking.startAt.toFormat("HH:mm")} - {booking.endAt.toFormat("HH:mm")}
           </p>
         </div>
-        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md ${statusClass}`}>
+        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${statusClass}`}>
           {statusLabel}
         </span>
       </header>

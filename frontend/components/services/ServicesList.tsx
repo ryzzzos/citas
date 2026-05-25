@@ -138,7 +138,7 @@ export default function ServicesList({
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-[var(--surface-1)]">
-                    <AppIcon icon={LayoutGrid} className="text-[var(--border-strong)]" size="xl" />
+                    <AppIcon icon={LayoutGrid} className="text-[var(--border-strong)]" size="lg" />
                   </div>
                 )}
                 <div className="absolute left-3 top-3 z-10">

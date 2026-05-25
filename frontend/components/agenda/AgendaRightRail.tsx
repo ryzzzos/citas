@@ -4,49 +4,75 @@ interface AgendaRightRailProps {
   total: number;
   pending: number;
   confirmed: number;
-  nextBookings: AgendaBooking[];
+  completed: number;
+  completed: number;
+  cancelled: number;
 }
 
-export default function AgendaRightRail({ total, pending, confirmed, nextBookings }: AgendaRightRailProps) {
-  return (
-    <aside aria-label="Resumen de agenda" className="rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]">
-      <h3 className="text-[17px] font-bold tracking-tight text-[var(--text-primary)]">Resumen del periodo</h3>
+import { ClipboardList, Hourglass, CheckCircle2, XCircle } from "lucide-react";
+import AppIcon from "@/components/ui/AppIcon";
 
-      <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
-        <div className="rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-          <dt className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)]">Total</dt>
-          <dd className="mt-1 text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{total}</dd>
+export default function AgendaRightRail({ total, pending, confirmed, completed, cancelled }: AgendaRightRailProps) {
+  return (
+    <aside aria-label="Resumen de agenda" className="flex h-full flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-md)]">
+      <h3 className="text-[13px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">Resumen del periodo</h3>
+
+      <dl className="mt-4 flex flex-1 flex-col gap-3">
+        {/* Total Reservas */}
+        <div className="flex flex-1 items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--text-primary)_6%,var(--surface-3)),var(--surface-3))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={ClipboardList} className="h-4 w-4" />
+            </div>
+            <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Reservas</dt>
+          </div>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{total}</dd>
         </div>
-        <div className="rounded-2xl border border-[var(--color-pending)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
-          <dt className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-pending)]">Pendientes</dt>
-          <dd className="mt-1 text-[26px] font-bold tracking-tight text-[var(--color-pending)]">{pending}</dd>
+
+        {/* Pendientes */}
+        <div className="flex flex-1 items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-pending)_8%,var(--surface-3)),var(--surface-3))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-pending)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={Hourglass} className="h-4 w-4" />
+            </div>
+            <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Pendientes</dt>
+          </div>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{pending}</dd>
         </div>
-        <div className="rounded-2xl border border-[var(--color-info)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
-          <dt className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-info)]">Confirmadas</dt>
-          <dd className="mt-1 text-[26px] font-bold tracking-tight text-[var(--color-info)]">{confirmed}</dd>
+
+        {/* Confirmadas */}
+        <div className="flex flex-1 items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-info)_8%,var(--surface-3)),var(--surface-3))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={CheckCircle2} className="h-4 w-4" />
+            </div>
+            <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Confirmadas</dt>
+          </div>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{confirmed}</dd>
+        </div>
+
+        {/* Completadas */}
+        <div className="flex flex-1 items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-success)_8%,var(--surface-3)),var(--surface-3))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={CheckCircle2} className="h-4 w-4" />
+            </div>
+            <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Completadas</dt>
+          </div>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{completed}</dd>
+        </div>
+
+        {/* Canceladas */}
+        <div className="flex flex-1 items-center justify-between rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-error)_8%,var(--surface-3)),var(--surface-3))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-error)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={XCircle} className="h-4 w-4" />
+            </div>
+            <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Canceladas</dt>
+          </div>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{cancelled}</dd>
         </div>
       </dl>
-
-      <div className="mt-8">
-        <h4 className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Próximos eventos</h4>
-        {nextBookings.length === 0 ? (
-           <p className="mt-4 rounded-2xl border border-dashed border-[var(--border-strong)] p-4 text-[13px] font-medium text-[var(--text-muted)]">
-            No hay eventos próximos en este rango.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {nextBookings.map((booking) => (
-              <li key={booking.id} className="rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm transition-transform hover:scale-[1.02] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-                <p className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">{booking.serviceName}</p>
-                <p className="mt-1 text-[13px] font-medium text-[var(--text-secondary)]">{booking.staffName}</p>
-                <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-[var(--app-primary)]">
-                  {booking.startAt.toFormat("dd LLL HH:mm")} - {booking.endAt.toFormat("HH:mm")}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </aside>
   );
 }

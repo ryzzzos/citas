@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.3.5] - 2026-05-25
+
+### Changed
+- Refined Dashboard Sidebar navigation with a `framer-motion` sliding pill animation and optimized local state for 60fps frame-perfect transitions.
+- Improved Agenda UI by redesigning the Right Rail metrics into compact, horizontal cards that strictly respect the timeline's grid height.
+- Styled global scrollbars (`::-webkit-scrollbar`) with a premium macOS-inspired floating pill aesthetic to seamlessly blend into light and dark themes.
+
+### Fixed
+- Fixed a layout bug in the Agenda Timeline where hour labels were vertically offset by +30 minutes, causing the current-time indicator line to visually display incorrect proportions.
+- Resolved an issue in the Dashboard Sidebar where `framer-motion`'s `layoutId` collided between mobile and desktop mounts, by assigning unique prefixes.
+
 ## [0.3.4] - 2026-05-21
 
 ### Changed
