@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.3.6] - 2026-05-27
+
+### Added
+- **Design Guidelines (`AGENTS.md`)**: Added strict guidelines for CSS design tokens, shadows, custom radii compliance, and the Apple-inspired standard for modal and drawer form grouping cards.
+
+### Changed
+- **Services UX Refactoring (`ServiceFormModal` & `ServiceCategoriesModal`)**: Polished visual aesthetics to match Apple Human Interface Guidelines, grouping sections into container cards (`bg-[var(--surface-3)]`) and introducing custom easing curves (`ease: [0.32, 0.72, 0, 1]`) in Framer Motion.
+- **Business Profile Styling (`BusinessProfileEditorPage` & `BusinessProfileView`)**: Restructured forms into modular layout groupings with subtle shadows and custom offset backgrounds to enhance UI breathing room.
+- **Services Filtering & Views (`ServicesFilters`, `ServicesList`, `ServicesHeader`)**: Polished filtering selectors, refined card sizing, added responsive list/grid toggles, and unified visual layouts.
+- **API Client Core (`client.ts`)**: Structured base client requests to support unified response formats and standardized error handling.
+
+### Fixed
+- **Cascading Render Warning (`ServicesPage.tsx`)**: Resolved a critical React ESLint warning by refactoring state synchronizations to run directly inside the render cycle rather than a synchronous `useEffect`.
+
 ## [0.3.5] - 2026-05-25
 
 ### Changed

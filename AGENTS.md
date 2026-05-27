@@ -52,6 +52,32 @@ agenda-web/
 - Use subtle animations and transitions to reinforce clarity, not decoration.
 - Keep components consistent and reusable to preserve visual coherence as features scale.
 
+### Design Tokens Strict Compliance (CRITICAL)
+
+- **DO NOT invent or hardcode Tailwind utility values** for shadows, borders, radii, or colors. 
+- **ALWAYS** use the exact CSS variables defined in `frontend/app/globals.css`.
+  - Backgrounds: `bg-[var(--surface-0)]`, `bg-[var(--surface-1)]`, `bg-[var(--surface-2)]`, `bg-[var(--surface-3)]`.
+  - Shadows: `shadow-[var(--shadow-sm)]`, `shadow-[var(--shadow-md)]`, `shadow-[var(--shadow-lg)]` (Never use `shadow-sm`, `shadow-md`, etc.).
+  - Radii: `rounded-[var(--radius-sm)]`, `rounded-[var(--radius-lg)]`, `rounded-[var(--radius-2xl)]`.
+  - Borders: `border-[var(--border-strong)]`, `border-[var(--border-soft)]`.
+  - Text: `text-[var(--text-primary)]`, `text-[var(--text-secondary)]`, `text-[var(--text-muted)]`.
+  - Accents: `bg-[var(--app-primary)]`, `text-[var(--color-pending)]`, etc.
+
+### Modals, Drawers & Forms (Apple-Inspired Standard)
+
+- **Reference Implementation**: Use `frontend/components/business-profile/BusinessProfileEditorPage.tsx` as the gold standard for how drawers/modals must look and behave.
+- **Layout & Container**:
+  - The modal/drawer container must use a base surface like `bg-[var(--surface-2)]` (or `surface-0`/`surface-1` depending on context).
+  - Use large border radii for the container edges (e.g., `rounded-l-[var(--radius-2xl)]` for right-side drawers).
+  - Use an overlay backdrop behind the modal (`bg-[var(--text-primary)]/10 backdrop-blur-sm`).
+- **Internal Grouping (Cards)**:
+  - Do NOT use `<hr>` to separate form sections.
+  - Group related fields into independent "cards" using `bg-[var(--surface-3)]`, `rounded-[var(--radius-lg)]`, `border-[var(--border-strong)]`, and `shadow-[var(--shadow-sm)]`.
+  - Inside these cards, inputs/fields should typically use a slightly offset background for contrast, such as `bg-[var(--surface-2)]`.
+- **Animations**:
+  - Always use `framer-motion` (`<AnimatePresence>` and `<motion.div>`) for mounting/unmounting modals.
+  - Use custom easing curves for premium slide-in/slide-out effects (e.g., `ease: [0.32, 0.72, 0, 1]`) instead of default linear animations.
+
 ### Backend (backend/)
 - **Framework**: FastAPI (Python)
 - **Responsibilities**: business logic, authentication, bookings, payments, geolocation, user management

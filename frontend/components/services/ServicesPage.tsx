@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import ServiceFormModal from "@/components/services/ServiceFormModal";
 import ServiceCategoriesModal from "@/components/services/ServiceCategoriesModal";
@@ -35,6 +35,12 @@ export default function ServicesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const mode = useMemo(() => (editingService ? "edit" : "create"), [editingService]);
+
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  if (!loading && !hasLoaded) {
+    setHasLoaded(true);
+  }
 
   function openCreateModal() {
     setActionError(null);
@@ -92,7 +98,7 @@ export default function ServicesPage() {
     }
   }
 
-  if (loading) {
+  if (loading && !hasLoaded) {
     return (
       <div className="dashboard-surface-1 flex min-h-[50vh] items-center justify-center">
         <div className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)] dark:border-[var(--border-strong)] dark:border-t-[var(--app-primary)]" />

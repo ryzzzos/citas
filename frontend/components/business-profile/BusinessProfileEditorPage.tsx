@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import { CheckCircle2, ChevronRight, ImagePlus, Loader2, RefreshCw, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Button from "@/components/ui/Button";
 import BusinessProfileView from "@/components/business-profile/BusinessProfileView";
@@ -39,7 +40,7 @@ function FieldGroup({
   hint?: React.ReactNode;
 }) {
   const commonClasses =
-    "dashboard-focusable w-full rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus:bg-[var(--surface-1)] disabled:opacity-60 disabled:cursor-not-allowed";
+    "dashboard-focusable w-full rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus:bg-[var(--surface-1)] disabled:opacity-60 disabled:cursor-not-allowed";
 
   return (
     <div className="flex flex-col gap-1.5 focus-within:text-[var(--app-primary-strong)] dark:focus-within:text-[var(--app-primary)]">
@@ -106,7 +107,7 @@ function ImageUploadField({
       </span>
       <label
         className={cn(
-          "dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-dashed border-[var(--border-strong)] bg-[var(--surface-2)] transition-colors hover:bg-[var(--surface-2)] dark:bg-[var(--surface-0)] dark:hover:bg-[var(--surface-1)]",
+          "dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-[var(--border-strong)] bg-[var(--surface-2)] transition-colors hover:bg-[var(--surface-3)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-1)]",
           aspectRatio,
           disabled ? "pointer-events-none opacity-60" : ""
         )}
@@ -169,16 +170,6 @@ export default function BusinessProfileEditorPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [panelRendered, setPanelRendered] = useState(false);
-
-  useEffect(() => {
-    if (isEditing) {
-      setPanelRendered(true);
-    } else {
-      const timer = setTimeout(() => setPanelRendered(false), 500); 
-      return () => clearTimeout(timer);
-    }
-  }, [isEditing]);
 
   const bioCounter = useMemo(() => `${draft.public_bio.length}/280`, [draft.public_bio]);
 
@@ -253,7 +244,7 @@ export default function BusinessProfileEditorPage() {
       <div
         className={cn(
           "h-full w-full overflow-y-auto px-4 pb-24 pt-6 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-6 lg:px-8",
-          isEditing && "scale-[0.98] opacity-60 md:mr-[440px] md:scale-100 xl:mr-[480px]"
+          isEditing && "opacity-60"
         )}
       >
         <div className="mx-auto w-full max-w-[1240px]">
@@ -267,36 +258,39 @@ export default function BusinessProfileEditorPage() {
         </div>
       </div>
 
-      {/* BACKDROP FOR OVERLAY */}
-      {panelRendered && (
-        <div
-          role="presentation"
-          className={cn(
-            "fixed inset-0 z-40 bg-[var(--text-primary)]/10 backdrop-blur-sm transition-opacity duration-500 md:hidden",
-            isEditing ? "opacity-100" : "opacity-0 pointer-events-none"
-          )}
-          onClick={() => setIsEditing(false)}
-        />
-      )}
+      {/* OVERLAY AND DRAWER */}
+      <AnimatePresence>
+        {isEditing && (
+          <>
+            {/* BACKDROP FOR OVERLAY */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              role="presentation"
+              className="fixed inset-0 z-40 bg-[var(--text-primary)]/10 backdrop-blur-sm"
+              onClick={() => setIsEditing(false)}
+            />
 
-      {/* ELEGANT EDITOR DRAWER */}
-      {panelRendered && (
-        <aside
-          className={cn(
-            "pointer-events-auto absolute inset-y-0 right-0 z-50 flex w-[90vw] max-w-[440px] flex-col border-l border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-lg)] transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] xl:max-w-[480px]",
-            isEditing ? "translate-x-0" : "translate-x-full"
-          )}
-          aria-hidden={!isEditing}
-        >
-          {/* DRAWER HEADER */}
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--border-strong)] px-5">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] active:scale-95"
-                aria-label="Cerrar editor"
-              >
+            {/* ELEGANT EDITOR DRAWER */}
+            <motion.aside
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="pointer-events-auto absolute inset-y-0 right-0 z-50 flex w-[90vw] max-w-[440px] flex-col overflow-hidden rounded-l-[var(--radius-2xl)] border-l border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-lg)] xl:max-w-[480px]"
+              aria-hidden={!isEditing}
+            >
+              {/* DRAWER HEADER */}
+              <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-2)] px-5">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] active:scale-95"
+                    aria-label="Cerrar editor"
+                  >
                 <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
               </button>
               <div>
@@ -321,11 +315,11 @@ export default function BusinessProfileEditorPage() {
 
           {/* DRAWER BODY */}
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
-            <form id="business-profile-form" className="flex flex-col gap-8" onSubmit={onSubmit}>
+            <form id="business-profile-form" className="flex flex-col gap-6" onSubmit={onSubmit}>
               
               {/* IMAGES SECTION */}
-              <section className="flex flex-col gap-4">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
+              <section className="flex flex-col gap-5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
+                <h3 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Identidad Visual
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -346,11 +340,9 @@ export default function BusinessProfileEditorPage() {
                 </div>
               </section>
 
-              <hr className="border-[var(--border-strong)]" />
-
               {/* INFO SECTION */}
-              <section className="flex flex-col gap-5">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
+              <section className="flex flex-col gap-5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
+                <h3 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Información Básica
                 </h3>
                 <FieldGroup
@@ -399,7 +391,7 @@ export default function BusinessProfileEditorPage() {
                       Autogenerar
                     </button>
                   </div>
-                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-1)] dark:bg-[var(--surface-0)] dark:focus-within:bg-[var(--surface-1)] transition-colors">
+                  <div className="flex overflow-hidden rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus-within:bg-[var(--surface-1)] transition-colors">
                     <span className="flex items-center pl-4 pr-1 text-sm font-medium text-[var(--text-muted)]">
                       /
                     </span>
@@ -446,11 +438,9 @@ export default function BusinessProfileEditorPage() {
                 />
               </section>
 
-              <hr className="border-[var(--border-strong)]" />
-
               {/* CONTACT SECTION */}
-              <section className="flex flex-col gap-5 pb-8">
-                <h3 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
+              <section className="flex flex-col gap-5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] mb-6">
+                <h3 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Contacto
                 </h3>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -497,8 +487,10 @@ export default function BusinessProfileEditorPage() {
               )}
             </div>
           )}
-        </aside>
-      )}
+        </motion.aside>
+        </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

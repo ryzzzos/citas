@@ -1,9 +1,12 @@
+
 import Image from "next/image";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import type { CreateServiceInput, Service } from "@/types";
+import { AnimatePresence, motion } from "framer-motion";
+import { ImagePlus, Loader2 } from "lucide-react";
 
 interface ServiceFormModalProps {
   open: boolean;
@@ -119,9 +122,7 @@ export default function ServiceFormModal({
     [mode]
   );
 
-  if (!open) {
-    return null;
-  }
+
 
   function resetSelectedImage() {
     setSelectedFile(null);
@@ -144,34 +145,7 @@ export default function ServiceFormModal({
     return null;
   }
 
-  async function handleUploadSelectedImage() {
-    if (!selectedFile) {
-      setUploadError("Selecciona una imagen primero.");
-      return;
-    }
 
-    const validation = validateSelectedFile(selectedFile);
-    if (validation) {
-      setUploadError(validation);
-      return;
-    }
-
-    setUploadingImage(true);
-    setUploadError(null);
-    setUploadMessage(null);
-
-    try {
-      const result = await onUploadImage(selectedFile);
-      setForm((previous) => ({ ...previous, imageUrl: result.image_url }));
-      setPreviewUrl(result.image_url);
-      setSelectedFile(null);
-      setUploadMessage("Imagen subida correctamente.");
-    } catch (uploadErr) {
-      setUploadError(uploadErr instanceof Error ? uploadErr.message : "No se pudo subir la imagen.");
-    } finally {
-      setUploadingImage(false);
-    }
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -203,34 +177,67 @@ export default function ServiceFormModal({
       return;
     }
 
+    let finalImageUrl = imageUrl;
+
     if (selectedFile) {
-      setValidationError("Sube la imagen seleccionada antes de guardar el servicio.");
-      return;
+      setUploadingImage(true);
+      try {
+        const result = await onUploadImage(selectedFile);
+        finalImageUrl = result.image_url;
+      } catch (err) {
+        setValidationError(err instanceof Error ? err.message : "Error al subir la imagen");
+        setUploadingImage(false);
+        return;
+      }
     }
 
-    if (imageUrl.length > 0 && !isValidHttpImageUrl(imageUrl)) {
+    if (finalImageUrl.length > 0 && !isValidHttpImageUrl(finalImageUrl)) {
       setValidationError("La imagen debe ser una URL valida con http o https.");
+      setUploadingImage(false);
       return;
     }
 
-    await onSubmit({
-      name,
-      description: form.description.trim() || null,
-      image_url: imageUrl || null,
-      duration_minutes: duration,
-      price: price.toFixed(2),
-      is_active: form.isActive,
-      service_category_id: categoryId || null,
-    });
+    try {
+      await onSubmit({
+        name,
+        description: form.description.trim() || null,
+        image_url: finalImageUrl || null,
+        duration_minutes: duration,
+        price: price.toFixed(2),
+        is_active: form.isActive,
+        service_category_id: categoryId || null,
+      });
+    } finally {
+      setUploadingImage(false);
+    }
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[var(--surface-0)]/60 backdrop-blur-md p-4 sm:p-6 transition-all duration-300">
-      <div className="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-[24px] border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-2xl max-h-[95vh]">
-        
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-3)]/90 px-6 py-5 backdrop-blur-md">
-          <div>
+    <AnimatePresence>
+      {open && (
+        <>
+        <motion.div
+          key="backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          role="presentation"
+          className="fixed inset-0 z-[80] bg-[var(--text-primary)]/10 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <motion.aside
+          key="drawer"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+          className="pointer-events-auto fixed right-4 sm:right-6 top-0 bottom-0 my-auto z-[80] flex w-[90vw] max-w-[500px] h-[95vh] flex-col overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-lg)] xl:max-w-[540px]"
+          aria-hidden={!open}
+        >
+            {/* Sticky Header */}
+            <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-2)] px-6 py-5">
+              <div>
             <h3 className="text-[18px] font-bold tracking-tight text-[var(--text-primary)]">{title}</h3>
             <p className="text-[13.5px] text-[var(--text-secondary)] mt-0.5">
               Configura los detalles de este servicio.
@@ -244,9 +251,9 @@ export default function ServiceFormModal({
           >
             ✕
           </button>
-        </div>
+            </header>
 
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Scrollable Body */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             
@@ -276,7 +283,7 @@ export default function ServiceFormModal({
                         id="service-category"
                         value={form.categoryId}
                         onChange={(event) => setForm((previous) => ({ ...previous, categoryId: event.target.value }))}
-                        className="w-full h-11 pl-3 pr-8 rounded-lg bg-[var(--surface-1)] border border-[var(--border-strong)] text-[14px] text-[var(--text-primary)] appearance-none focus:outline-none focus:border-[var(--app-primary)] focus:ring-1 focus:ring-[var(--app-primary)] transition-all cursor-pointer"
+                        className="dashboard-focusable w-full h-[3.25rem] pl-4 pr-8 rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[0.925rem] font-medium text-[var(--text-primary)] appearance-none transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus:bg-[var(--surface-1)] cursor-pointer"
                         required
                       >
                         <option value="" disabled>Seleccione una categoría</option>
@@ -284,7 +291,7 @@ export default function ServiceFormModal({
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                       </select>
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                         <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -304,7 +311,7 @@ export default function ServiceFormModal({
                       setForm((previous) => ({ ...previous, description: event.target.value }))
                     }
                     rows={3}
-                    className="w-full rounded-lg bg-[var(--surface-1)] border border-[var(--border-strong)] px-3 py-2.5 text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--app-primary)] focus:ring-1 focus:ring-[var(--app-primary)] transition-all"
+                    className="dashboard-focusable w-full rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 text-[0.925rem] font-medium text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus:bg-[var(--surface-1)] resize-none"
                     placeholder="Escribe una breve descripción (opcional)"
                   />
                 </div>
@@ -344,11 +351,34 @@ export default function ServiceFormModal({
             <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
               <h4 className="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Imagen del Servicio</h4>
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
+                <label
+                  className={`dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-[var(--border-strong)] bg-[var(--surface-2)] transition-colors hover:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-1)] aspect-[16/10] ${uploadingImage ? "pointer-events-none opacity-60" : ""}`}
+                >
+                  {previewUrl && (
+                    <Image src={previewUrl} alt="" fill className="object-cover" unoptimized />
+                  )}
+                  <div
+                    className={`relative z-10 flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-full px-4 py-3 text-center transition-all duration-300 ${
+                      previewUrl
+                        ? "border border-[var(--glass-border)] bg-[var(--surface-glass)] text-[var(--text-primary)] backdrop-blur-md backdrop-saturate-150 group-hover:bg-[var(--surface-glass)]"
+                        : "text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    {uploadingImage ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        <ImagePlus className="h-5 w-5" strokeWidth={2.5} />
+                        <span className="text-[0.75rem] font-bold uppercase tracking-wider">
+                          {previewUrl ? "Cambiar" : "Elegir"}
+                        </span>
+                      </>
+                    )}
+                  </div>
                   <input
-                    id="service-image-file"
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="sr-only"
                     onChange={(event) => {
                       const file = event.target.files?.[0] ?? null;
                       if (!file) {
@@ -366,43 +396,16 @@ export default function ServiceFormModal({
 
                       setSelectedFile(file);
                       setUploadError(null);
-                      setUploadMessage("Vista previa lista. Sube la imagen para confirmarla.");
+                      setUploadMessage(null);
+                      setForm((prev) => ({ ...prev, imageUrl: "" }));
                     }}
-                    className="block w-full text-[13px] text-[var(--text-secondary)] file:mr-4 file:rounded-full file:border-0 file:bg-[var(--surface-1)] file:px-4 file:py-2 file:text-[13px] file:font-semibold file:text-[var(--text-primary)] hover:file:bg-[var(--border-strong)] transition-all cursor-pointer"
+                    disabled={uploadingImage}
                   />
-                  <p className="text-[12px] text-[var(--text-muted)] mt-1">
-                    Formatos soportados: JPEG, PNG o WEBP. Peso máximo: 2MB.
-                  </p>
-                </div>
+                </label>
+                <p className="text-[12px] text-[var(--text-muted)] mt-1">
+                  Formatos soportados: JPEG, PNG o WEBP. Peso máximo: 2MB.
+                </p>
 
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleUploadSelectedImage}
-                    disabled={uploadingImage || !selectedFile}
-                  >
-                    {uploadingImage ? "Subiendo..." : "Subir imagen"}
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={resetSelectedImage} disabled={uploadingImage}>
-                    Limpiar
-                  </Button>
-                </div>
-
-                {previewUrl ? (
-                  <div className="mt-2 overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--surface-1)]">
-                    <Image
-                      src={previewUrl}
-                      alt={form.name ? `Vista previa de ${form.name}` : "Vista previa de la imagen del servicio"}
-                      width={640}
-                      height={320}
-                      className="h-40 w-full object-cover"
-                      unoptimized
-                    />
-                  </div>
-                ) : null}
-
-                {uploadMessage ? <p className="text-[13px] font-medium text-[var(--color-info)]">{uploadMessage}</p> : null}
                 {uploadError ? <p className="text-[13px] font-medium text-[var(--color-error)]">{uploadError}</p> : null}
 
                 <div className="pt-2">
@@ -456,16 +459,18 @@ export default function ServiceFormModal({
           </div>
 
           {/* Sticky Footer */}
-          <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-[var(--border-strong)] bg-[var(--surface-3)]/90 px-6 py-4 backdrop-blur-md">
+          <footer className="sticky bottom-0 z-10 flex shrink-0 items-center justify-end gap-3 border-t border-[var(--border-strong)] bg-[var(--surface-2)] px-6 py-4">
             <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
             <Button type="submit" isLoading={saving || uploadingImage} disabled={uploadingImage}>
               {mode === "create" ? "Crear Servicio" : "Guardar Cambios"}
             </Button>
-          </div>
+          </footer>
         </form>
-      </div>
-    </div>
+        </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

@@ -73,6 +73,15 @@ export async function request<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      clearAccessToken();
+      // Redirect to login if we are not already on an auth page
+      if (!window.location.pathname.startsWith("/auth/")) {
+        window.location.href = `/auth/login?redirect=${encodeURIComponent(
+          window.location.pathname + window.location.search
+        )}`;
+      }
+    }
     throw new Error(await parseErrorDetail(response));
   }
 
