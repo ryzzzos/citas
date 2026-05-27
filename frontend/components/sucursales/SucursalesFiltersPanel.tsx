@@ -428,7 +428,7 @@ export default function SucursalesFiltersPanel({
         className={cn(
           "pointer-events-auto absolute left-6 z-[460] hidden w-[min(420px,calc(100%-3rem))] min-h-0 rounded-[var(--radius-xl)] p-4 lg:flex flex-col",
           "top-[calc(env(safe-area-inset-top)+6.5rem)] h-[calc(100%-env(safe-area-inset-top)-8.5rem)]",
-          "bg-[var(--surface-glass)] backdrop-blur-3xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
+          "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
         )}
       >
         <PanelBody
@@ -460,7 +460,7 @@ export default function SucursalesFiltersPanel({
         onClick={() => onMobileOpenChange(true)}
         className={cn(
           "dashboard-focusable pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 z-[800] inline-flex min-h-14 items-center gap-2.5 rounded-full px-6 text-[0.9rem] font-bold text-[var(--text-primary)] lg:hidden",
-          "bg-[var(--surface-glass)] backdrop-blur-2xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)] transition-transform active:scale-95"
+          "bg-[var(--surface-glass)] backdrop-blur-2xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)] transition-transform active:scale-95"
         )}
       >
         <Search className="h-5 w-5 text-[var(--app-primary)]" />
@@ -488,7 +488,7 @@ export default function SucursalesFiltersPanel({
           className={cn(
             "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+5rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-4 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
             mobileOpen ? "translate-y-0" : "translate-y-12",
-            "bg-[var(--surface-glass)] backdrop-blur-3xl border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
+            "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
           )}
         >
           <div className="mb-4 flex items-center justify-end shrink-0">

@@ -118,7 +118,7 @@ function ImageUploadField({
           className={cn(
             "relative z-10 flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-full px-4 py-3 text-center transition-all duration-300",
             imageUrl
-              ? "border border-[var(--glass-border)] bg-[var(--surface-glass)] text-[var(--text-primary)] backdrop-blur-md group-hover:bg-[var(--surface-glass)]"
+              ? "border border-[var(--glass-border)] bg-[var(--surface-glass)] text-[var(--text-primary)] backdrop-blur-md backdrop-saturate-150 group-hover:bg-[var(--surface-glass)]"
               : "text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
           )}
         >

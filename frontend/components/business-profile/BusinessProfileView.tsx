@@ -15,6 +15,7 @@ import {
   Pencil,
   Phone,
   Scissors,
+  Share2,
   Sparkles,
   Store,
 } from "lucide-react";
@@ -60,18 +61,20 @@ function InfoRow({
   value,
   href,
   icon: Icon,
+  colorClass,
 }: {
   label: string;
   value: string;
   href?: string | null;
   icon: LucideIcon;
+  colorClass?: string;
 }) {
   const opensExternal = Boolean(href && href.startsWith("http"));
 
   return (
     <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-      <div className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
-        <AppIcon icon={Icon} className="text-[var(--text-secondary)]" />
+      <div className={`rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] ${colorClass || "text-[var(--text-secondary)]"}`}>
+        <AppIcon icon={Icon} className="text-current" />
       </div>
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
@@ -197,7 +200,7 @@ export default function BusinessProfileView({
 
   return (
     <section className="space-y-5">
-      <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)]  shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
+      <article className="overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-2)]  shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)]">
         <div className="relative isolate">
           {!business.cover_image_url || coverError ? (
             <div className="aspect-[20/8] w-full lg:aspect-[24/8]" />
@@ -214,7 +217,7 @@ export default function BusinessProfileView({
           )}
 
           <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)] backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-success)] backdrop-blur-md backdrop-saturate-150">
               <Store className="h-3.5 w-3.5" aria-hidden="true" />
               Perfil verificado
             </span>
@@ -222,7 +225,7 @@ export default function BusinessProfileView({
         </div>
 
         <div className="relative px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
-          <div className="-mt-14 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-glass)] p-4 shadow-[var(--shadow-md)] backdrop-blur-md dark:border-[var(--border-strong)] dark:bg-[var(--surface-glass)] sm:-mt-16 sm:p-5">
+          <div className="-mt-14 rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-glass)] p-4 shadow-[var(--shadow-md)] backdrop-blur-md backdrop-saturate-150 dark:border-[var(--border-strong)] dark:bg-[var(--surface-glass)] sm:-mt-16 sm:p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                 <Avatar logoUrl={business.logo_image_url} businessName={business.name} />
@@ -232,7 +235,7 @@ export default function BusinessProfileView({
                       {business.category}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] ">
-                      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                      <MapPin className="h-3.5 w-3.5 text-[var(--text-secondary)]" aria-hidden="true" />
                       {business.city}
                     </span>
                   </div>
@@ -245,12 +248,12 @@ export default function BusinessProfileView({
                 </div>
               </div>
 
-              <div className="grid w-full gap-2 sm:w-auto sm:min-w-[240px]">
+              <div className="flex w-full flex-col gap-3 pt-4 sm:w-[240px] lg:pt-0">
                 {mode === "dashboard-preview" && onToggleEditing ? (
                   <button
                     type="button"
                     onClick={onToggleEditing}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
+                    className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-6 text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
                   >
                     <AppIcon icon={Pencil} />
                     {isEditing ? "Cerrar editor" : "Editar perfil"}
@@ -260,21 +263,31 @@ export default function BusinessProfileView({
                 {mode === "dashboard-preview" ? (
                   <Link
                     href={publicProfileHref}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
+                    className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
                   >
                     Ver perfil publico
                     <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   </Link>
-                ) : hasActiveServices ? (
-                  <Link
-                    href={bookingHref}
-                    className="dashboard-focusable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
-                  >
-                    Reservar ahora
-                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                ) : null}
-
+                ) : (
+                  <div className="flex w-full flex-col gap-3">
+                    {hasActiveServices && (
+                      <Link
+                        href={bookingHref}
+                        className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
+                      >
+                        Reservar ahora
+                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-6 text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
+                    >
+                      <Share2 className="h-4 w-4" aria-hidden="true" />
+                      Compartir
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -283,49 +296,28 @@ export default function BusinessProfileView({
         <div className="px-4 pb-6 sm:px-6 sm:pb-7 lg:px-8 lg:pb-8">
           <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
             <aside className="space-y-4">
-              <section className="h-fit rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
+              <section className="h-fit rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
                 <h2 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Informacion del negocio
                 </h2>
 
                 <div className="mt-4 space-y-3">
-                  <InfoRow label="Ubicacion" value={`${business.address}, ${business.city}`} icon={MapPin} />
-                  <InfoRow label="Telefono" value={business.phone} href={phoneHref} icon={Phone} />
+                  <InfoRow label="Ubicacion" value={`${business.address}, ${business.city}`} icon={MapPin} colorClass="text-[var(--color-error)]" />
+                  <InfoRow label="Telefono" value={business.phone} href={phoneHref} icon={Phone} colorClass="text-[var(--color-info)]" />
                   <InfoRow
                     label="WhatsApp"
                     value={business.whatsapp_phone ?? "No configurado"}
                     href={whatsappHref}
                     icon={MessageCircle}
+                    colorClass="text-[var(--color-success)]"
                   />
-                  <InfoRow label="Correo" value={business.email} href={`mailto:${business.email}`} icon={Mail} />
+                  <InfoRow label="Correo" value={business.email} href={`mailto:${business.email}`} icon={Mail} colorClass="text-[var(--color-pending)]" />
                 </div>
 
-                <div className="mt-5 grid gap-2">
-                  {whatsappHref ? (
-                    <Link
-                      href={whatsappHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:text-[var(--text-primary)] dark:hover:bg-[var(--surface-2)]"
-                    >
-                      <AppIcon icon={MessageCircle} />
-                      Contactar por WhatsApp
-                    </Link>
-                  ) : null}
 
-                  {phoneHref ? (
-                    <Link
-                      href={phoneHref}
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
-                    >
-                      <AppIcon icon={Phone} />
-                      Llamar ahora
-                    </Link>
-                  ) : null}
-                </div>
               </section>
 
-              <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
+              <section className="overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                 <iframe
                   title={`Mapa de ${business.name}`}
                   src={mapEmbedUrl}
@@ -337,14 +329,12 @@ export default function BusinessProfileView({
             </aside>
 
             <div className="space-y-5">
-              <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
+              <section className="rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                   <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
                     Servicios
                   </h2>
-                  <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-                    Magic Card
-                  </span>
+
                 </div>
 
                 {magicFeatures.length > 0 ? (

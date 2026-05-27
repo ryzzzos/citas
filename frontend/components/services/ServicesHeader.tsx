@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { BriefcaseBusiness, CircleCheckBig, CircleOff, Plus, Tags } from "lucide-react";
+import { BriefcaseBusiness, CheckCircle2, Plus, Tags, CircleDollarSign } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import type { Service } from "@/types";
 
@@ -10,8 +10,26 @@ interface ServicesHeaderProps {
 }
 
 export default function ServicesHeader({ services, onCreate, onManageCategories }: ServicesHeaderProps) {
-  const activeCount = services.filter((service) => service.is_active).length;
-  const inactiveCount = services.length - activeCount;
+  const activeServices = services.filter((service) => service.is_active);
+  const activeCount = activeServices.length;
+  
+  const validPrices = activeServices.map(s => Number(s.price)).filter(n => !isNaN(n));
+  const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
+  const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : 0;
+  
+  const formatPrice = (p: number) => new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    maximumFractionDigits: 0,
+  }).format(p);
+
+  const priceRange = validPrices.length === 0 
+    ? formatPrice(0)
+    : minPrice === maxPrice 
+      ? formatPrice(minPrice) 
+      : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+      
+  const categoriesCount = new Set(activeServices.map(s => s.service_category_id).filter(Boolean)).size;
 
   return (
     <header className="flex flex-col gap-6">
@@ -43,35 +61,38 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
         </div>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 xs:grid-cols-2 lg:grid-cols-3">
-        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Catálogo Activo */}
+        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-info)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-secondary)]">
-              <AppIcon icon={BriefcaseBusiness} size="sm" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={CheckCircle2} size="sm" />
             </div>
-            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Total de servicios</p>
+            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Catálogo activo</p>
           </div>
-          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{services.length}</p>
+          <p className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">{activeCount}</p>
         </article>
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
-           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)]">
-              <AppIcon icon={CircleCheckBig} size="sm" />
+        {/* Categorías */}
+        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--app-primary)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--app-primary)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={Tags} size="sm" />
             </div>
-            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Activos</p>
+            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Categorías</p>
           </div>
-          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{activeCount}</p>
+          <p className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">{categoriesCount}</p>
         </article>
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
-           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-pending)] text-[var(--surface-3)]">
-              <AppIcon icon={CircleOff} size="sm" />
+        {/* Rango de Precios */}
+        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-success)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+              <AppIcon icon={CircleDollarSign} size="sm" />
             </div>
-            <p className="text-[14px] font-semibold text-[var(--text-primary)]">Inactivos</p>
+            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Rango precios</p>
           </div>
-          <p className="mt-4 text-3xl font-bold tracking-tight text-[var(--text-primary)]">{inactiveCount}</p>
+          <p className="text-[20px] sm:text-[22px] font-bold tracking-tight text-[var(--text-primary)]">{priceRange}</p>
         </article>
       </div>
     </header>

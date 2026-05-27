@@ -42,7 +42,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300`}
       >
         <SessionOnboardingGuard />
         <Navbar />

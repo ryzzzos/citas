@@ -44,7 +44,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
     <section
       className={cn(
         "pointer-events-auto fixed bottom-4 left-4 right-4 z-[500] flex flex-col overflow-hidden rounded-[var(--radius-xl)]",
-        "bg-[var(--surface-glass)] backdrop-blur-2xl shadow-[var(--shadow-lg)] border border-[var(--border-soft)]",
+        "bg-[var(--surface-glass)] backdrop-blur-2xl backdrop-saturate-150 shadow-[var(--shadow-lg)] border border-[var(--border-soft)]",
         "lg:bottom-[max(env(safe-area-inset-bottom),1.5rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[400px]"
       )}
       aria-label={`Detalle de sucursal: ${business.name}`}

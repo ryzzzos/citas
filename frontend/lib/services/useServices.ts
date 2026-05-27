@@ -18,11 +18,13 @@ export type ServiceStatusFilter = "all" | "active" | "inactive";
 export interface ServicesFiltersState {
   query: string;
   status: ServiceStatusFilter;
+  categoryId: string;
 }
 
 const DEFAULT_FILTERS: ServicesFiltersState = {
   query: "",
   status: "all",
+  categoryId: "all",
 };
 
 function sortByName(services: Service[]): Service[] {
@@ -69,10 +71,16 @@ export function useServices() {
           : filters.status === "active"
             ? service.is_active
             : !service.is_active;
+      const matchesCategory =
+        filters.categoryId === "all"
+          ? true
+          : filters.categoryId === "null"
+            ? service.service_category_id === null
+            : service.service_category_id === filters.categoryId;
 
-      return matchesQuery && matchesStatus;
+      return matchesQuery && matchesStatus && matchesCategory;
     });
-  }, [filters.query, filters.status, services]);
+  }, [filters.query, filters.status, filters.categoryId, services]);
 
   const create = useCallback(
     async (data: CreateServiceInput) => {

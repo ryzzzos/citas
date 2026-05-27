@@ -86,9 +86,9 @@ export default function Navbar() {
     >
       <div
         className={cn(
-          "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-[var(--radius-sm)] px-3.5 sm:px-6",
+          "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-full px-3.5 sm:px-6",
           isMapRoute ? "w-full max-w-[78rem]" : "w-full max-w-6xl",
-          "bg-[var(--surface-glass)] shadow-[shadow-[var(--shadow-md)]] backdrop-blur border border-[var(--border-strong)]",
+          "bg-[var(--surface-glass)] shadow-[shadow-[var(--shadow-md)]] backdrop-blur-md backdrop-saturate-150 border border-[var(--border-strong)]",
         )}
       >
         <Link
@@ -111,7 +111,7 @@ export default function Navbar() {
             className={cn(
               navItemClassName,
               isBranchesRoute
-                ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)] shadow-[var(--shadow-[var(--shadow-sm)])]"
+                ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)] shadow-[var(--shadow-sm)]"
                 : undefined
             )}
           >

@@ -17,8 +17,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={id}
-          className={`w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-0)]/50 dark:placeholder:text-[var(--text-secondary)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)] ${
-            error ? "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]" : ""
+          className={`w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--text-secondary)] focus:bg-[var(--surface-3)] focus:outline-none dark:border-[var(--border-strong)] dark:bg-[var(--surface-0)]/50 dark:placeholder:text-[var(--text-secondary)] dark:focus:border-[var(--text-secondary)] dark:focus:bg-[var(--surface-1)] ${
+            error ? "border-[var(--color-error)] focus:border-[var(--color-error)]" : ""
           } ${className}`}
           {...props}
         />

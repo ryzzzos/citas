@@ -5,7 +5,6 @@ interface AgendaRightRailProps {
   pending: number;
   confirmed: number;
   completed: number;
-  completed: number;
   cancelled: number;
 }
 

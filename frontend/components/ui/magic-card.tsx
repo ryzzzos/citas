@@ -56,7 +56,7 @@ const BentoCard = ({
   <div
     key={name}
     className={cn(
-      "group relative col-span-3 flex min-h-[27rem] flex-col justify-between overflow-hidden rounded-xl",
+      "group relative col-span-3 flex min-h-[27rem] flex-col justify-between overflow-hidden rounded-[var(--radius-2xl)]",
       "bg-[var(--surface-3)] shadow-[var(--shadow-md)]",
       "dark:bg-[var(--surface-3)] transform-gpu border border-[var(--border-strong)]",
       className
@@ -64,21 +64,21 @@ const BentoCard = ({
     {...props}
   >
     <div className="relative flex h-48 items-start justify-center overflow-hidden px-4 pt-4">
-      <div className="h-full w-full max-w-[17rem] overflow-hidden rounded-3xl [&>img]:h-full [&>img]:w-full [&>img]:max-w-none [&>img]:rounded-none [&>img]:object-cover [&>img]:object-top [&>img]:transform-gpu [&>img]:transition-transform [&>img]:duration-300 [&>img]:ease-out group-hover:[&>img]:scale-[1.05] [&>div]:h-full [&>div]:w-full [&>div]:max-w-none [&>div]:rounded-none">
+      <div className="h-full w-full max-w-[17rem] overflow-hidden rounded-[var(--radius-md)] [&>img]:h-full [&>img]:w-full [&>img]:max-w-none [&>img]:rounded-none [&>img]:object-cover [&>img]:object-top [&>img]:transform-gpu [&>img]:transition-transform [&>img]:duration-300 [&>img]:ease-out group-hover:[&>img]:scale-[1.05] [&>div]:h-full [&>div]:w-full [&>div]:max-w-none [&>div]:rounded-none border border-[var(--border-strong)]">
         {background}
       </div>
 
       {(durationBadge || priceBadge) ? (
         <div className="absolute left-6 top-6 flex flex-wrap gap-2">
           {durationBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md backdrop-saturate-150 shadow-[var(--shadow-sm)]">
               <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
               {durationBadge}
             </span>
           ) : null}
 
           {priceBadge ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--glass-border)] bg-[var(--surface-3)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md dark:bg-[var(--surface-1)]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur-md backdrop-saturate-150 shadow-[var(--shadow-sm)]">
               <Tag className="h-3.5 w-3.5" aria-hidden="true" />
               {priceBadge}
             </span>
