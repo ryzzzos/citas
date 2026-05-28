@@ -21,12 +21,14 @@ import {
 } from "lucide-react";
 
 import AppIcon from "@/components/ui/AppIcon";
-import { BentoCard, BentoGrid } from "@/components/ui/magic-card";
-import type { Business, Service } from "@/types";
+import { BentoCard } from "@/components/ui/magic-card";
+import { AccordionGroup, AccordionItem } from "@/components/ui/Accordion";
+import type { Business, Service, ServiceCategory } from "@/types";
 
 interface BusinessProfileViewProps {
   business: Business;
   services: Service[];
+  categories?: ServiceCategory[];
   mode?: "dashboard-preview" | "public";
   isEditing?: boolean;
   onToggleEditing?: () => void;
@@ -124,6 +126,7 @@ function Avatar({ logoUrl, businessName }: { logoUrl: string | null; businessNam
 export default function BusinessProfileView({
   business,
   services,
+  categories = [],
   mode = "dashboard-preview",
   isEditing = false,
   onToggleEditing,
@@ -167,36 +170,34 @@ export default function BusinessProfileView({
     () => [Scissors, Sparkles, Clock3, BadgeDollarSign, Store],
     []
   );
-  const magicFeatures = useMemo<MagicFeature[]>(() => {
-    return activeServices.slice(0, 5).map((service, index) => {
-      const serviceDescription =
-        service.description?.trim() ??
-        "Servicio premium con enfoque en detalle, comodidad y resultados consistentes.";
 
-      return {
-        Icon: demoIcons[index % demoIcons.length],
-        name: service.name,
-        durationBadge: `${service.duration_minutes} min`,
-        priceBadge: formatPrice(service.price),
-        description: serviceDescription,
-        href: `/${business.slug}?service=${service.id}#reserva`,
-        cta: "Reservar servicio",
-        background: service.image_url ? (
-          <Image
-            src={service.image_url}
-            alt=""
-            width={272}
-            height={272}
-            className="h-full w-full max-w-[17rem] rounded-3xl object-cover object-top"
-            loading="lazy"
-            unoptimized
-          />
-        ) : (
-          <div className="h-full w-full max-w-[17rem] rounded-3xl bg-[var(--surface-glass)]" />
-        ),
-      };
-    });
-  }, [activeServices, business.slug, demoIcons]);
+  const groupedCategories = useMemo(() => {
+    if (!categories || categories.length === 0) {
+      return [{ id: "all", name: "Servicios", services: activeServices }];
+    }
+
+    const grouped = categories.map((cat) => ({
+      ...cat,
+      services: activeServices.filter((s) => s.service_category_id === cat.id),
+    })).filter((cat) => cat.services.length > 0);
+
+    const uncategorized = activeServices.filter(
+      (s) => !s.service_category_id || !categories.some((c) => c.id === s.service_category_id)
+    );
+
+    if (uncategorized.length > 0) {
+      grouped.push({
+        id: "uncategorized",
+        name: "Otros servicios",
+        services: uncategorized,
+        position: 9999,
+        description: null,
+        business_id: "",
+      });
+    }
+
+    return grouped;
+  }, [activeServices, categories]);
 
   return (
     <section className="space-y-5">
@@ -329,26 +330,75 @@ export default function BusinessProfileView({
             </aside>
 
             <div className="space-y-5">
-              <section className="rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
-                    Servicios
-                  </h2>
+              {groupedCategories.length > 0 ? (
+                <AccordionGroup>
+                  {groupedCategories.map((group, groupIndex) => {
+                    const magicFeaturesForGroup = group.services.map((service, index) => {
+                      const serviceDescription =
+                        service.description?.trim() ??
+                        "Servicio premium con enfoque en detalle, comodidad y resultados consistentes.";
 
-                </div>
+                      return {
+                        Icon: demoIcons[index % demoIcons.length],
+                        name: service.name,
+                        durationBadge: `${service.duration_minutes} min`,
+                        priceBadge: formatPrice(service.price),
+                        description: serviceDescription,
+                        href: `/${business.slug}?service=${service.id}#reserva`,
+                        cta: "Reservar servicio",
+                        background: service.image_url ? (
+                          <Image
+                            src={service.image_url}
+                            alt=""
+                            width={272}
+                            height={272}
+                            className="h-full w-full max-w-[17rem] rounded-3xl object-cover object-top"
+                            loading="lazy"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="h-full w-full max-w-[17rem] rounded-3xl bg-[var(--surface-glass)]" />
+                        ),
+                      };
+                    });
 
-                {magicFeatures.length > 0 ? (
-                  <BentoGrid>
-                    {magicFeatures.map((feature) => (
-                      <BentoCard key={feature.name} {...feature} />
-                    ))}
-                  </BentoGrid>
-                ) : (
+                    return (
+                      <AccordionItem 
+                        key={group.id} 
+                        title={group.name} 
+                        defaultOpen={groupIndex === 0}
+                      >
+                        <div className="relative w-full">
+                          <div className="flex flex-row gap-5 overflow-x-auto py-8 px-4 snap-x snap-mandatory after:content-[''] after:w-4 after:shrink-0">
+                            {magicFeaturesForGroup.map((feature) => (
+                              <BentoCard 
+                                key={feature.name} 
+                                {...feature} 
+                                className="w-[270px] min-w-[270px] shrink-0 snap-center"
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* Gradientes laterales para simular desvanecimiento */}
+                          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-4 bg-gradient-to-r from-[var(--surface-3)] to-transparent" />
+                          <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-4 bg-gradient-to-l from-[var(--surface-3)] to-transparent" />
+                        </div>
+                      </AccordionItem>
+                    );
+                  })}
+                </AccordionGroup>
+              ) : (
+                <section className="rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">
+                      Servicios
+                    </h2>
+                  </div>
                   <p className="text-sm leading-6 text-[var(--text-secondary)]">
                     No hay servicios activos para mostrar.
                   </p>
-                )}
-              </section>
+                </section>
+              )}
             </div>
           </div>
         </div>

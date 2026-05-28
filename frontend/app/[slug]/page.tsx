@@ -6,8 +6,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import BusinessProfileView from "@/components/business-profile/BusinessProfileView";
 import Button from "@/components/ui/Button";
-import { createBooking, getAvailability, getBusinessBySlug, listServices, listStaff } from "@/lib/api";
-import type { Business, Service, Staff } from "@/types";
+import { createBooking, getAvailability, getBusinessBySlug, listServices, listStaff, getServiceCategories } from "@/lib/api";
+import type { Business, Service, Staff, ServiceCategory } from "@/types";
 
 export default function PublicBusinessPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +16,7 @@ export default function PublicBusinessPage() {
 
   const [business, setBusiness] = useState<Business | null>(null);
   const [services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,17 +36,20 @@ export default function PublicBusinessPage() {
       setLoading(true);
       try {
         const biz = await getBusinessBySlug(slug);
-        const [svcs, sf] = await Promise.all([
+        const [svcs, cats, sf] = await Promise.all([
           listServices(biz.id, { includeInactive: false }),
+          getServiceCategories(biz.id),
           listStaff(biz.id),
         ]);
 
         setBusiness(biz);
         setServices(svcs);
+        setCategories(cats);
         setStaff(sf);
       } catch {
         setBusiness(null);
         setServices([]);
+        setCategories([]);
         setStaff([]);
       } finally {
         setLoading(false);
@@ -153,7 +157,7 @@ export default function PublicBusinessPage() {
 
   return (
     <main className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:py-10">
-      <BusinessProfileView business={business} services={services} mode="public" />
+      <BusinessProfileView business={business} services={services} categories={categories} mode="public" />
 
       <section
         id="reserva"
@@ -187,11 +191,39 @@ export default function PublicBusinessPage() {
                className="dashboard-focusable min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-sm text-[var(--text-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un servicio</option>
-              {services.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {service.name} - {service.duration_minutes} min
-                </option>
-              ))}
+              {(() => {
+                const grouped = categories.map((cat) => ({
+                  ...cat,
+                  services: services.filter((s) => s.service_category_id === cat.id),
+                })).filter((cat) => cat.services.length > 0);
+                
+                const uncategorized = services.filter(
+                  (s) => !s.service_category_id || !categories.some((c) => c.id === s.service_category_id)
+                );
+                
+                return (
+                  <>
+                    {grouped.map((cat) => (
+                      <optgroup key={cat.id} label={cat.name}>
+                        {cat.services.map((service) => (
+                          <option key={service.id} value={service.id}>
+                            {service.name} - {service.duration_minutes} min
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                    {uncategorized.length > 0 && (
+                      <optgroup label="Otros servicios">
+                        {uncategorized.map((service) => (
+                          <option key={service.id} value={service.id}>
+                            {service.name} - {service.duration_minutes} min
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </>
+                );
+              })()}
             </select>
           </div>
 

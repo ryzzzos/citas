@@ -57,6 +57,7 @@ build/
 coverage/
 *.sqlite3
 *.db
+backend/storage/
 
 # ------------------------------
 # Local assistant tooling

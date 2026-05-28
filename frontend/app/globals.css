@@ -137,3 +137,12 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
 }
+
+/* Utilities */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

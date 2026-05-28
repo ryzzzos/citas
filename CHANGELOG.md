@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.3.7] - 2026-05-28
+
+### Added
+- **Accordion Component (`Accordion.tsx`)**: Created a premium, reusable accordion component with keyboard accessibility, focus rings, and custom slide-in/slide-out animations powered by `framer-motion` using custom easing transitions.
+
+### Changed
+- **Categorized Services Layout (`BusinessProfileView.tsx`)**: Redesigned the services showcase of the business page to group active services by their corresponding category using the new Accordion. Inside each category, services are displayed inside a smooth horizontal scrolling gallery with CSS scroll-snapping and lateral fade gradient masks.
+- **Service Options in Booking Page (`[slug]/page.tsx`)**: Refactored the public booking form's dropdown selector to group available services under `<optgroup>` tags representing their categories, including a fallback "Otros servicios" section.
+- **Concurrent API Data Fetching (`useBusinessProfileEditor.ts`)**: Optimized profile loading to fetch both active services and categories concurrently (`Promise.all`).
+- **Global CSS & Styling Utilities (`globals.css` & `magic-card.tsx`)**: Added a global `.hide-scrollbar` CSS utility to remove native scrollbars in custom horizontal viewports, and reduced `BentoCard` minimum height to `24rem` to fit perfectly into the horizontal galleries.
+
 ## [0.3.6] - 2026-05-27
 
 ### Added

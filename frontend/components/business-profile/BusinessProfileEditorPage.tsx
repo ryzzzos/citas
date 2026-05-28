@@ -150,6 +150,7 @@ export default function BusinessProfileEditorPage() {
   const {
     business,
     services,
+    categories,
     draft,
     previewBusiness,
     loading,
@@ -251,6 +252,7 @@ export default function BusinessProfileEditorPage() {
           <BusinessProfileView
             business={previewBusiness}
             services={services}
+            categories={categories}
             mode="dashboard-preview"
             isEditing={isEditing}
             onToggleEditing={() => setIsEditing((current) => !current)}
