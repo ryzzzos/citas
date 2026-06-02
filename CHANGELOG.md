@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.4.1] - 2026-06-02
+
+### Changed
+- **Git Ignoring Specifications (`.gitignore`)**: Added specific patterns to permanently ignore local launch scripts and text editor backup files (`backup_editor.txt`) to protect repository cleanliness and security.
+
+### Removed
+- **Unnecessary Remote Script Assets**: Untracked `start.bat`, `start.ps1`, and `backup_editor.txt` from the Git repository index to ensure local helper scripts and plain-text editor backups are kept in the local workspace but not stored on the public GitHub remote repository.
+
 ## [0.4.0] - 2026-06-02
 
 ### Added

@@ -64,3 +64,8 @@ backend/storage/
 # ------------------------------
 .agents/
 skills-lock.json
+
+# Local scripts and editor backups
+backup_editor.txt
+start.bat
+start.ps1
