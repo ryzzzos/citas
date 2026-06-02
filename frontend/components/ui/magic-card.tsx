@@ -22,6 +22,7 @@ interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   description: string
   href: string
   cta: string
+  onCtaClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
 const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
@@ -51,6 +52,7 @@ const BentoCard = ({
   description,
   href,
   cta,
+  onCtaClick,
   ...props
 }: BentoCardProps) => (
   <div
@@ -107,7 +109,7 @@ const BentoCard = ({
           "pointer-events-none z-10 flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden mt-4"
         )}
       >
-        <a href={href} className={ctaClass}>
+        <a href={href} className={ctaClass} onClick={onCtaClick}>
           {cta}
           <ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" />
         </a>
@@ -118,7 +120,7 @@ const BentoCard = ({
           "pointer-events-none z-10 absolute bottom-0 left-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex"
         )}
       >
-        <a href={href} className={ctaClass}>
+        <a href={href} className={ctaClass} onClick={onCtaClick}>
           {cta}
           <ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" />
         </a>

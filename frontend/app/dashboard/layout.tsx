@@ -9,6 +9,7 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { getDashboardTitle } from "@/components/layout/dashboardNavigation";
 import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { BranchProvider } from "@/contexts/BranchContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,7 +31,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pageTitle = getDashboardTitle(pathname);
 
   return (
-    <div className="bg-[var(--surface-1)] h-dvh overflow-hidden [color:var(--text-primary)]">
+    <BranchProvider>
+      <div className="bg-[var(--surface-1)] h-dvh overflow-hidden [color:var(--text-primary)]">
       <a
         href="#dashboard-main"
         className="sr-only z-[70] rounded-md bg-[var(--surface-0)] px-3 py-2 text-sm shadow-[var(--shadow-sm)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary-strong)]"
@@ -103,6 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </BranchProvider>
   );
 }

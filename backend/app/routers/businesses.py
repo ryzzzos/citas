@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_business_owner
 from app.models.business import Business
+from app.models.branch import Branch
 from app.models.user import User
 from app.schemas.business import (
     BusinessCreate,
@@ -212,8 +213,33 @@ def create_business(
             city=payload["city"],
         )
 
+    address = payload.pop("address")
+    city = payload.pop("city")
+    latitude = payload.pop("latitude", None)
+    longitude = payload.pop("longitude", None)
+    geocoding_status = payload.pop("geocoding_status", GEOCODING_STATUS_PENDING)
+    geocoding_error = payload.pop("geocoding_error", None)
+    geocoded_at = payload.pop("geocoded_at", None)
+
     business = Business(**payload, owner_id=current_user.id)
     db.add(business)
+    db.flush()
+
+    branch = Branch(
+        business_id=business.id,
+        name="Sede Principal",
+        address=address,
+        city=city,
+        phone=payload.get("phone", ""),
+        is_active=True,
+        latitude=latitude,
+        longitude=longitude,
+        geocoding_status=geocoding_status,
+        geocoding_error=geocoding_error,
+        geocoded_at=geocoded_at
+    )
+    db.add(branch)
+
     db.commit()
     db.refresh(business)
     return business
@@ -262,41 +288,40 @@ def list_businesses_for_map(
             detail="east and west cannot be equal",
         )
 
-    query = db.query(Business).filter(Business.latitude.is_not(None), Business.longitude.is_not(None))
-    query = query.filter(Business.latitude <= north, Business.latitude >= south)
+    query = db.query(Business, Branch).join(Branch, Business.id == Branch.business_id)
+    query = query.filter(Branch.latitude.is_not(None), Branch.longitude.is_not(None))
+    query = query.filter(Branch.latitude <= north, Branch.latitude >= south)
 
     if east > west:
-        query = query.filter(Business.longitude >= west, Business.longitude <= east)
+        query = query.filter(Branch.longitude >= west, Branch.longitude <= east)
     else:
         # Support anti-meridian viewports where east wraps around the globe.
-        query = query.filter(or_(Business.longitude >= west, Business.longitude <= east))
+        query = query.filter(or_(Branch.longitude >= west, Branch.longitude <= east))
 
     if city:
-        query = query.filter(Business.city.ilike(f"%{city}%"))
+        query = query.filter(Branch.city.ilike(f"%{city}%"))
     if category:
         query = query.filter(Business.category.ilike(f"%{category}%"))
 
     total = query.count()
-    businesses = query.order_by(Business.created_at.desc()).offset(offset).limit(limit).all()
+    results = query.order_by(Business.created_at.desc()).offset(offset).limit(limit).all()
 
-    items = [
-        {
-            "id": business.id,
+    items = []
+    for business, branch in results:
+        items.append({
+            "id": branch.id,
             "slug": business.slug,
             "name": business.name,
             "category": business.category,
-            "city": business.city,
-            "address": business.address,
-            "latitude": float(business.latitude),
-            "longitude": float(business.longitude),
+            "city": branch.city,
+            "address": branch.address,
+            "latitude": float(branch.latitude),
+            "longitude": float(branch.longitude),
             "public_bio": business.public_bio,
             "logo_image_url": business.logo_image_url,
             "cover_image_url": business.cover_image_url,
-            "geocoding_status": business.geocoding_status,
-        }
-        for business in businesses
-        if business.latitude is not None and business.longitude is not None
-    ]
+            "geocoding_status": branch.geocoding_status,
+        })
 
     return {
         "items": items,
@@ -408,8 +433,20 @@ def update_business(
                 city=_effective_value(updates, "city", business.city),
             )
 
+    # Extract branch fields
+    branch_updates = {}
+    for f in ("address", "city", "latitude", "longitude", "geocoding_status", "geocoding_error", "geocoded_at"):
+        if f in updates:
+            branch_updates[f] = updates.pop(f)
+
     for field, value in updates.items():
         setattr(business, field, value)
+
+    if branch_updates and business.branches:
+        branch = business.branches[0]
+        for field, value in branch_updates.items():
+            setattr(branch, field, value)
+            
     db.commit()
     db.refresh(business)
     return business

@@ -90,6 +90,7 @@ def business_agenda(
     statuses: list[str] | None = Query(default=None),
     staff_id: uuid.UUID | None = None,
     service_id: uuid.UUID | None = None,
+    branch_id: uuid.UUID | None = None,
     q: str | None = None,
     current_user: User = Depends(require_business_owner),
     db: Session = Depends(get_db),
@@ -97,6 +98,9 @@ def business_agenda(
     local_zone = _resolve_timezone(timezone)
 
     query = db.query(Booking).filter(Booking.business_id == business_id)
+
+    if branch_id:
+        query = query.filter(Booking.branch_id == branch_id)
 
     if staff_id:
         query = query.filter(Booking.staff_id == staff_id)

@@ -7,6 +7,7 @@ import { businessAgenda } from "@/lib/api/bookings";
 import { listServices } from "@/lib/api/services";
 import { listStaff } from "@/lib/api/staff";
 import type { Booking, Service, Staff } from "@/types";
+import { useBranchContext } from "@/contexts/BranchContext";
 
 import type { AgendaFilters, AgendaView } from "./types";
 
@@ -34,7 +35,9 @@ function normalizeQuery(value: string): string {
 }
 
 export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState {
-  const [businessId, setBusinessId] = useState<string | null>(null);
+  const { activeBranch, business, isLoading: branchLoading, error: branchError } = useBranchContext();
+  const businessId = business?.id || null;
+  const branchId = activeBranch?.id || null;
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -42,34 +45,21 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function loadBusiness() {
-      try {
-        const business = await getMyBusiness();
-        if (!cancelled) {
-          setBusinessId(business.id);
-        }
-      } catch {
-        if (!cancelled) {
-          setLoading(false);
-          setError("No se pudo identificar el negocio actual.");
-        }
+    if (!branchLoading) {
+      if (branchError) {
+        setError(branchError);
+      } else if (!businessId) {
+        setError("No se pudo identificar el negocio actual.");
       }
     }
-
-    loadBusiness();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [branchLoading, branchError, businessId]);
 
   const bookingQuery = useMemo(() => {
     const statuses = options.filters.status === "all" ? [] : [options.filters.status];
 
     return {
       timezone: options.timezone,
+      branch_id: branchId || undefined,
       from_at: options.fromAtIso,
       to_at: options.toAtIso,
       booking_date: options.view === "day" ? options.selectedDateIso : undefined,
@@ -88,10 +78,11 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     options.timezone,
     options.toAtIso,
     options.view,
+    branchId,
   ]);
 
   const loadAgendaData = useCallback(async () => {
-    if (!businessId) {
+    if (!businessId || !branchId) {
       return;
     }
 
@@ -101,7 +92,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     try {
       const [bookingsResult, staffResult, servicesResult] = await Promise.all([
         businessAgenda(businessId, bookingQuery),
-        listStaff(businessId),
+        listStaff(businessId, branchId),
         listServices(businessId),
       ]);
 
@@ -113,7 +104,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     } finally {
       setLoading(false);
     }
-  }, [bookingQuery, businessId]);
+  }, [bookingQuery, businessId, branchId]);
 
   useEffect(() => {
     loadAgendaData();

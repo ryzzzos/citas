@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class BookingCreate(BaseModel):
     business_id: uuid.UUID
+    branch_id: uuid.UUID
     service_id: uuid.UUID
     staff_id: uuid.UUID
     booking_date: date
@@ -17,6 +18,7 @@ class BookingRead(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
     business_id: uuid.UUID
+    branch_id: uuid.UUID
     service_id: uuid.UUID
     staff_id: uuid.UUID
     booking_date: date

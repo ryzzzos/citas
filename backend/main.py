@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
-from app.routers import auth, users, businesses, services, staff, schedules, bookings, service_categories
+from app.routers import auth, users, businesses, branches, services, staff, schedules, bookings, service_categories
 
 STORAGE_ROOT = Path(__file__).resolve().parent / "storage"
 STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(businesses.router, prefix="/api/v1/businesses", tags=["businesses"])
+app.include_router(branches.router, prefix="/api/v1/businesses/{business_id}/branches", tags=["branches"])
 app.include_router(services.router, prefix="/api/v1/services", tags=["services"])
 app.include_router(service_categories.router, prefix="/api/v1/businesses/{business_id}/categories", tags=["service_categories"])
 app.include_router(staff.router, prefix="/api/v1/staff", tags=["staff"])

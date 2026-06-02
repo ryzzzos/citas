@@ -23,15 +23,17 @@ import {
 import AppIcon from "@/components/ui/AppIcon";
 import { BentoCard } from "@/components/ui/magic-card";
 import { AccordionGroup, AccordionItem } from "@/components/ui/Accordion";
-import type { Business, Service, ServiceCategory } from "@/types";
+import type { Business, Service, ServiceCategory, Branch } from "@/types";
 
 interface BusinessProfileViewProps {
   business: Business;
   services: Service[];
   categories?: ServiceCategory[];
+  branch?: Branch;
   mode?: "dashboard-preview" | "public";
   isEditing?: boolean;
   onToggleEditing?: () => void;
+  onServiceSelect?: (serviceId: string) => void;
 }
 
 interface MagicFeature {
@@ -127,9 +129,11 @@ export default function BusinessProfileView({
   business,
   services,
   categories = [],
+  branch,
   mode = "dashboard-preview",
   isEditing = false,
   onToggleEditing,
+  onServiceSelect,
 }: BusinessProfileViewProps) {
   const [coverError, setCoverError] = useState(false);
   const hasActiveServices = useMemo(
@@ -141,21 +145,26 @@ export default function BusinessProfileView({
     [services]
   );
 
+  const displayPhone = branch?.phone || business.phone;
+  const displayAddress = branch?.address || business.address;
+  const displayCity = branch?.city || business.city;
+  const displayWhatsapp = branch?.whatsapp_phone || business.whatsapp_phone;
+
   const phoneHref = useMemo(() => {
-    const phone = (business.phone ?? "").replace(/[^\d+]/g, "").trim();
+    const phone = (displayPhone ?? "").replace(/[^\d+]/g, "").trim();
     if (!phone) {
       return null;
     }
     return `tel:${phone}`;
-  }, [business.phone]);
+  }, [displayPhone]);
 
   const whatsappHref = useMemo(() => {
-    const phone = (business.whatsapp_phone ?? "").replace(/[^\d+]/g, "").trim();
+    const phone = (displayWhatsapp ?? "").replace(/[^\d+]/g, "").trim();
     if (!phone) {
       return null;
     }
     return `https://wa.me/${phone.replace(/\+/g, "")}`;
-  }, [business.whatsapp_phone]);
+  }, [displayWhatsapp]);
 
   const publicProfileHref = `/${business.slug}`;
   const bookingHref = `${publicProfileHref}#reserva`;
@@ -164,7 +173,7 @@ export default function BusinessProfileView({
     business.description?.trim() ||
     "Negocio verificado en Agenda Web. Gestion profesional y atencion personalizada.";
 
-  const mapQuery = encodeURIComponent(`${business.address}, ${business.city}`);
+  const mapQuery = encodeURIComponent(`${displayAddress}, ${displayCity}`);
   const mapEmbedUrl = `https://maps.google.com/maps?q=${mapQuery}&z=14&output=embed`;
   const demoIcons = useMemo(
     () => [Scissors, Sparkles, Clock3, BadgeDollarSign, Store],
@@ -237,7 +246,7 @@ export default function BusinessProfileView({
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] ">
                       <MapPin className="h-3.5 w-3.5 text-[var(--text-secondary)]" aria-hidden="true" />
-                      {business.city}
+                      {displayCity}
                     </span>
                   </div>
                   <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem]">
@@ -303,11 +312,11 @@ export default function BusinessProfileView({
                 </h2>
 
                 <div className="mt-4 space-y-3">
-                  <InfoRow label="Ubicacion" value={`${business.address}, ${business.city}`} icon={MapPin} colorClass="text-[var(--color-error)]" />
-                  <InfoRow label="Telefono" value={business.phone} href={phoneHref} icon={Phone} colorClass="text-[var(--color-info)]" />
+                  <InfoRow label="Ubicacion" value={`${displayAddress}, ${displayCity}`} icon={MapPin} colorClass="text-[var(--color-error)]" />
+                  <InfoRow label="Telefono" value={displayPhone} href={phoneHref} icon={Phone} colorClass="text-[var(--color-info)]" />
                   <InfoRow
                     label="WhatsApp"
-                    value={business.whatsapp_phone ?? "No configurado"}
+                    value={displayWhatsapp ?? "No configurado"}
                     href={whatsappHref}
                     icon={MessageCircle}
                     colorClass="text-[var(--color-success)]"
@@ -346,6 +355,12 @@ export default function BusinessProfileView({
                         description: serviceDescription,
                         href: `/${business.slug}?service=${service.id}#reserva`,
                         cta: "Reservar servicio",
+                        onCtaClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                          if (onServiceSelect) {
+                            e.preventDefault();
+                            onServiceSelect(service.id);
+                          }
+                        },
                         background: service.image_url ? (
                           <Image
                             src={service.image_url}

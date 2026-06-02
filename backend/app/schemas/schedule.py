@@ -1,12 +1,13 @@
 import uuid
 from datetime import time
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 
 
 class ScheduleCreate(BaseModel):
+    branch_id: uuid.UUID
     staff_id: uuid.UUID
-    day_of_week: int
+    day_of_week: int = Field(ge=0, le=6, description="0 = Monday, 6 = Sunday")
     start_time: time
     end_time: time
 
@@ -29,6 +30,7 @@ class ScheduleCreate(BaseModel):
 class ScheduleRead(BaseModel):
     id: uuid.UUID
     business_id: uuid.UUID
+    branch_id: uuid.UUID
     staff_id: uuid.UUID
     day_of_week: int
     start_time: time

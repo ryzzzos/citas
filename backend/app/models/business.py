@@ -28,19 +28,43 @@ class Business(Base):
     public_bio: Mapped[str | None] = mapped_column(String(280), nullable=True)
     cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     logo_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    address: Mapped[str] = mapped_column(String(255), nullable=False)
-    city: Mapped[str] = mapped_column(String(100), nullable=False)
-    latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
-    longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
-    geocoding_status: Mapped[str] = mapped_column(String(24), nullable=False, default="pending", index=True)
-    geocoding_error: Mapped[str | None] = mapped_column(Text, nullable=True)
-    geocoded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     owner = relationship("User", back_populates="businesses")
+    branches = relationship("Branch", back_populates="business", lazy="select", order_by="Branch.created_at")
     services = relationship("Service", back_populates="business", lazy="select")
     staff = relationship("Staff", back_populates="business", lazy="select")
     schedules = relationship("Schedule", back_populates="business", lazy="select")
     bookings = relationship("Booking", back_populates="business", lazy="select")
+
+    # Backward compatibility properties for BusinessRead schema
+    @property
+    def address(self) -> str:
+        return self.branches[0].address if self.branches else ""
+
+    @property
+    def city(self) -> str:
+        return self.branches[0].city if self.branches else ""
+
+    @property
+    def latitude(self) -> float | None:
+        return self.branches[0].latitude if self.branches else None
+
+    @property
+    def longitude(self) -> float | None:
+        return self.branches[0].longitude if self.branches else None
+
+    @property
+    def geocoding_status(self) -> str:
+        return self.branches[0].geocoding_status if self.branches else "pending"
+
+    @property
+    def geocoding_error(self) -> str | None:
+        return self.branches[0].geocoding_error if self.branches else None
+
+    @property
+    def geocoded_at(self) -> datetime | None:
+        return self.branches[0].geocoded_at if self.branches else None

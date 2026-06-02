@@ -11,6 +11,7 @@ export interface GetAvailabilityParams {
 
 export interface CreateBookingInput {
   business_id: string;
+  branch_id: string;
   service_id: string;
   staff_id: string;
   booking_date: string;
@@ -21,6 +22,7 @@ export type BookingStatusUpdate = "confirmed" | "cancelled" | "completed";
 
 export interface BusinessAgendaQuery {
   timezone: string;
+  branch_id?: string;
   from_at?: string;
   to_at?: string;
   booking_date?: string;
@@ -55,6 +57,7 @@ export async function businessAgenda(
   const params = new URLSearchParams();
 
   params.set("timezone", query.timezone);
+  if (query.branch_id) params.set("branch_id", query.branch_id);
   if (query.from_at) params.set("from_at", query.from_at);
   if (query.to_at) params.set("to_at", query.to_at);
   if (query.booking_date) params.set("booking_date", query.booking_date);

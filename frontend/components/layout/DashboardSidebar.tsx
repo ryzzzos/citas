@@ -14,6 +14,7 @@ import {
   isItemActive,
 } from "@/components/layout/dashboardNavigation";
 import AppIcon from "@/components/ui/AppIcon";
+import BranchSelector from "./BranchSelector";
 
 interface DashboardSidebarProps {
   mobileOpen: boolean;
@@ -113,19 +114,7 @@ function SidebarGroup({
 function SidebarContent({ pathname, onItemSelect, layoutIdPrefix }: { pathname: string; onItemSelect: (href: string) => void; layoutIdPrefix: string; }) {
   return (
     <>
-      <div className="mb-2 px-1">
-        <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)]">
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)]">
-            Agenda Web
-          </p>
-          <p className="mt-1.5 text-[19px] font-bold tracking-tight text-[var(--text-primary)]">
-            Control Center
-          </p>
-          <p className="mt-2 text-[11px] font-medium leading-relaxed text-[var(--text-muted)]">
-            Gestión integral de reservas y operación diaria.
-          </p>
-        </div>
-      </div>
+      <BranchSelector />
 
       <nav className="mt-6 space-y-6 px-1" aria-label="Navegacion del dashboard">
         {DASHBOARD_NAV_GROUPS.map((group) => (

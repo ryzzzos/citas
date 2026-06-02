@@ -7,6 +7,7 @@ from app.core.deps import get_db, require_business_owner
 from app.models.business import Business
 from app.models.staff import Staff
 from app.models.user import User
+from app.models.service import Service
 from app.schemas.staff import StaffCreate, StaffRead, StaffUpdate
 
 router = APIRouter()
@@ -29,7 +30,19 @@ def add_staff(
     db: Session = Depends(get_db),
 ):
     _get_owned_business(business_id, current_user, db)
-    member = Staff(**data.model_dump(), business_id=business_id)
+    
+    services = []
+    if data.service_ids:
+        services = db.query(Service).filter(
+            Service.id.in_(data.service_ids),
+            Service.business_id == business_id
+        ).all()
+        if len(services) != len(data.service_ids):
+            raise HTTPException(status_code=400, detail="One or more services are invalid or don't belong to this business")
+
+    dump_data = data.model_dump(exclude={"service_ids"})
+    member = Staff(**dump_data, business_id=business_id)
+    member.services = services
     db.add(member)
     db.commit()
     db.refresh(member)
@@ -37,12 +50,15 @@ def add_staff(
 
 
 @router.get("/{business_id}/staff", response_model=list[StaffRead])
-def list_staff(business_id: uuid.UUID, db: Session = Depends(get_db)):
-    return (
-        db.query(Staff)
-        .filter(Staff.business_id == business_id, Staff.is_active.is_(True))
-        .all()
-    )
+def list_staff(
+    business_id: uuid.UUID,
+    branch_id: uuid.UUID | None = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Staff).filter(Staff.business_id == business_id, Staff.is_active.is_(True))
+    if branch_id:
+        query = query.filter(Staff.branch_id == branch_id)
+    return query.all()
 
 
 @router.patch("/{business_id}/staff/{staff_id}", response_model=StaffRead)
@@ -57,8 +73,24 @@ def update_staff(
     member = db.get(Staff, staff_id)
     if not member or member.business_id != business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found")
-    for field, value in data.model_dump(exclude_unset=True).items():
+    
+    update_data = data.model_dump(exclude_unset=True)
+    if "service_ids" in update_data:
+        service_ids = update_data.pop("service_ids")
+        if service_ids:
+            services = db.query(Service).filter(
+                Service.id.in_(service_ids),
+                Service.business_id == business_id
+            ).all()
+            if len(services) != len(service_ids):
+                raise HTTPException(status_code=400, detail="One or more services are invalid or don't belong to this business")
+            member.services = services
+        else:
+            member.services = []
+
+    for field, value in update_data.items():
         setattr(member, field, value)
+    
     db.commit()
     db.refresh(member)
     return member

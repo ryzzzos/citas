@@ -5,9 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import BusinessProfileView from "@/components/business-profile/BusinessProfileView";
+import StickyBranchSelector from "@/components/public-profile/StickyBranchSelector";
+import LocationPickerDrawer from "@/components/public-profile/LocationPickerDrawer";
 import Button from "@/components/ui/Button";
 import { createBooking, getAvailability, getBusinessBySlug, listServices, listStaff, getServiceCategories } from "@/lib/api";
-import type { Business, Service, Staff, ServiceCategory } from "@/types";
+import { listBranches } from "@/lib/api/branches";
+import type { Business, Service, Staff, ServiceCategory, Branch } from "@/types";
 
 export default function PublicBusinessPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -15,10 +18,15 @@ export default function PublicBusinessPage() {
   const searchParams = useSearchParams();
 
   const [business, setBusiness] = useState<Business | null>(null);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [shakeBadge, setShakeBadge] = useState(false);
 
   const [selectedService, setSelectedService] = useState("");
   const [selectedStaff, setSelectedStaff] = useState("");
@@ -31,23 +39,46 @@ export default function PublicBusinessPage() {
 
   const minBookingDate = useMemo(() => new Date().toISOString().split("T")[0], []);
 
+  const selectedBranch = useMemo(() => {
+    return branches.find((b) => b.id === selectedBranchId) || undefined;
+  }, [branches, selectedBranchId]);
+
+  const displayServices = useMemo(() => {
+    if (!selectedBranchId) return services;
+    
+    // Find staff that belongs to the selected branch
+    const branchStaff = staff.filter((s) => s.branch_id === selectedBranchId);
+    
+    // Extract unique service IDs that these staff members provide
+    const branchServiceIds = new Set<string>();
+    branchStaff.forEach((member) => {
+      member.service_ids?.forEach((id) => branchServiceIds.add(id));
+    });
+    
+    // Filter the global services list to only those provided at this branch
+    return services.filter((service) => branchServiceIds.has(service.id));
+  }, [services, staff, selectedBranchId]);
+
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
         const biz = await getBusinessBySlug(slug);
-        const [svcs, cats, sf] = await Promise.all([
+        const [brs, svcs, cats, sf] = await Promise.all([
+          listBranches(biz.id),
           listServices(biz.id, { includeInactive: false }),
           getServiceCategories(biz.id),
           listStaff(biz.id),
         ]);
 
         setBusiness(biz);
+        setBranches(brs.filter(b => b.is_active));
         setServices(svcs);
         setCategories(cats);
         setStaff(sf);
       } catch {
         setBusiness(null);
+        setBranches([]);
         setServices([]);
         setCategories([]);
         setStaff([]);
@@ -58,6 +89,13 @@ export default function PublicBusinessPage() {
 
     load();
   }, [slug]);
+
+  useEffect(() => {
+    const branchFromQuery = searchParams.get("branch");
+    if (branchFromQuery && branches.some((b) => b.id === branchFromQuery)) {
+      setSelectedBranchId(branchFromQuery);
+    }
+  }, [searchParams, branches]);
 
   useEffect(() => {
     const serviceFromQuery = searchParams.get("service");
@@ -77,8 +115,35 @@ export default function PublicBusinessPage() {
     );
   }, [searchParams, services]);
 
+  function handleServiceSelect(serviceId: string) {
+    if (branches.length > 0 && !selectedBranchId) {
+      setShakeBadge(true);
+      setTimeout(() => {
+        setShakeBadge(false);
+        setIsDrawerOpen(true);
+      }, 600);
+      return;
+    }
+    
+    setSelectedService(serviceId);
+    setBookingError("");
+    
+    setTimeout(() => {
+      document.getElementById("reserva")?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+  }
+
   async function loadSlots() {
     if (!business || !selectedService || !selectedStaff || !date) {
+      return;
+    }
+
+    if (!selectedBranchId) {
+      setShakeBadge(true);
+      setTimeout(() => {
+        setShakeBadge(false);
+        setIsDrawerOpen(true);
+      }, 600);
       return;
     }
 
@@ -100,7 +165,7 @@ export default function PublicBusinessPage() {
   }
 
   async function handleBook() {
-    if (!business || !selectedService || !selectedStaff || !date || !selectedSlot) {
+    if (!business || !selectedService || !selectedStaff || !date || !selectedSlot || !selectedBranchId) {
       return;
     }
 
@@ -114,6 +179,7 @@ export default function PublicBusinessPage() {
         staff_id: selectedStaff,
         booking_date: date,
         start_time: selectedSlot,
+        branch_id: selectedBranchId,
       });
       router.push("/dashboard");
     } catch (err: unknown) {
@@ -157,7 +223,14 @@ export default function PublicBusinessPage() {
 
   return (
     <main className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6 lg:py-10">
-      <BusinessProfileView business={business} services={services} categories={categories} mode="public" />
+      <StickyBranchSelector 
+        branches={branches}
+        selectedBranchId={selectedBranchId}
+        onClick={() => setIsDrawerOpen(true)}
+        pulse={shakeBadge}
+      />
+
+      <BusinessProfileView business={business} services={displayServices} categories={categories} branch={selectedBranch} mode="public" onServiceSelect={handleServiceSelect} />
 
       <section
         id="reserva"
@@ -194,10 +267,10 @@ export default function PublicBusinessPage() {
               {(() => {
                 const grouped = categories.map((cat) => ({
                   ...cat,
-                  services: services.filter((s) => s.service_category_id === cat.id),
+                  services: displayServices.filter((s) => s.service_category_id === cat.id),
                 })).filter((cat) => cat.services.length > 0);
                 
-                const uncategorized = services.filter(
+                const uncategorized = displayServices.filter(
                   (s) => !s.service_category_id || !categories.some((c) => c.id === s.service_category_id)
                 );
                 
@@ -241,7 +314,10 @@ export default function PublicBusinessPage() {
                className="dashboard-focusable min-h-11 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-sm text-[var(--text-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
             >
               <option value="">Selecciona un profesional</option>
-              {staff.map((member) => (
+              {staff
+                .filter(member => !selectedBranchId || member.branch_id === selectedBranchId)
+                .filter(member => !selectedService || member.service_ids?.some(id => id === selectedService))
+                .map((member) => (
                 <option key={member.id} value={member.id}>
                   {member.name}
                 </option>
@@ -267,67 +343,85 @@ export default function PublicBusinessPage() {
           </div>
         </div>
 
-        <div className="mt-4">
-          <Button
-            variant="secondary"
-            onClick={loadSlots}
-            isLoading={slotsLoading}
-            disabled={!selectedService || !selectedStaff || !date}
-            className="min-h-11"
-          >
-            Ver horarios disponibles
-          </Button>
-        </div>
+        {date && selectedService && selectedStaff && (
+          <div className="mt-5 sm:mt-6">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={loadSlots}
+              disabled={slotsLoading}
+              className="w-full rounded-xl sm:w-auto"
+            >
+              {slotsLoading ? "Buscando horarios..." : "Buscar horarios"}
+            </Button>
+          </div>
+        )}
 
-        {slots.length > 0 ? (
-          <div className="mt-4">
-            <p className="text-sm font-medium text-[var(--text-secondary)] ">Horario</p>
-            <div className="mt-2 flex flex-wrap gap-2">
+        {slots.length > 0 && (
+          <div className="mt-5 sm:mt-6">
+            <label className="mb-3 block text-sm font-medium text-[var(--text-secondary)] ">
+              Horarios disponibles
+            </label>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
               {slots.map((slot) => (
                 <button
                   key={slot}
                   type="button"
                   onClick={() => setSelectedSlot(slot)}
-                  aria-pressed={selectedSlot === slot}
-                  className={`dashboard-focusable min-h-11 rounded-full border px-4 py-2 text-sm font-medium  ${
+                  className={`dashboard-focusable flex min-h-11 items-center justify-center rounded-xl border text-sm font-medium transition-all ${
                     selectedSlot === slot
-                      ? "border-[var(--app-primary-strong)] bg-[var(--app-primary-strong)] text-[var(--surface-3)] dark:border-[var(--app-primary)] dark:bg-[var(--app-primary)] dark:text-[var(--surface-3)]"
-                      : "border-[var(--border-strong)] bg-[var(--surface-3)] text-[var(--text-secondary)] hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)] dark:hover:bg-[var(--surface-2)]"
+                      ? "border-transparent bg-[var(--app-primary)] text-white shadow-[var(--shadow-md)]"
+                      : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-primary)] hover:bg-[var(--surface-1)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-1)]"
                   }`}
                 >
-                  {slot.slice(0, 5)}
+                  {slot}
                 </button>
               ))}
             </div>
           </div>
-        ) : null}
+        )}
 
-        {slots.length === 0 && !slotsLoading && selectedService && selectedStaff && date ? (
-          <p className="mt-4 text-sm text-[var(--text-muted)] ">
-            No hay horarios disponibles para esa fecha.
-          </p>
-        ) : null}
-
-        {bookingError ? (
-          <div className="mt-4 rounded-xl border border-[var(--color-error)] bg-[var(--surface-3)] p-3 text-sm text-[var(--color-error)]">
-            <p>{bookingError}</p>
-            <Link href="/sucursales" className="dashboard-focusable mt-2 inline-flex underline underline-offset-4">
-              Volver al mapa de sucursales
-            </Link>
+        {bookingError && (
+          <div className="mt-5 rounded-xl border border-[var(--color-error)] bg-[var(--color-error)]/10 p-4">
+            <p className="text-sm text-[var(--color-error)]">{bookingError}</p>
           </div>
-        ) : null}
+        )}
 
-        <div className="mt-5">
+        <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row-reverse sm:items-center sm:justify-between">
           <Button
+            type="button"
             onClick={handleBook}
-            isLoading={bookingLoading}
-            disabled={!selectedSlot}
-            className="min-h-11 w-full"
+            disabled={!selectedSlot || bookingLoading}
+            className="w-full rounded-xl sm:w-auto"
           >
-            Confirmar reserva
+            {bookingLoading ? "Confirmando..." : "Confirmar reserva"}
           </Button>
+
+          {selectedSlot && (
+            <p className="text-center text-sm font-medium text-[var(--text-secondary)] sm:text-left">
+              Tu cita sera el {new Date(date).toLocaleDateString("es-ES", { weekday: 'long', day: 'numeric', month: 'long' })} a las {selectedSlot}
+            </p>
+          )}
         </div>
       </section>
+
+      {business && branches.length > 0 && (
+        <LocationPickerDrawer
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          branches={branches}
+          selectedBranchId={selectedBranchId}
+          onSelect={(id) => {
+            setSelectedBranchId(id);
+            // Si cambian de sucursal, es mejor resetear las selecciones 
+            // ya que el personal y los servicios disponibles pueden cambiar.
+            setSelectedStaff("");
+            setSelectedService("");
+            setSelectedSlot("");
+            setSlots([]);
+          }}
+        />
+      )}
     </main>
   );
 }

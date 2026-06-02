@@ -29,6 +29,12 @@ def create_schedule(
     db: Session = Depends(get_db),
 ):
     _get_owned_business(business_id, current_user, db)
+
+    from app.models.staff import Staff
+    staff = db.get(Staff, data.staff_id)
+    if not staff or staff.branch_id != data.branch_id or staff.business_id != business_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid staff or branch")
+
     schedule = Schedule(**data.model_dump(), business_id=business_id)
     db.add(schedule)
     db.commit()

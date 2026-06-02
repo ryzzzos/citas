@@ -11,6 +11,7 @@ from app.schemas.business import (
     BusinessSlugAvailabilityRead,
     BusinessUpdate,
 )
+from app.schemas.branch import BranchCreate, BranchRead, BranchUpdate
 from app.schemas.service_category import ServiceCategoryCreate, ServiceCategoryRead, ServiceCategoryUpdate, ServiceCategoryReorder
 from app.schemas.service import ServiceCreate, ServiceRead, ServiceUpdate
 from app.schemas.staff import StaffCreate, StaffRead, StaffUpdate
@@ -22,6 +23,7 @@ __all__ = [
     "UserCreate", "UserRead", "UserUpdate",
     "BusinessCreate", "BusinessRead", "BusinessUpdate", "BusinessSlugAvailabilityRead", "BusinessImageUploadRead",
     "BusinessMapPointRead", "BusinessMapViewportRead", "BusinessMapClusteringRead", "BusinessMapResponseRead",
+    "BranchCreate", "BranchRead", "BranchUpdate",
     "ServiceCreate", "ServiceRead", "ServiceUpdate",
     "StaffCreate", "StaffRead", "StaffUpdate",
     "ScheduleCreate", "ScheduleRead",

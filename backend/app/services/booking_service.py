@@ -14,6 +14,11 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
     if not service or not service.is_active or service.business_id != data.business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
 
+    from app.models.staff import Staff
+    staff = db.get(Staff, data.staff_id)
+    if not staff or staff.branch_id != data.branch_id or not staff.is_active:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid staff or branch")
+
     end_time = (
         datetime.combine(data.booking_date, data.start_time)
         + timedelta(minutes=service.duration_minutes)
@@ -40,6 +45,7 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
     booking = Booking(
         user_id=user_id,
         business_id=data.business_id,
+        branch_id=data.branch_id,
         service_id=data.service_id,
         staff_id=data.staff_id,
         booking_date=data.booking_date,

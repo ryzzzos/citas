@@ -30,3 +30,4 @@ class Service(Base):
     business = relationship("Business", back_populates="services")
     category = relationship("ServiceCategory", back_populates="services", lazy="joined")
     bookings = relationship("Booking", back_populates="service", lazy="select")
+    staff = relationship("Staff", secondary="staff_services", back_populates="services", lazy="select")

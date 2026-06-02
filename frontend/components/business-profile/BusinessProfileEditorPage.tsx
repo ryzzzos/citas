@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import BusinessProfileView from "@/components/business-profile/BusinessProfileView";
 import { useBusinessProfileEditor } from "@/lib/business-profile/useBusinessProfileEditor";
+import { useBranchContext } from "@/contexts/BranchContext";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -151,6 +152,7 @@ export default function BusinessProfileEditorPage() {
     business,
     services,
     categories,
+    staff,
     draft,
     previewBusiness,
     loading,
@@ -166,6 +168,20 @@ export default function BusinessProfileEditorPage() {
     suggestSlugFromName,
     reload,
   } = useBusinessProfileEditor();
+
+  const { activeBranch } = useBranchContext();
+
+  const displayServices = useMemo(() => {
+    if (!activeBranch) return services;
+    
+    const branchStaff = staff.filter((s) => s.branch_id === activeBranch.id);
+    const branchServiceIds = new Set<string>();
+    branchStaff.forEach((member) => {
+      member.service_ids?.forEach((id) => branchServiceIds.add(id));
+    });
+    
+    return services.filter((service) => branchServiceIds.has(service.id));
+  }, [services, staff, activeBranch]);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -251,8 +267,9 @@ export default function BusinessProfileEditorPage() {
         <div className="mx-auto w-full max-w-[1240px]">
           <BusinessProfileView
             business={previewBusiness}
-            services={services}
+            services={displayServices}
             categories={categories}
+            branch={activeBranch || undefined}
             mode="dashboard-preview"
             isEditing={isEditing}
             onToggleEditing={() => setIsEditing((current) => !current)}

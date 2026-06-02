@@ -126,7 +126,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
         </p>
 
         <Link
-          href={`/${business.slug}`}
+          href={`/${business.slug}?branch=${business.id}`}
           className={cn(
             "mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-full",
             "bg-[var(--app-primary)] text-white shadow-sm transition-opacity hover:opacity-90"

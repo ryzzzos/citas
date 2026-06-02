@@ -18,6 +18,9 @@ class Schedule(Base):
     business_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
     )
+    branch_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    )
     staff_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("staff.id", ondelete="CASCADE"), nullable=False
     )
@@ -27,4 +30,5 @@ class Schedule(Base):
     end_time: Mapped[object] = mapped_column(Time, nullable=False)
 
     business = relationship("Business", back_populates="schedules")
+    branch = relationship("Branch", back_populates="schedules")
     staff = relationship("Staff", back_populates="schedules")

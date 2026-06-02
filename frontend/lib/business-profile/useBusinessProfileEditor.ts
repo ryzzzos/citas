@@ -10,8 +10,9 @@ import {
   uploadBusinessCoverImage,
   uploadBusinessLogoImage,
   getServiceCategories,
+  listStaff,
 } from "@/lib/api";
-import type { Business, Service, UpdateBusinessInput, ServiceCategory } from "@/types";
+import type { Business, Service, UpdateBusinessInput, ServiceCategory, Staff } from "@/types";
 
 interface ProfileDraft {
   name: string;
@@ -88,6 +89,7 @@ export function useBusinessProfileEditor() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
   const [draft, setDraft] = useState<ProfileDraft>(EMPTY_DRAFT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -101,14 +103,16 @@ export function useBusinessProfileEditor() {
 
     try {
       const profile = await getMyBusiness();
-      const [serviceRows, categoryRows] = await Promise.all([
+      const [serviceRows, categoryRows, staffRows] = await Promise.all([
         listServices(profile.id, { includeInactive: true }),
         getServiceCategories(profile.id),
+        listStaff(profile.id),
       ]);
       setBusiness(profile);
       setDraft(toDraft(profile));
       setServices(serviceRows);
       setCategories(categoryRows);
+      setStaff(staffRows);
       setSlugAvailable(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo cargar tu perfil de negocio.");
@@ -226,6 +230,7 @@ export function useBusinessProfileEditor() {
     business,
     services,
     categories,
+    staff,
     draft,
     previewBusiness,
     loading,

@@ -5,4 +5,6 @@ export interface Staff {
   email: string | null;
   phone: string | null;
   is_active: boolean;
+  branch_id: string;
+  service_ids: string[];
 }

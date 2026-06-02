@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.4.0] - 2026-06-02
+
+### Added
+- **Soporte Multisede (Arquitectura de Sucursales)**:
+  - **Base de Datos & Modelado**: Incorporación del modelo `Branch` (`backend/app/models/branch.py`) para soportar la gestión de múltiples sedes físicas por negocio. Incluye campos de geolocalización (`latitude`, `longitude`, `geocoding_status`, `geocoded_at`) e integración directa con servicios de geocodificación automática.
+  - **CRUD de Sucursales**: Implementación del router `/businesses/{business_id}/branches` en el backend para crear, actualizar, listar y eliminar sedes de forma autónoma.
+- **Asociación de Empleados y Servicios (Relación N a N)**:
+  - **Mapeo Relacional**: Creación de la tabla intermedia de unión `staff_services` para posibilitar que un profesional sea asociado únicamente a los servicios específicos que está capacitado para impartir en su sede.
+  - **Esquemas & API**: Actualización de esquemas Pydantic y llamadas del cliente API frontend para incluir y sincronizar los arreglos de `service_ids` y `branch_id` al registrar o editar personal.
+- **Paneles de Control para Sedes y Personal en Dashboard**:
+  - **Sección "Mis sedes" (`/dashboard/branches`)**: Nueva interfaz interactiva para dueños de negocios para configurar datos principales, teléfonos de contacto directos, enlaces de WhatsApp y ubicaciones físicas de cada sucursal.
+  - **Sección "Mis empleados" (`/dashboard/staff`)**: Nueva sección de administración que permite asignar profesionales a sucursales específicas, activar/desactivar sus perfiles y asociarles servicios habilitados.
+- **Mecanismos de Navegación y Contexto Frontend**:
+  - **Contexto Global de Sede (`BranchContext.tsx`)**: Arquitectura de contexto reactivo que persiste la sede activa seleccionada en `localStorage`, recarga la lista de sedes de forma asíncrona y simplifica la experiencia de control de la sede en todo el Dashboard.
+  - **Selector de Sede (`BranchSelector.tsx`)**: Dropdown premium con soporte de imagen de logotipo y animaciones de hover integrado en el sidebar principal para alternar ágilmente el contexto del panel de control.
+- **Selector Público de Ubicación para Clientes**:
+  - **Barra Adherente (`StickyBranchSelector.tsx`)**: Un botón flotante premium en la página pública del negocio con animaciones vibratorias de llamada a la acción (`framer-motion`) si el cliente intenta agendar sin elegir sede.
+  - **Cajón de Selección (`LocationPickerDrawer.tsx`)**: Cajón inferior (drawer) adaptado a móviles con efecto de desenfoque de fondo (backdrop blur), soporte de gestos visuales y listado de sucursales activas con direcciones detalladas.
+
+### Changed
+- **Reestructuración de la Base de Datos (Migraciones Alembic)**:
+  - **De-normalización Geográfica**: Migración de las columnas de dirección, ciudad y coordenadas geográficas desde la tabla `businesses` hacia la tabla `branches`.
+  - **Propiedades de Retrocompatibilidad**: Definición de propiedades virtuales (`@property`) en el modelo `Business` que apuntan dinámicamente a la primera sede ("Sede Principal") para evitar conflictos de regresión con endpoints existentes.
+  - **Migraciones Secuenciales**: Creación y aplicación automática de 3 versiones de base de datos Alembic para añadir las nuevas tablas, referencias de llaves foráneas y el campo opcional de teléfono de WhatsApp.
+- **Flujos de Operación en el Backend**:
+  - **Creación de Negocio**: Modificación del endpoint de registro de negocios para inicializar automáticamente una "Sede Principal" por defecto con la dirección provista originalmente.
+  - **Búsqueda Geográfica de Negocios**: Modificación de la consulta del mapa en `list_businesses_for_map` para enlazar y consultar contra la tabla `branches`, permitiendo buscar sucursales individuales en lugar de la entidad de negocio global.
+  - **Reglas de Negocio en Reservas (`create_booking`)**: Validación estricta que impide generar citas si el profesional seleccionado no pertenece a la sucursal de destino o no está calificado para el servicio solicitado.
+- **Flujos y Experiencia en Frontend**:
+  - **Agrupamiento en Formulario de Reserva**: Refactorización del dropdown de selección de servicios en `[slug]/page.tsx` para anidar opciones bajo etiquetas `<optgroup>` con el nombre de su categoría correspondiente.
+  - **Filtrado Dinámico en Reserva**: El selector de profesionales y servicios ahora reacciona instantáneamente a la sucursal seleccionada por el cliente, limitando las opciones únicamente a lo disponible en dicha sucursal.
+
+### Fixed
+- **Optimización de Renderizado en Formularios (`BranchFormModal` & `StaffFormModal`)**: Reemplazo de los hooks `useEffect` síncronos de inicialización por un patrón de actualización de estado durante la renderización para evitar re-renders en cascada.
+- **Validaciones de Tipado en Booking Client**: Adición de la propiedad `branch_id` a la firma del método de creación de reserva `CreateBookingInput` y tipado estricto en el evento submit.
+- **Corrección de Estilos en Botones**: Actualización de la prop `variant="outline"` a `variant="secondary"` en los modales de sucursales y personal para cumplir con los lineamientos de diseño premium del proyecto.
+
 ## [0.3.7] - 2026-05-28
 
 ### Added

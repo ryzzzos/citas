@@ -117,8 +117,9 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-5">
-      <ServicesHeader 
+    <div className="flex flex-col h-full overflow-hidden space-y-4 lg:space-y-5">
+      <div className="shrink-0 space-y-4 lg:space-y-5">
+        <ServicesHeader 
         services={services} 
         onCreate={openCreateModal} 
         onManageCategories={() => setCategoriesModalOpen(true)}
@@ -130,8 +131,10 @@ export default function ServicesPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
+      </div>
 
-      {actionError ? (
+      <div className="flex-1 overflow-y-auto pb-10 pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)]">
+        {actionError ? (
         <p className="rounded-lg border border-[var(--color-error)] bg-[var(--color-error)]/10 p-3 text-sm text-[var(--color-error)]">
           {actionError}
         </p>
@@ -157,6 +160,7 @@ export default function ServicesPage() {
           onDelete={handleDelete}
         />
       )}
+      </div>
 
       <ServiceFormModal
         open={modalOpen}

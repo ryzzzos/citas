@@ -19,6 +19,9 @@ class Booking(Base):
     business_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
     )
+    branch_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    )
     service_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("services.id", ondelete="CASCADE"), nullable=False
     )
@@ -36,6 +39,7 @@ class Booking(Base):
 
     user = relationship("User", back_populates="bookings")
     business = relationship("Business", back_populates="bookings")
+    branch = relationship("Branch", back_populates="bookings")
     service = relationship("Service", back_populates="bookings")
     staff = relationship("Staff", back_populates="bookings")
     payment = relationship("Payment", back_populates="booking", uselist=False)
