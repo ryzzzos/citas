@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { DateTime } from "luxon";
 import { CalendarDays } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
@@ -20,6 +20,12 @@ export default function AgendaHorizontalDays({
   view,
 }: AgendaHorizontalDaysProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [prevView, setPrevView] = useState(view);
+  const viewChanged = prevView !== view;
+
+  if (viewChanged) {
+    setPrevView(view);
+  }
 
   // Generamos los días o las semanas del mes actual basado en anchorDate y la vista seleccionada
   const items = useMemo(() => {
@@ -28,8 +34,8 @@ export default function AgendaHorizontalDays({
 
     if (view === "week") {
       const weeksList: DateTime[] = [];
-      // Generamos 6 semanas hacia el pasado y 18 hacia el futuro respecto a la semana de anchorDate
-      const currentWeekStart = localAnchor.startOf("week");
+      // Generamos 6 semanas hacia el pasado y 18 hacia el futuro respecto al inicio del mes del anchorDate para mantener la lista estable
+      const currentWeekStart = startOfMonth.startOf("week");
 
       for (let i = -6; i <= 18; i++) {
         weeksList.push(currentWeekStart.plus({ weeks: i }));
@@ -54,12 +60,12 @@ export default function AgendaHorizontalDays({
 
     if (selectedBtn) {
       selectedBtn.scrollIntoView({
-        behavior: "smooth",
+        behavior: viewChanged ? "auto" : "smooth",
         inline: "center",
         block: "nearest",
       });
     }
-  }, [anchorDate, items]);
+  }, [anchorDate, items, viewChanged]);
 
   // Habilitar scroll horizontal con la rueda vertical del mouse
   useEffect(() => {
@@ -105,7 +111,7 @@ export default function AgendaHorizontalDays({
               const isThisWeek = date.hasSame(today, "week");
 
               let btnClasses =
-                "relative snap-center flex min-w-[250px] sm:min-w-[296px] h-[72px] sm:h-[76px] items-center justify-between rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-4 sm:px-5 py-2.5 sm:py-3 shrink-0 overflow-hidden z-10";
+                "relative snap-center flex min-w-[190px] sm:min-w-[220px] h-[72px] sm:h-[76px] items-center justify-between rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-4 sm:px-5 py-2.5 sm:py-3 shrink-0 z-10";
 
               if (isSelected) {
                 btnClasses += " border-transparent font-bold shadow-[var(--shadow-md)] text-[var(--surface-3)]";
@@ -117,9 +123,10 @@ export default function AgendaHorizontalDays({
                 }
               }
 
+
               return (
                 <motion.button
-                  layout
+                  layout={isSelected}
                   key={date.toISODate()}
                   type="button"
                   onClick={() => onDateSelect(date)}
@@ -127,19 +134,30 @@ export default function AgendaHorizontalDays({
                   className={btnClasses}
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 >
-                  <div className="flex flex-col items-start text-left">
-                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? "text-[var(--surface-3)]/80" : "text-[var(--text-muted)]"}`}>
-                      {isThisWeek && !isSelected ? "Esta semana" : `Semana ${date.weekNumber}`}
+                  {/* Left: large week number with accent bar */}
+                  <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                    <div className="flex flex-col items-center">
+                      <span className={`text-[22px] sm:text-[26px] font-black leading-none tracking-tighter ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+                        {date.weekNumber}
+                      </span>
+                      <span className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] mt-0.5 ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
+                        sem
+                      </span>
+                    </div>
+                    {/* Vertical accent divider */}
+                    <div className={`h-9 sm:h-10 w-[2px] rounded-full shrink-0 ${isSelected ? "bg-white/25" : "bg-[var(--border-strong)]"}`} />
+                  </div>
+
+                  {/* Right: clean date info */}
+                  <div className="flex flex-col items-start text-left flex-1 min-w-0 ml-3 sm:ml-4">
+                    <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
+                      {isThisWeek && !isSelected ? "Esta semana" : `${weekEnd.toFormat("MMM")} · ${weekEnd.toFormat("yyyy")}`}
                     </span>
-                    <span className={`mt-0.5 text-xs sm:text-[14px] font-bold tracking-tight ${isSelected ? "text-[var(--surface-3)]" : "text-[var(--text-primary)]"}`}>
-                      {weekStart.toFormat("dd")} al {weekEnd.toFormat("dd")} de {weekEnd.toFormat("MMM")}
+                    <span className={`text-[14px] sm:text-[16px] font-extrabold tracking-tight leading-snug mt-0.5 ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+                      {weekStart.toFormat("dd")} — {weekEnd.toFormat("dd")}
                     </span>
                   </div>
-                  <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl shrink-0 ${isSelected ? "bg-white/15 text-white" : "bg-[var(--surface-1)] text-[var(--text-secondary)]"}`}>
-                    <span className="text-[10px] sm:text-[11px] font-black uppercase">
-                      W{date.weekNumber}
-                    </span>
-                  </div>
+
                   {isSelected && (
                     <motion.div
                       layoutId="active-pill-bg"
@@ -161,7 +179,7 @@ export default function AgendaHorizontalDays({
             const dayNumber = date.toFormat("d");
 
             let btnClasses =
-              "relative snap-center flex min-w-[68px] sm:min-w-[72px] h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-2 shrink-0 overflow-hidden z-10";
+              "relative snap-center flex min-w-[68px] sm:min-w-[72px] h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-2 shrink-0 z-10";
 
             if (isSelected) {
               btnClasses += " border-transparent font-bold shadow-[var(--shadow-md)] text-[var(--surface-3)]";
@@ -175,7 +193,7 @@ export default function AgendaHorizontalDays({
 
             return (
               <motion.button
-                layout
+                layout={isSelected}
                 key={date.toISODate()}
                 type="button"
                 onClick={() => onDateSelect(date)}

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+
+## [0.4.3] - 2026-06-19
+
+### Changed
+- **Calendario Horizontal Semanal (`AgendaHorizontalDays.tsx`)**: Rediseño premium de la visualización semanal en el selector horizontal de la agenda. Incorpora un número de semana de alto impacto visual y un divisor acentuado, además de optimizar la estabilidad en el desplazamiento automático y controlar la animación de cambio de vista para evitar brincos en la interfaz.
+
 ## [0.4.2] - 2026-06-19
 
 ### Added
