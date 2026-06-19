@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://user:password@localhost:5432/agenda_web_db"
     secret_key: str = "change-me"
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 1440
     app_env: str = "development"
     allowed_origins: list[str] = ["http://localhost:3000"]
     geocoding_user_agent: str = "agenda-web-geocoder"

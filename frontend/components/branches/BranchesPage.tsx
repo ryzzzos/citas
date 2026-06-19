@@ -121,57 +121,71 @@ export default function BranchesPage() {
           </Button>
         </section>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {branches.map((branch) => (
-            <div
+            <article
               key={branch.id}
-              className="group relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:border-[var(--app-primary)] hover:shadow-[var(--shadow-md)]"
+              className={`group relative flex flex-col justify-between overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-gradient-to-br from-[var(--surface-3)] to-[var(--surface-2)] p-4 shadow-[var(--shadow-sm)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-md)] hover:border-[var(--border-soft)] ${!branch.is_active ? 'opacity-75 grayscale-[0.3]' : ''}`}
             >
-              <div className="flex items-center justify-between border-b border-[var(--border-soft)] px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface-2)] text-[var(--app-primary)]">
-                    <AppIcon icon={Store} size="sm" />
-                  </div>
-                  <h3 className="font-semibold text-[var(--text-primary)]">{branch.name}</h3>
+              {/* Inner subtle glow for depth */}
+              <div className="pointer-events-none absolute inset-0 rounded-[var(--radius-2xl)] ring-1 ring-inset ring-white/5 dark:ring-white/10" />
+
+              {/* Top Row: Icon & Badge */}
+              <div className="relative flex items-start justify-between">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--app-primary)]/10 text-[var(--app-primary)] shadow-inner backdrop-blur-md">
+                  <AppIcon icon={Store} size="sm" />
                 </div>
-                {!branch.is_active && (
-                  <span className="rounded-full bg-[var(--surface-2)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                    Inactiva
-                  </span>
-                )}
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest shadow-[0_2px_8px_rgba(0,0,0,0.05)] backdrop-blur-md ${
+                  branch.is_active 
+                    ? "border-[var(--color-info)]/20 bg-[var(--color-info)]/10 dark:bg-white/10 text-[var(--color-info)] dark:text-[var(--color-info)]"
+                    : "border-[var(--border-strong)]/50 bg-[var(--surface-1)]/50 text-[var(--text-secondary)]"
+                }`}>
+                  {branch.is_active ? "Activa" : "Inactiva"}
+                </span>
               </div>
-              <div className="flex flex-1 flex-col justify-between gap-4 p-4 text-sm text-[var(--text-secondary)]">
-                <div className="space-y-2">
+
+              {/* Middle: Info */}
+              <div className="relative mt-5 mb-4">
+                <h3 className="text-[16px] font-bold tracking-tight text-[var(--text-primary)] leading-tight line-clamp-1">
+                  {branch.name}
+                </h3>
+                <div className="mt-2.5 flex flex-col gap-1.5 text-[12.5px] text-[var(--text-secondary)]">
                   <div className="flex items-start gap-2">
-                    <AppIcon icon={MapPin} size="xs" className="mt-0.5 shrink-0 text-[var(--text-muted)]" />
-                    <span>{branch.address}, {branch.city}</span>
+                    <AppIcon icon={MapPin} size="xs" className="mt-[2px] shrink-0 text-[var(--text-muted)]" />
+                    <span className="line-clamp-1">{branch.address}, {branch.city}</span>
                   </div>
-                  {branch.phone && (
+                  {branch.phone ? (
                     <div className="flex items-center gap-2">
                       <AppIcon icon={Phone} size="xs" className="shrink-0 text-[var(--text-muted)]" />
-                      <span>{branch.phone}</span>
+                      <span className="truncate">{branch.phone}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <AppIcon icon={Phone} size="xs" className="shrink-0 opacity-0" />
+                      <span className="text-[var(--text-muted)] italic text-[11px]">Sin teléfono</span>
                     </div>
                   )}
                 </div>
-
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-soft)]">
-                  <button
-                    onClick={() => openEditModal(branch)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-colors"
-                    aria-label="Editar"
-                  >
-                    <AppIcon icon={Edit2} size="xs" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(branch)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors"
-                    aria-label="Eliminar"
-                  >
-                    <AppIcon icon={Trash2} size="xs" />
-                  </button>
-                </div>
               </div>
-            </div>
+
+              {/* Bottom: Actions Bar */}
+              <div className="relative mt-auto flex items-center justify-end gap-2 pt-4 border-t border-[var(--border-strong)]/50">
+                <button
+                  onClick={() => openEditModal(branch)}
+                  className="flex h-8 items-center gap-1.5 rounded-full bg-[var(--surface-1)]/80 px-3 text-[11.5px] font-semibold text-[var(--text-secondary)] backdrop-blur-md transition-colors hover:bg-[var(--color-info)]/10 hover:text-[var(--color-info)]"
+                >
+                  <AppIcon icon={Edit2} size="xs" />
+                  <span>Editar</span>
+                </button>
+                <button
+                  onClick={() => handleDelete(branch)}
+                  className="flex h-8 items-center gap-1.5 rounded-full bg-[var(--surface-1)]/80 px-3 text-[11.5px] font-semibold text-[var(--text-secondary)] backdrop-blur-md transition-colors hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)]"
+                >
+                  <AppIcon icon={Trash2} size="xs" />
+                  <span>Eliminar</span>
+                </button>
+              </div>
+            </article>
           ))}
         </div>
       )}

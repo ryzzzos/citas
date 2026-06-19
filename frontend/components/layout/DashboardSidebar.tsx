@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { X, LogOut } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { motion } from "framer-motion";
 
@@ -15,6 +15,7 @@ import {
 } from "@/components/layout/dashboardNavigation";
 import AppIcon from "@/components/ui/AppIcon";
 import BranchSelector from "./BranchSelector";
+import { logout } from "@/lib/api/auth";
 
 interface DashboardSidebarProps {
   mobileOpen: boolean;
@@ -26,7 +27,7 @@ const navLinkVariants = cva(
   {
     variants: {
       active: {
-        true: "text-[var(--app-primary-strong)] dark:text-[var(--app-primary)]",
+        true: "text-[var(--app-primary)]",
         false: "text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)]",
       },
     },
@@ -112,22 +113,44 @@ function SidebarGroup({
 }
 
 function SidebarContent({ pathname, onItemSelect, layoutIdPrefix }: { pathname: string; onItemSelect: (href: string) => void; layoutIdPrefix: string; }) {
-  return (
-    <>
-      <BranchSelector />
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/auth/login";
+  };
 
-      <nav className="mt-6 space-y-6 px-1" aria-label="Navegacion del dashboard">
-        {DASHBOARD_NAV_GROUPS.map((group) => (
-          <SidebarGroup
-            key={group.id}
-            group={group}
-            pathname={pathname}
-            onItemSelect={onItemSelect}
-            layoutIdPrefix={layoutIdPrefix}
-          />
-        ))}
-      </nav>
-    </>
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)] pb-4 pr-1">
+        <BranchSelector />
+
+        <nav className="mt-6 space-y-6 px-1" aria-label="Navegacion del dashboard">
+          {DASHBOARD_NAV_GROUPS.map((group) => (
+            <SidebarGroup
+              key={group.id}
+              group={group}
+              pathname={pathname}
+              onItemSelect={onItemSelect}
+              layoutIdPrefix={layoutIdPrefix}
+            />
+          ))}
+        </nav>
+      </div>
+
+      <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] pt-4 px-1 pb-1">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="group relative flex min-h-12 w-full items-center justify-between gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-[var(--text-secondary)] transition-colors duration-300 hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-error)] focus-visible:ring-offset-2"
+        >
+          <span className="relative z-10 flex min-w-0 items-center gap-3">
+            <AppIcon icon={LogOut} size="md" className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1" />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-semibold">Cerrar sesión</span>
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
   );
 }
 

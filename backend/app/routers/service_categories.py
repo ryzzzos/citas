@@ -17,18 +17,15 @@ router = APIRouter()
 def list_service_categories(
     business_id: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_owner),
 ):
     """List all service categories for a specific business."""
-    # Ensure current user owns the business
+    # We no longer require the user to own the business for listing categories
     from app.models.business import Business
-    business = db.query(Business).filter(
-        Business.id == business_id, Business.owner_id == current_user.id
-    ).first()
+    business = db.get(Business, business_id)
     if not business:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Business not found or you don't have access",
+            detail="Business not found",
         )
 
     categories = db.query(ServiceCategory).filter(

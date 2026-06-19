@@ -12,7 +12,7 @@
 
 :root {
   --app-primary: #2563eb;
-  --app-primary-strong: #1d4ed8;
+  --app-primary-strong: #0939bf;
 
   /* surfaces */
   --surface-0: #dddddd;
@@ -25,21 +25,23 @@
   --surface-glass: rgba(255, 255, 255, 0.45);
 
   /* borders */
-  --border-soft: rgba(255,255,255,0.5);
+  --border-soft: rgba(255, 255, 255, 0.5);
   --border-strong: rgb(226, 232, 240);
   --glass-border: rgba(255, 255, 255, 0.4);
 
   /* shadows */
-  --shadow-sm: 0 8px 24px -8px rgba(37,99,235,0.15);
-  --shadow-md: 0 12px 32px -10px rgba(37,99,235,0.20);
-  --shadow-lg: 0 20px 48px -12px rgba(37,99,235,0.25);
+  --shadow-sm: 0 8px 24px -8px rgba(37, 99, 235, 0.15);
+  --shadow-md: 0 12px 32px -10px rgba(37, 99, 235, 0.20);
+  --shadow-lg: 0 20px 48px -12px rgba(37, 99, 235, 0.25);
 
-  --glass-shadow: 0 8px 32px -12px rgba(15,23,42,0.18);
+  --glass-shadow: 0 8px 32px -12px rgba(15, 23, 42, 0.18);
 
   /* text */
   --text-primary: #0f172a;
-  --text-secondary: #475569; /* slate-600 (mejor constraste que 500) */
-  --text-muted: #64748b; /* slate-500 (el tono que se usaba antes para los párrafos, ahora usado como muted) */
+  --text-secondary: #475569;
+  /* slate-600 (mejor constraste que 500) */
+  --text-muted: #64748b;
+  /* slate-500 (el tono que se usaba antes para los párrafos, ahora usado como muted) */
 
   /* radius */
   --radius-sm: 0.75rem;
@@ -59,7 +61,7 @@
 
 .dark {
   --app-primary: #60a5fa;
-  --app-primary-strong: #3b82f6;
+  --app-primary-strong: #2563eb;
 
   /* surfaces */
   --surface-0: #09090b;
@@ -71,16 +73,16 @@
   --surface-glass: rgba(24, 24, 27, 0.45);
 
   /* borders */
-  --border-soft: rgba(255,255,255,0.06);
-  --border-strong: rgba(255,255,255,0.12);
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
   --glass-border: rgba(255, 255, 255, 0.1);
 
   /* shadows */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.35);
-  --shadow-lg: 0 24px 48px rgba(0,0,0,0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.45);
 
-  --glass-shadow: 0 8px 32px -12px rgba(0,0,0,0.45);
+  --glass-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.45);
 
   /* text */
   --text-primary: #fafafa;
@@ -143,6 +145,11 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@utility bg-primary-gradient {
+  background: linear-gradient(90deg, var(--app-primary) 0%, var(--app-primary-strong) 100%);
 }

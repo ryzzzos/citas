@@ -1,10 +1,11 @@
 from typing import List
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_db, require_business_owner
+from app.core.security import decode_access_token
 from app.models.branch import Branch
 from app.models.business import Business
 from app.models.user import User
@@ -17,23 +18,45 @@ router = APIRouter()
 @router.get("", response_model=List[BranchRead])
 def list_branches(
     business_id: uuid.UUID,
+    include_inactive: bool = Query(default=False),
+    authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_owner),
 ):
-    """List all branches for a specific business."""
-    business = db.query(Business).filter(
-        Business.id == business_id, Business.owner_id == current_user.id
-    ).first()
+    """List all branches for a specific business. Includes active ones by default."""
+    business = db.get(Business, business_id)
     if not business:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Business not found or you don't have access",
+            detail="Business not found",
         )
 
-    branches = db.query(Branch).filter(
-        Branch.business_id == business_id
-    ).order_by(Branch.created_at.asc()).all()
-    return branches
+    query = db.query(Branch).filter(Branch.business_id == business_id)
+
+    if include_inactive:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication required to include inactive branches",
+            )
+        
+        token = authorization.removeprefix("Bearer ").strip()
+        user_id = decode_access_token(token)
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired token",
+            )
+        
+        current_user = db.get(User, uuid.UUID(user_id))
+        if not current_user or (business.owner_id != current_user.id and current_user.role != "admin"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden to view inactive branches",
+            )
+    else:
+        query = query.filter(Branch.is_active.is_(True))
+
+    return query.order_by(Branch.created_at.asc()).all()
 
 @router.post("", response_model=BranchRead, status_code=status.HTTP_201_CREATED)
 def create_branch(

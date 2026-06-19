@@ -33,7 +33,7 @@ export function BranchProvider({ children }: { children: React.ReactNode }) {
       setBusiness(myBusiness);
       
       // Then get its branches
-      const fetchedBranches = await listBranches(myBusiness.id);
+      const fetchedBranches = await listBranches(myBusiness.id, { includeInactive: true });
       setBranches(fetchedBranches);
       
       // Determine active branch

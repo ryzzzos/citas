@@ -8,6 +8,7 @@ class StaffCreate(BaseModel):
     branch_id: uuid.UUID
     email: EmailStr | None = None
     phone: str | None = None
+    photo_url: str | None = None
     is_active: bool = True
     service_ids: list[uuid.UUID] = []
 
@@ -19,6 +20,7 @@ class StaffRead(BaseModel):
     name: str
     email: str | None
     phone: str | None
+    photo_url: str | None = None
     is_active: bool
     service_ids: list[uuid.UUID] = []
 
@@ -30,5 +32,6 @@ class StaffUpdate(BaseModel):
     branch_id: uuid.UUID | None = None
     email: EmailStr | None = None
     phone: str | None = None
+    photo_url: str | None = None
     is_active: bool | None = None
     service_ids: list[uuid.UUID] | None = None

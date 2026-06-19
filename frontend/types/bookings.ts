@@ -10,4 +10,12 @@ export interface Booking {
   start_time: string;
   end_time: string;
   status: BookingStatus;
+  service_name?: string;
+  staff_name?: string;
+  branch_name?: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  customer_whatsapp?: string;
+  notes?: string;
 }

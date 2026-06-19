@@ -240,7 +240,7 @@ export default function BranchFormModal({
               <Button type="button" variant="secondary" onClick={onClose} disabled={saving} className="bg-[var(--surface-3)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                 Cancelar
               </Button>
-              <Button type="submit" form="branch-form" disabled={saving} className="min-w-[120px] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] border border-[var(--border-soft)] shadow-[var(--shadow-sm)] text-[var(--surface-3)]">
+              <Button type="submit" form="branch-form" disabled={saving} className="min-w-[120px] bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] border border-[var(--border-soft)] shadow-[var(--shadow-sm)] text-[var(--surface-3)]">
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin text-[var(--surface-3)]" />
                 ) : mode === "create" ? (

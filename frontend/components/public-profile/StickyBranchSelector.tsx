@@ -33,8 +33,8 @@ export default function StickyBranchSelector({
         className={`pointer-events-auto group flex items-center gap-3 rounded-full border border-[var(--border-strong)] py-2.5 pl-3 pr-4 shadow-[var(--shadow-md)] backdrop-blur-md transition-all hover:border-[var(--app-primary)] hover:shadow-[var(--shadow-lg)]
         ${
           selectedBranch
-            ? "bg-[var(--surface-1)]/90 text-[var(--text-primary)]"
-            : "bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)]"
+            ? "bg-[var(--surface-glass)]/90 text-[var(--text-primary)]"
+            : "bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)]"
         }
         `}
       >
@@ -45,7 +45,7 @@ export default function StickyBranchSelector({
               : "bg-white/20 text-white"
           }`}
         >
-          <MapPin className="h-3.5 w-3.5" />
+          <MapPin className="h-4.5 w-4.5" />
         </div>
         <div className="flex flex-col items-start text-left">
           {selectedBranch ? (

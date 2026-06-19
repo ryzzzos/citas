@@ -82,7 +82,7 @@ export default function AgendaHeader({
                   onClick={() => onViewChange(option.value)}
                   className={`min-h-9 rounded-xl px-4 text-[13px] font-semibold transition-all ${
                     active
-                      ? "bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] shadow-[var(--shadow-md)] border border-[var(--border-soft)]"
+                      ? "bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] shadow-[var(--shadow-md)] border border-[var(--border-soft)]"
                       : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[var(--surface-2)] dark:hover:text-[var(--text-primary)]"
                   }`}
                 >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { createStaff, deleteStaff, listStaff, updateStaff } from "@/lib/api/staff";
+import { createStaff, deleteStaff, listStaff, updateStaff, uploadStaffPhoto } from "@/lib/api/staff";
 import type { Staff } from "@/types";
 import { useBranchContext } from "@/contexts/BranchContext";
 
@@ -61,6 +61,19 @@ export function useStaff() {
     }
   };
 
+  const uploadPhoto = async (id: string, file: File) => {
+    if (!business) throw new Error("No hay negocio activo");
+
+    setSaving(true);
+    try {
+      const updated = await uploadStaffPhoto(business.id, id, file);
+      setStaff((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      return updated;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const remove = async (id: string) => {
     if (!business) throw new Error("No hay negocio activo");
 
@@ -81,6 +94,7 @@ export function useStaff() {
     reload: fetchStaff,
     create,
     update,
+    uploadPhoto,
     remove,
   };
 }

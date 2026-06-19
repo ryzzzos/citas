@@ -1,6 +1,8 @@
 import uuid
+from pathlib import Path
+import re
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request, UploadFile, File
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_db, require_business_owner
@@ -11,6 +13,23 @@ from app.models.service import Service
 from app.schemas.staff import StaffCreate, StaffRead, StaffUpdate
 
 router = APIRouter()
+
+MAX_IMAGE_BYTES = 2 * 1024 * 1024
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+}
+STORAGE_ROOT = Path(__file__).resolve().parents[2] / "storage"
+
+def _slugify_filename(value: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
+    return slug or "staff-photo"
+
+def _staff_photo_path(business_id: uuid.UUID, staff_id: uuid.UUID, filename: str) -> Path:
+    path = STORAGE_ROOT / "businesses" / str(business_id) / "staff" / str(staff_id)
+    path.mkdir(parents=True, exist_ok=True)
+    return path / filename
 
 
 def _get_owned_business(business_id: uuid.UUID, current_user: User, db: Session) -> Business:
@@ -109,3 +128,56 @@ def remove_staff(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found")
     db.delete(member)
     db.commit()
+
+@router.post("/{business_id}/staff/{staff_id}/photo", response_model=StaffRead)
+async def upload_staff_photo(
+    request: Request,
+    business_id: uuid.UUID,
+    staff_id: uuid.UUID,
+    file: UploadFile = File(...),
+    current_user: User = Depends(require_business_owner),
+    db: Session = Depends(get_db),
+):
+    _get_owned_business(business_id, current_user, db)
+    member = db.get(Staff, staff_id)
+    if not member or member.business_id != business_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found")
+
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Only JPEG, PNG and WEBP images are allowed",
+        )
+
+    original_name = Path(file.filename or "staff-photo").stem
+    safe_name = _slugify_filename(original_name)
+    ext = ALLOWED_IMAGE_TYPES[file.content_type]
+    final_name = f"{safe_name}-{uuid.uuid4().hex[:12]}.{ext}"
+
+    target_path = _staff_photo_path(business_id, staff_id, final_name)
+    written = 0
+
+    try:
+        with target_path.open("wb") as destination:
+            while chunk := await file.read(1024 * 256):
+                written += len(chunk)
+                if written > MAX_IMAGE_BYTES:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail="Image size must be 2MB or smaller",
+                    )
+                destination.write(chunk)
+    except HTTPException:
+        if target_path.exists():
+            target_path.unlink(missing_ok=True)
+        raise
+    finally:
+        await file.close()
+
+    # Update DB
+    url = f"{request.base_url}storage/businesses/{business_id}/staff/{staff_id}/{final_name}"
+    member.photo_url = url
+    db.commit()
+    db.refresh(member)
+
+    return member

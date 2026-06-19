@@ -38,3 +38,17 @@ export async function deleteStaff(
     method: "DELETE",
   });
 }
+
+export async function uploadStaffPhoto(
+  businessId: string,
+  staffId: string,
+  file: File
+): Promise<Staff> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return request<Staff>(`/staff/${businessId}/staff/${staffId}/photo`, {
+    method: "POST",
+    body: formData,
+  });
+}

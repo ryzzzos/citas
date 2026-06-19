@@ -322,18 +322,38 @@ export default function ServiceFormModal({
             <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
               <h4 className="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Precio y Duración</h4>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Input
-                  id="service-duration"
-                  label="Duración (minutos)"
-                  type="number"
-                  min={1}
-                  max={720}
-                  value={form.duration}
-                  onChange={(event) =>
-                    setForm((previous) => ({ ...previous, duration: event.target.value }))
-                  }
-                  required
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="service-duration" className="text-[13px] font-semibold text-[var(--text-secondary)]">
+                    Duración
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="service-duration"
+                      value={form.duration}
+                      onChange={(event) =>
+                        setForm((previous) => ({ ...previous, duration: event.target.value }))
+                      }
+                      className="dashboard-focusable w-full h-[3.25rem] pl-4 pr-8 rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[0.925rem] font-medium text-[var(--text-primary)] appearance-none transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus:bg-[var(--surface-1)] cursor-pointer"
+                      required
+                    >
+                      {Array.from({ length: 48 }, (_, i) => (i + 1) * 15).map((mins) => {
+                        const h = Math.floor(mins / 60);
+                        const m = mins % 60;
+                        const label = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m} min`;
+                        return (
+                          <option key={mins} value={mins}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                      <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
                 <Input
                   id="service-price"
                   label="Precio (CLP)"

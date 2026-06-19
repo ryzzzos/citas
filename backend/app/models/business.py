@@ -22,6 +22,7 @@ class Business(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     slug: Mapped[str] = mapped_column(String(90), nullable=False, index=True)
     category: Mapped[str] = mapped_column(String(60), nullable=False)
+    timezone: Mapped[str] = mapped_column(String(50), nullable=False, server_default="America/Bogota")
     phone: Mapped[str] = mapped_column(String(30), nullable=False)
     whatsapp_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False)

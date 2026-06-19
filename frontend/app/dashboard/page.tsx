@@ -2,11 +2,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass, Hourglass, TrendingUp, TrendingDown, Minus, XCircle } from "lucide-react";
-import { getMe, myBookings } from "@/lib/api";
+import { 
+  CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass, 
+  Hourglass, TrendingUp, Minus, XCircle, ChevronLeft, ChevronRight, User, MapPin
+} from "lucide-react";
+import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
 import AppIcon from "@/components/ui/AppIcon";
-import type { Booking, User } from "@/types";
-
+import type { Booking, User as UserType } from "@/types";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
+import { es } from "date-fns/locale";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente",
@@ -15,38 +19,57 @@ const STATUS_LABELS: Record<string, string> = {
   completed: "Completada",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "border border-[var(--color-pending)] bg-[var(--surface-3)] text-[var(--color-pending)] shadow-[var(--shadow-sm)]",
-  confirmed: "border border-[var(--color-info)] bg-[var(--surface-3)] text-[var(--color-info)] shadow-[var(--shadow-sm)]",
-  cancelled: "border border-[var(--color-error)] bg-[var(--surface-3)] text-[var(--color-error)] shadow-[var(--shadow-sm)]",
-  completed: "border border-[var(--color-success)] bg-[var(--surface-3)] text-[var(--color-success)] shadow-[var(--shadow-sm)]",
-};
-
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   useEffect(() => {
+    let mounted = true;
     async function load() {
       try {
-        const [me, bks] = await Promise.all([getMe(), myBookings()]);
+        setLoading(true);
+        const me = await getMe();
+        if (!mounted) return;
         setUser(me);
-        setBookings(bks);
+
+        let bks: Booking[] = [];
+        if (me.role === "business_owner") {
+          const myBiz = await getMyBusiness().catch(() => null);
+          if (myBiz) {
+            const startStr = format(startOfMonth(currentMonth), "yyyy-MM-dd");
+            const endStr = format(endOfMonth(currentMonth), "yyyy-MM-dd");
+            bks = await businessAgenda(myBiz.id, {
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              from_at: new Date(startStr + "T00:00:00").toISOString(),
+              to_at: new Date(endStr + "T23:59:59").toISOString(),
+            });
+          }
+        } else {
+          const allBks = await myBookings();
+          bks = allBks.filter((b) => {
+            const d = new Date(b.booking_date + "T12:00:00");
+            return isSameMonth(d, currentMonth);
+          });
+        }
+        
+        if (mounted) setBookings(bks);
       } catch {
         router.push("/auth/login");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
     load();
-  }, [router]);
+    return () => { mounted = false; };
+  }, [router, currentMonth]);
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)] dark:border-[var(--border-strong)] dark:border-t-[var(--app-primary)]" />
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)]" />
       </div>
     );
   }
@@ -63,16 +86,41 @@ export default function DashboardPage() {
   const cancelledPct = totalBookings > 0 ? Math.round((cancelledBookings / totalBookings) * 100) : 0;
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)]  dark:border border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)] p-6">
-        <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl ">
-          Hola, {user?.name}
-        </h2>
-        <p className="mt-1.5 max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
-          {user?.role === "business_owner"
-            ? "Administra la operación de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
-            : "Consulta tus próximas reservas y accede rápido al mapa de sucursales para reservar nuevos servicios."}
-        </p>
+    <div className="flex flex-col h-full space-y-6 lg:space-y-8">
+      <div className="shrink-0 space-y-6 lg:space-y-8">
+        {/* Hero / Welcome */}
+      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+              Hola, {user?.name}
+            </h2>
+            <p className="max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
+              {user?.role === "business_owner"
+                ? "Administra la operación de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
+                : "Consulta tus próximas reservas y accede rápido al mapa de sucursales para reservar nuevos servicios."}
+            </p>
+          </div>
+
+          {/* Month selector */}
+          <div className="flex items-center gap-1 sm:gap-2.5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-1.5 py-1 shadow-[var(--shadow-sm)] shrink-0 self-start sm:self-auto">
+            <button 
+              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="min-w-[110px] text-center text-[13px] sm:text-sm font-semibold capitalize text-[var(--text-primary)]">
+              {format(currentMonth, "MMMM yyyy", { locale: es })}
+            </span>
+            <button 
+              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
 
         <div className="mt-6 flex flex-wrap gap-2.5">
           {user?.role === "business_owner" ? (
@@ -86,7 +134,7 @@ export default function DashboardPage() {
           ) : null}
           <Link
             href="/sucursales"
-            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-5 text-[13px] font-bold tracking-tight text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-3)] active:scale-[0.98] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-5 text-[13px] font-bold tracking-tight text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-3)] active:scale-[0.98]"
           >
             <AppIcon icon={Compass} />
             Explorar sucursales
@@ -94,8 +142,8 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {/* Reservas Totales */}
+      {/* Metric cards */}
+      <section className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -112,12 +160,11 @@ export default function DashboardPage() {
           <div className="mt-2">
             <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{totalBookings}</p>
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--text-primary)]" style={{ width: totalBookings > 0 ? '100%' : '0%' }}></div>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--text-primary)]" style={{ width: totalBookings > 0 ? '100%' : '0%' }} />
             </div>
           </div>
         </article>
 
-        {/* Pendientes */}
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -134,12 +181,11 @@ export default function DashboardPage() {
           <div className="mt-2">
             <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{pendingBookings}</p>
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-pending)]" style={{ width: `${pendingPct}%` }}></div>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-pending)]" style={{ width: `${pendingPct}%` }} />
             </div>
           </div>
         </article>
 
-        {/* Confirmadas */}
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -156,12 +202,11 @@ export default function DashboardPage() {
           <div className="mt-2">
             <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{confirmedBookings}</p>
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-info)]" style={{ width: `${confirmedPct}%` }}></div>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-info)]" style={{ width: `${confirmedPct}%` }} />
             </div>
           </div>
         </article>
 
-        {/* Completadas */}
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -178,12 +223,11 @@ export default function DashboardPage() {
           <div className="mt-2">
             <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{completedBookings}</p>
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-success)]" style={{ width: `${completedPct}%` }}></div>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-success)]" style={{ width: `${completedPct}%` }} />
             </div>
           </div>
         </article>
 
-        {/* Canceladas */}
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -200,43 +244,103 @@ export default function DashboardPage() {
           <div className="mt-2">
             <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{cancelledBookings}</p>
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-error)]" style={{ width: `${cancelledPct}%` }}></div>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-error)]" style={{ width: `${cancelledPct}%` }} />
             </div>
           </div>
         </article>
       </section>
+      </div>
 
-      <section className="rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-lg)]">
-        <h3 className="text-[19px] font-bold tracking-tight text-[var(--text-primary)] ">
+      {/* Booking list */}
+      <section className={`flex-1 min-h-0 flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)] ${loading ? 'opacity-50' : ''} transition-opacity`}>
+        <h3 className="shrink-0 text-[17px] font-bold tracking-tight text-[var(--text-primary)]">
           {user?.role === "business_owner" ? "Últimas reservas" : "Mis reservas"}
         </h3>
 
         {bookings.length === 0 ? (
-          <div className="mt-5 rounded-[var(--radius-xl)] border border-dashed border-[var(--border-strong)] p-8 text-center text-[14px] font-medium text-[var(--text-muted)]">
+          <div className="mt-5 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] p-8 text-center text-[14px] font-medium text-[var(--text-muted)]">
             <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-3" />
-            No hay reservas aún. <Link href="/sucursales" className="text-[var(--app-primary)] underline underline-offset-4">Busca una sucursal</Link>
+            No hay reservas para este mes.{" "}
+            {user?.role !== "business_owner" && (
+              <>
+                <Link href="/sucursales" className="text-[var(--app-primary)] underline underline-offset-4">
+                  Busca una sucursal
+                </Link>{" "}
+                para empezar.
+              </>
+            )}
           </div>
         ) : (
-          <ul className="mt-5 space-y-3">
-            {bookings.map((b) => (
-              <li
-                key={b.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-1)] p-4 shadow-[var(--shadow-sm)] transition-transform hover:scale-[1.01] dark:border-[var(--border-strong)] dark:bg-[var(--surface-1)]"
-              >
-                <div>
-                  <p className="text-[14px] font-bold tracking-tight text-[var(--text-primary)] ">
-                    {b.booking_date} · {b.start_time.slice(0, 5)} - {b.end_time.slice(0, 5)}
-                  </p>
-                  <p className="mt-1 font-mono text-[11px] font-medium text-[var(--text-secondary)]">ID: {b.id.slice(0, 8)}...</p>
-                </div>
-                <span
-                  className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md ${STATUS_COLORS[b.status] ?? STATUS_COLORS.pending}`}
-                >
-                  {STATUS_LABELS[b.status]}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <div
+            className="mt-4 flex-1 min-h-0 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)]"
+          >
+            <div className="space-y-2">
+              {bookings.map((b) => {
+                const statusColor = {
+                  pending: "var(--color-pending)",
+                  confirmed: "var(--color-info)",
+                  completed: "var(--color-success)",
+                  cancelled: "var(--color-error)",
+                }[b.status] ?? "var(--color-pending)";
+
+                return (
+                  <div
+                    key={b.id}
+                    className="group flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)]"
+                  >
+                    {/* Vertical status accent */}
+                    <div
+                      className="hidden sm:block w-1 self-stretch rounded-full shrink-0"
+                      style={{ backgroundColor: statusColor }}
+                    />
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[14px] font-semibold tracking-tight text-[var(--text-primary)] truncate">
+                          {b.service_name || "Servicio reservado"}
+                        </p>
+                        <span
+                          className="shrink-0 rounded-full px-2 py-px text-[10px] font-bold uppercase tracking-wider"
+                          style={{
+                            color: statusColor,
+                            backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+                          }}
+                        >
+                          {STATUS_LABELS[b.status]}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[12px] text-[var(--text-muted)]">
+                        <span className="inline-flex items-center gap-1">
+                          <User size={12} className="opacity-60" />
+                          {b.staff_name || "Sin asignar"}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin size={12} className="opacity-60" />
+                          {b.branch_name || "Sucursal"}
+                        </span>
+                        {user?.role === "business_owner" && b.customer_name && (
+                          <span className="text-[var(--text-secondary)] font-medium">
+                            → {b.customer_name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Date column */}
+                    <div className="shrink-0 text-right">
+                      <p className="text-[13px] font-semibold tabular-nums text-[var(--text-primary)]">
+                        {format(new Date(b.booking_date + "T" + b.start_time), "d MMM", { locale: es })}
+                      </p>
+                      <p className="text-[11px] tabular-nums text-[var(--text-muted)]">
+                        {format(new Date(b.booking_date + "T" + b.start_time), "h:mm a", { locale: es })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </section>
     </div>

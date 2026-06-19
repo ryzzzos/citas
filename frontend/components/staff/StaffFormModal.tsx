@@ -7,6 +7,8 @@ import Input from "@/components/ui/Input";
 import type { Staff, Service } from "@/types";
 import { useServices } from "@/lib/services/useServices";
 import { useStaff } from "@/lib/staff/useStaff";
+import Image from "next/image";
+import { ImagePlus } from "lucide-react";
 
 interface StaffFormModalProps {
   open: boolean;
@@ -54,9 +56,11 @@ export default function StaffFormModal({
 }: StaffFormModalProps) {
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   
   const { services, loading: loadingServices } = useServices();
-  const { create, update } = useStaff();
+  const { create, update, uploadPhoto } = useStaff();
 
   const [prevOpen, setPrevOpen] = useState(open);
   const [prevStaff, setPrevStaff] = useState(staff);
@@ -66,6 +70,8 @@ export default function StaffFormModal({
     setPrevStaff(staff);
     if (open) {
       setForm(toFormState(staff));
+      setPhotoFile(null);
+      setPhotoPreview(staff?.photo_url || null);
       setValidationError(null);
     }
   }
@@ -109,11 +115,17 @@ export default function StaffFormModal({
         service_ids: form.serviceIds,
       };
 
+      let savedStaff;
       if (mode === "create") {
-        await create(data);
+        savedStaff = await create(data);
       } else if (staff) {
-        await update(staff.id, data);
+        savedStaff = await update(staff.id, data);
       }
+
+      if (savedStaff && photoFile) {
+        await uploadPhoto(savedStaff.id, photoFile);
+      }
+
       onClose();
     } catch (err) {
       setValidationError(err instanceof Error ? err.message : "Error al guardar el empleado.");
@@ -198,6 +210,46 @@ export default function StaffFormModal({
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       />
                     </div>
+                    
+                    <div className="space-y-1.5 pt-2">
+                      <label className="text-[13px] font-semibold text-[var(--text-primary)]">Foto del empleado (Opcional)</label>
+                      <div className="flex items-center gap-4">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)]">
+                          {photoPreview ? (
+                            <Image src={photoPreview} alt="Preview" fill className="object-cover" unoptimized />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
+                              <ImagePlus className="h-6 w-6" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <label className="inline-flex cursor-pointer items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] focus-within:ring-2 focus-within:ring-[var(--app-primary)]">
+                            <span>Subir imagen</span>
+                            <input
+                              type="file"
+                              accept="image/jpeg, image/png, image/webp"
+                              className="sr-only"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  if (file.size > 2 * 1024 * 1024) {
+                                    setValidationError("La imagen no debe superar los 2MB.");
+                                    return;
+                                  }
+                                  setPhotoFile(file);
+                                  setPhotoPreview(URL.createObjectURL(file));
+                                  setValidationError(null);
+                                }
+                              }}
+                            />
+                          </label>
+                          <p className="mt-1.5 text-[11px] text-[var(--text-muted)]">
+                            JPEG, PNG o WEBP. Máx 2MB.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -272,7 +324,7 @@ export default function StaffFormModal({
               <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting} className="bg-[var(--surface-3)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                 Cancelar
               </Button>
-              <Button type="submit" form="staff-form" disabled={isSubmitting} className="min-w-[120px] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] border border-[var(--border-soft)] shadow-[var(--shadow-sm)] text-[var(--surface-3)]">
+              <Button type="submit" form="staff-form" disabled={isSubmitting} className="min-w-[120px] bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] border border-[var(--border-soft)] shadow-[var(--shadow-sm)] text-[var(--surface-3)]">
                 {isSubmitting ? (
                   <Loader2 className="h-4 w-4 animate-spin text-[var(--surface-3)]" />
                 ) : mode === "create" ? (

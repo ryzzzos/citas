@@ -30,6 +30,7 @@ class Staff(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     business = relationship("Business", back_populates="staff")

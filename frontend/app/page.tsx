@@ -19,7 +19,7 @@ export default function HomePage() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/auth/register"
-            className="rounded-full bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-6 py-3 text-sm font-semibold text-[var(--surface-3)]
+            className="rounded-full bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] px-6 py-3 text-sm font-semibold text-[var(--surface-3)]
              transition-colors hover:brightness-110"
           >
             Registra tu negocio

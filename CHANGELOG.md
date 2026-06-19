@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+## [0.4.2] - 2026-06-19
+
+### Added
+- **Intervalos en Horarios (`TimeRangeSlider` & `StaffScheduleModal`)**:
+  - **Componente Visual**: Incorporación de un deslizador interactivo de rango horario (`TimeRangeSlider.tsx`) que permite definir de forma táctil y visual el turno laboral y el horario de descanso de cada empleado.
+  - **Migración a Intervalos JSONB**: Migración del esquema de base de datos de horarios para almacenar intervalos estructurados en formato JSONB en lugar de una hora fija de inicio y fin.
+- **Reservas de Invitados (Guest Checkout)**:
+  - **Flexibilidad de Cuenta**: Modificación de las relaciones de reservas en la base de datos para admitir reservas anónimas (`user_id` es ahora opcional y utiliza `SET NULL` en cascada inversa).
+  - **Campos de Contacto de Invitados**: Incorporación de campos dedicados a capturar nombre, correo, teléfono, WhatsApp y notas de clientes no registrados directamente en el registro de reservas.
+- **Perfiles de Personal con Fotos**:
+  - **Atributo Visual**: Adición de la columna `photo_url` al modelo de base de datos `Staff` para desplegar fotografías del personal en la interfaz pública de reservas.
+  - **Componente Booking Drawer**: Nuevo panel lateral `ServiceBookingDrawer.tsx` para una selección intuitiva y fluida de servicios del perfil público.
+- **Documentación de Lanzamiento (`AGENTS.md`)**:
+  - **Protocolo de Releases**: Inclusión formal de las directrices y secuencia de comandos Git para efectuar compilaciones, documentaciones, y etiquetados de versiones (Git tags).
+
+### Changed
+- **Motor de Disponibilidad Avanzado (`availability_service.py`)**:
+  - **Disponibilidad Multiempleado**: El endpoint `/bookings/availability` ahora devuelve un diccionario estructurado que mapea horas a listas de ID de profesionales disponibles, permitiendo verificar disponibilidad sin requerir seleccionar previamente a un empleado específico.
+  - **Cálculo de Huecos con Intervalos**: Adaptación del algoritmo de cálculo de horarios libres para procesar los intervalos dinámicos del JSONB de `Schedule`.
+- **Dependencias**:
+  - Instalación de la librería `date-fns` en el frontend para formateo rápido y manipulación de fechas en los nuevos componentes de agenda.
+
+### Fixed
+- **Compilación de React Compiler (`TimeRangeSlider.tsx`)**:
+  - **Memoización de Intervalos**: Ajuste de la función `updateIntervals` y el handler de movimiento del cursor usando `useCallback` para cumplir con las estrictas reglas de dependencias del compilador de React 19.
+
 ## [0.4.1] - 2026-06-02
 
 ### Changed

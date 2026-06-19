@@ -52,6 +52,11 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
         start_time=data.start_time,
         end_time=end_time,
         status="pending",
+        customer_name=data.customer_name,
+        customer_email=data.customer_email,
+        customer_phone=data.customer_phone,
+        customer_whatsapp=data.customer_whatsapp,
+        notes=data.notes,
     )
     db.add(booking)
     db.commit()

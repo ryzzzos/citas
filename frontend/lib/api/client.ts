@@ -80,6 +80,8 @@ export async function request<T>(
         window.location.href = `/auth/login?redirect=${encodeURIComponent(
           window.location.pathname + window.location.search
         )}`;
+        // Halt JS execution to prevent React error boundaries from triggering during navigation
+        return new Promise(() => {});
       }
     }
     throw new Error(await parseErrorDetail(response));

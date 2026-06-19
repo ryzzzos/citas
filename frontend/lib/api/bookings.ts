@@ -4,9 +4,9 @@ import { request, toQueryString } from "./client";
 
 export interface GetAvailabilityParams {
   business_id: string;
-  staff_id: string;
   service_id: string;
   booking_date: string;
+  staff_id?: string;
 }
 
 export interface CreateBookingInput {
@@ -16,6 +16,11 @@ export interface CreateBookingInput {
   staff_id: string;
   booking_date: string;
   start_time: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  customer_whatsapp?: string;
+  notes?: string;
 }
 
 export type BookingStatusUpdate = "confirmed" | "cancelled" | "completed";
@@ -34,9 +39,9 @@ export interface BusinessAgendaQuery {
 
 export async function getAvailability(
   params: GetAvailabilityParams
-): Promise<string[]> {
+): Promise<Record<string, string[]>> {
   const query = toQueryString(params);
-  return request<string[]>(`/bookings/availability?${query}`);
+  return request<Record<string, string[]>>(`/bookings/availability?${query}`);
 }
 
 export async function createBooking(data: CreateBookingInput): Promise<Booking> {

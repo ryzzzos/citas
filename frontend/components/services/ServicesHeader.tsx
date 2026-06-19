@@ -53,7 +53,7 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
 
           <Button 
             onClick={onCreate} 
-            className="flex-1 sm:flex-none relative min-h-11 rounded-full px-5 shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] border border-[var(--border-soft)]"
+            className="flex-1 sm:flex-none relative min-h-11 rounded-full px-5 shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] border border-[var(--border-soft)]"
           >
             <AppIcon icon={Plus} className="mr-2" size="sm" />
             <span className="font-semibold text-[13px] tracking-tight">Nuevo</span>

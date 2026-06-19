@@ -118,7 +118,7 @@ function renderEventBlock(
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="min-h-7 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-2 text-[10px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-7 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] px-2 text-[10px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Ok
         </button>

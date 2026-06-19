@@ -1,7 +1,7 @@
 import uuid
 
 from sqlalchemy import ForeignKey, Integer, Time
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -26,8 +26,9 @@ class Schedule(Base):
     )
     # 0 = Monday, 6 = Sunday
     day_of_week: Mapped[int] = mapped_column(Integer, nullable=False)
-    start_time: Mapped[object] = mapped_column(Time, nullable=False)
-    end_time: Mapped[object] = mapped_column(Time, nullable=False)
+    
+    # Store intervals as JSONB: [{"start": "09:00", "end": "13:00"}]
+    intervals: Mapped[list[dict]] = mapped_column(JSONB, nullable=False, server_default='[]')
 
     business = relationship("Business", back_populates="schedules")
     branch = relationship("Branch", back_populates="schedules")

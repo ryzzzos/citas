@@ -4,9 +4,9 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import String, and_, cast, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from app.core.deps import get_current_user, get_db, require_business_owner
+from app.core.deps import get_current_user, get_current_user_optional, get_db, require_business_owner
 from app.models.booking import Booking
 from app.models.service import Service
 from app.models.staff import Staff
@@ -66,10 +66,11 @@ def _ensure_aware_utc(value: datetime | None) -> datetime | None:
 @router.post("/", response_model=BookingRead, status_code=201)
 def book_appointment(
     data: BookingCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    return create_booking(data, current_user.id, db)
+    user_id = current_user.id if current_user else None
+    return create_booking(data, user_id, db)
 
 
 @router.get("/my", response_model=list[BookingRead])
@@ -77,7 +78,11 @@ def my_bookings(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return db.query(Booking).filter(Booking.user_id == current_user.id).all()
+    return db.query(Booking).options(
+        joinedload(Booking.service),
+        joinedload(Booking.staff),
+        joinedload(Booking.branch)
+    ).filter(Booking.user_id == current_user.id).order_by(Booking.booking_date.desc(), Booking.start_time.desc()).all()
 
 
 @router.get("/business/{business_id}", response_model=list[BookingRead])
@@ -97,7 +102,11 @@ def business_agenda(
 ):
     local_zone = _resolve_timezone(timezone)
 
-    query = db.query(Booking).filter(Booking.business_id == business_id)
+    query = db.query(Booking).options(
+        joinedload(Booking.service),
+        joinedload(Booking.staff),
+        joinedload(Booking.branch)
+    ).filter(Booking.business_id == business_id)
 
     if branch_id:
         query = query.filter(Booking.branch_id == branch_id)
@@ -146,15 +155,15 @@ def business_agenda(
     return bookings
 
 
-@router.get("/availability", response_model=list[time])
+@router.get("/availability", response_model=dict[str, list[uuid.UUID]])
 def check_availability(
     business_id: uuid.UUID,
-    staff_id: uuid.UUID,
     service_id: uuid.UUID,
     booking_date: date,
+    staff_id: uuid.UUID | None = None,
     db: Session = Depends(get_db),
 ):
-    return get_available_slots(db, staff_id, business_id, service_id, booking_date)
+    return get_available_slots(db, business_id, service_id, booking_date, staff_id)
 
 
 @router.patch("/{booking_id}/status", response_model=BookingRead)

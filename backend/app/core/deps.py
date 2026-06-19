@@ -1,7 +1,7 @@
 from typing import Generator
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -10,6 +10,7 @@ from app.database import SessionLocal
 from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -53,3 +54,17 @@ def require_admin(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin role required",
         )
     return current_user
+
+
+def get_current_user_optional(
+    token: str | None = Depends(oauth2_scheme_optional),
+    db: Session = Depends(get_db),
+) -> User | None:
+    """Return the authenticated user if a valid token is present, otherwise None."""
+    if not token:
+        return None
+    user_id = decode_access_token(token)
+    if not user_id:
+        return None
+    user = db.get(User, UUID(user_id))
+    return user

@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="bg-[var(--surface-1)] h-dvh overflow-hidden [color:var(--text-primary)]">
       <a
         href="#dashboard-main"
-        className="sr-only z-[70] rounded-md bg-[var(--surface-0)] px-3 py-2 text-sm shadow-[var(--shadow-sm)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary-strong)]"
+        className="sr-only z-[70] rounded-md bg-[var(--surface-0)] px-3 py-2 text-sm shadow-[var(--shadow-sm)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]"
       >
         Saltar al contenido principal
       </a>
@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </Link>
                   <Link
                     href="/sucursales"
-                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-5 text-[13px] font-semibold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] border border-[var(--border-soft)]"
+                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--app-primary)] px-5 text-[13px] font-semibold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] border border-[var(--border-soft)]"
                   >
                     <AppIcon icon={Compass} size="xs" />
                     Explorar

@@ -1,8 +1,12 @@
 import type { Branch, CreateBranchInput, UpdateBranchInput } from "@/types";
-import { request } from "./client";
+import { request, toQueryString } from "./client";
 
-export async function listBranches(businessId: string): Promise<Branch[]> {
-  return request<Branch[]>(`/businesses/${businessId}/branches`);
+export async function listBranches(
+  businessId: string,
+  options?: { includeInactive?: boolean }
+): Promise<Branch[]> {
+  const query = options?.includeInactive ? `?${toQueryString({ include_inactive: true })}` : "";
+  return request<Branch[]>(`/businesses/${businessId}/branches${query}`);
 }
 
 export async function createBranch(

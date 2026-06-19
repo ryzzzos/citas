@@ -62,6 +62,7 @@ agenda-web/
   - Borders: `border-[var(--border-strong)]`, `border-[var(--border-soft)]`.
   - Text: `text-[var(--text-primary)]`, `text-[var(--text-secondary)]`, `text-[var(--text-muted)]`.
   - Accents: `bg-[var(--app-primary)]`, `text-[var(--color-pending)]`, etc.
+  - **Note on Semantic Colors**: Do not be afraid to creatively use `color-pending`, `color-info`, `color-success`, and `color-error` for general aesthetic design elements (like badges, active states, soft backgrounds, glowing shadows) even if the context isn't strictly an "error" or "info" alert. They are part of the vibrant palette.
 
 ### Modals, Drawers & Forms (Apple-Inspired Standard)
 
@@ -152,6 +153,13 @@ agenda-web/
 - Prefer concise commits with prefixes like `feat:`, `fix:`, `docs:`, and `chore:` when applicable.
 - Update `CHANGELOG.md` on release-worthy changes.
 - Preserve the mandatory onboarding flow for `business_owner` users.
+- **Git Tagging & Release Protocol**:
+  1. Validate codebase builds (`pnpm lint` and `pnpm build`).
+  2. Bump the version in `frontend/package.json`.
+  3. Update `CHANGELOG.md` under the corresponding version.
+  4. Stage, commit (`git commit -m "<msg>"`), and push changes to `main`.
+  5. Create a local annotated Git tag: `git tag -a vMAJOR.MINOR.PATCH -m "Release vMAJOR.MINOR.PATCH"`.
+  6. Push the tag to the remote origin: `git push origin vMAJOR.MINOR.PATCH`.
 
 ## Agent Usage Notes
 

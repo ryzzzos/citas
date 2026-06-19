@@ -5,14 +5,17 @@ import Button from "@/components/ui/Button";
 import { useStaff } from "@/lib/staff/useStaff";
 import type { Staff } from "@/types";
 import StaffFormModal from "./StaffFormModal";
+import StaffScheduleModal from "./StaffScheduleModal";
+import Image from "next/image";
 import { useBranchContext } from "@/contexts/BranchContext";
 import AppIcon from "@/components/ui/AppIcon";
-import { Users, Mail, Phone, Edit2, Trash2, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Users, Mail, Phone, Edit2, Trash2, CalendarClock } from "lucide-react";
 
 export default function StaffPage() {
   const { staff, loading, error, reload, remove, saving } = useStaff();
   const { activeBranch } = useBranchContext();
   const [modalOpen, setModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -57,8 +60,20 @@ export default function StaffPage() {
     setModalOpen(true);
   }
 
+  function openScheduleModal(member: Staff) {
+    setActionError(null);
+    setEditingStaff(member);
+    setScheduleModalOpen(true);
+  }
+
   function closeModal() {
     setModalOpen(false);
+    setEditingStaff(null);
+    setActionError(null);
+  }
+
+  function closeScheduleModal() {
+    setScheduleModalOpen(false);
     setEditingStaff(null);
     setActionError(null);
   }
@@ -111,68 +126,99 @@ export default function StaffPage() {
           </Button>
         </section>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
           {staff.map((member) => (
-            <div
+            <article
               key={member.id}
-              className={`group relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-all hover:border-[var(--app-primary)] hover:shadow-[var(--shadow-md)] ${!member.is_active ? 'opacity-75 grayscale-[0.5]' : ''}`}
+              className={`group flex flex-col sm:flex-row overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)] ${!member.is_active ? 'opacity-75 grayscale-[0.5]' : ''}`}
             >
-              <div className="flex items-center justify-between border-b border-[var(--border-soft)] px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--app-primary)] ring-2 ring-[var(--surface-1)]">
-                    <span className="text-sm font-bold">{member.name.charAt(0).toUpperCase()}</span>
+              {/* Avatar/Photo Section */}
+              <div className="relative h-48 w-full sm:h-auto sm:w-40 sm:shrink-0 bg-[var(--surface-1)] border-b sm:border-b-0 sm:border-r border-[var(--border-strong)] overflow-hidden">
+                {member.photo_url ? (
+                  <Image
+                    src={member.photo_url}
+                    alt={member.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[var(--surface-2)]">
+                    <span className="text-4xl font-bold text-[var(--text-muted)]/40">
+                      {member.name.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-[var(--text-primary)]">{member.name}</h3>
-                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                      {member.is_active ? (
-                        <><AppIcon icon={ShieldCheck} size="xs" className="text-[var(--color-success)]" /> Activo</>
-                      ) : (
-                        <><AppIcon icon={ShieldAlert} size="xs" /> Inactivo</>
-                      )}
-                    </div>
-                  </div>
+                )}
+                <div className="absolute left-3 top-3 z-10 flex flex-col items-start">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-md ${
+                    member.is_active 
+                      ? "border-white/20 bg-white/30 dark:bg-black/30 text-[var(--color-info)] dark:text-[var(--color-info)]"
+                      : "border-[var(--border-strong)]/50 bg-[var(--surface-1)]/50 text-[var(--text-secondary)]"
+                  }`}>
+                    {member.is_active ? "Activo" : "Inactivo"}
+                  </span>
                 </div>
               </div>
-              <div className="flex flex-1 flex-col justify-between gap-4 p-4 text-sm text-[var(--text-secondary)]">
-                <div className="space-y-2">
-                  {member.email && (
-                    <div className="flex items-center gap-2">
-                      <AppIcon icon={Mail} size="xs" className="shrink-0 text-[var(--text-muted)]" />
-                      <span className="truncate">{member.email}</span>
-                    </div>
-                  )}
-                  {member.phone && (
-                    <div className="flex items-center gap-2">
-                      <AppIcon icon={Phone} size="xs" className="shrink-0 text-[var(--text-muted)]" />
-                      <span>{member.phone}</span>
-                    </div>
-                  )}
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    <span className="rounded-full bg-[var(--surface-1)] px-2 py-0.5 text-xs text-[var(--text-secondary)] border border-[var(--border-soft)]">
-                      {member.service_ids?.length || 0} servicios asignados
+
+              {/* Content Section */}
+              <div className="flex flex-1 flex-col p-4 sm:p-5 min-w-0 justify-between gap-4">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-[17px] font-bold tracking-tight text-[var(--text-primary)] truncate">
+                      {member.name}
+                    </h3>
+                    <span className="shrink-0 inline-flex items-center rounded-md border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+                      {member.service_ids?.length || 0} Servicios
                     </span>
+                  </div>
+                  
+                  <div className="mt-3 flex flex-col gap-2 text-[13px] text-[var(--text-secondary)]">
+                    {member.email && (
+                      <div className="flex items-center gap-2">
+                        <AppIcon icon={Mail} size="xs" className="shrink-0 text-[var(--text-muted)]" />
+                        <span className="truncate">{member.email}</span>
+                      </div>
+                    )}
+                    {member.phone && (
+                      <div className="flex items-center gap-2">
+                        <AppIcon icon={Phone} size="xs" className="shrink-0 text-[var(--text-muted)]" />
+                        <span className="truncate">{member.phone}</span>
+                      </div>
+                    )}
+                    {!member.email && !member.phone && (
+                      <p className="text-[var(--text-muted)] italic">Sin datos de contacto</p>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-soft)]">
+                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-soft)] mt-auto">
                   <button
-                    onClick={() => openEditModal(member)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-colors"
-                    aria-label="Editar"
+                    onClick={() => openScheduleModal(member)}
+                    className="group/btn flex h-9 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--app-primary)]/10 hover:text-[var(--app-primary)] transition-colors"
                   >
-                    <AppIcon icon={Edit2} size="xs" />
+                    <AppIcon icon={CalendarClock} size="xs" className="group-hover/btn:text-[var(--app-primary)] transition-colors" />
+                    <span>Horarios</span>
                   </button>
-                  <button
-                    onClick={() => handleDelete(member)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors"
-                    aria-label="Eliminar"
-                  >
-                    <AppIcon icon={Trash2} size="xs" />
-                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => openEditModal(member)}
+                      className="group/edit flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--color-info)]/10 hover:text-[var(--color-info)] transition-colors"
+                      title="Editar Perfil"
+                    >
+                      <AppIcon icon={Edit2} size="xs" className="group-hover/edit:text-[var(--color-info)] transition-colors" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(member)}
+                      className="group/del flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors"
+                      title="Eliminar Empleado"
+                    >
+                      <AppIcon icon={Trash2} size="xs" className="group-hover/del:text-[var(--color-error)] transition-colors" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
@@ -183,6 +229,12 @@ export default function StaffPage() {
         staff={editingStaff}
         saving={saving}
         onClose={closeModal}
+      />
+      
+      <StaffScheduleModal
+        open={scheduleModalOpen}
+        staff={editingStaff}
+        onClose={closeScheduleModal}
       />
     </div>
   );

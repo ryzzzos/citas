@@ -20,11 +20,13 @@ class ServiceCreate(BaseModel):
 
     @field_validator("duration_minutes")
     @classmethod
-    def positive_duration(cls, v: int) -> int:
+    def valid_duration(cls, v: int) -> int:
         if v <= 0:
             raise ValueError("duration_minutes must be positive")
         if v > MAX_DURATION_MINUTES:
             raise ValueError(f"duration_minutes must be <= {MAX_DURATION_MINUTES}")
+        if v % 15 != 0:
+            raise ValueError("duration_minutes must be a multiple of 15 (15, 30, 45, 60...)")
         return v
 
     @field_validator("name")
@@ -87,13 +89,15 @@ class ServiceUpdate(BaseModel):
 
     @field_validator("duration_minutes")
     @classmethod
-    def positive_duration(cls, v: int | None) -> int | None:
+    def valid_duration(cls, v: int | None) -> int | None:
         if v is None:
             return v
         if v <= 0:
             raise ValueError("duration_minutes must be positive")
         if v > MAX_DURATION_MINUTES:
             raise ValueError(f"duration_minutes must be <= {MAX_DURATION_MINUTES}")
+        if v % 15 != 0:
+            raise ValueError("duration_minutes must be a multiple of 15 (15, 30, 45, 60...)")
         return v
 
     @field_validator("price")

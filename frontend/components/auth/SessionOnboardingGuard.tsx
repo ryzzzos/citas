@@ -17,7 +17,7 @@ function isOnboardingRoute(pathname: string): boolean {
 }
 
 function isAuthError(detail: string): boolean {
-  return detail === "Invalid or expired token" || detail === "User not found";
+  return detail === "Invalid or expired token" || detail === "User not found" || detail === "Not authenticated";
 }
 
 export default function SessionOnboardingGuard() {

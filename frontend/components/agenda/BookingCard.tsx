@@ -62,7 +62,7 @@ export default function BookingCard({ booking, onConfirm, onCancel, onReschedule
           type="button"
           onClick={() => onConfirm(booking.id)}
           disabled={booking.status !== "pending"}
-          className="min-h-11 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(180deg,var(--app-primary),var(--app-primary-strong))] px-4 text-[13px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-11 rounded-xl border border-[var(--border-soft)] bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] px-4 text-[13px] font-bold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           Confirmar
         </button>
