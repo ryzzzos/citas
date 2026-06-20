@@ -56,13 +56,13 @@ export function getAgendaDayColumns(anchorDate: DateTime, view: AgendaView, time
   });
 }
 
-export function getTimelineSlots(stepMinutes = 60): string[] {
+export function getTimelineSlots(_stepMinutes = 60): string[] {
   const labels: string[] = [];
+  const startHour = 6;
+  const endHour = 22; // 10 PM
 
-  for (let minute = 0; minute < 24 * 60; minute += stepMinutes) {
-    const hour = Math.floor(minute / 60);
-    const mins = minute % 60;
-    labels.push(`${String(hour).padStart(2, "0")}:${String(mins).padStart(2, "0")}`);
+  for (let hour = startHour; hour <= endHour; hour++) {
+    labels.push(`${String(hour).padStart(2, "0")}:00`);
   }
 
   return labels;

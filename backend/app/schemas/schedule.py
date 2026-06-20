@@ -10,12 +10,24 @@ class ScheduleInterval(BaseModel):
     start: time
     end: time
 
+    @field_validator("start")
+    @classmethod
+    def start_within_limits(cls, v: time) -> time:
+        limit_start = time(6, 0)
+        limit_end = time(22, 0)
+        if v < limit_start or v > limit_end:
+            raise ValueError("Start time must be between 6:00 AM and 10:00 PM")
+        return v
+
     @field_validator("end")
     @classmethod
-    def end_after_start(cls, v: time, info) -> time:
+    def end_after_start_and_within_limits(cls, v: time, info) -> time:
         start = info.data.get("start")
         if start and v <= start:
             raise ValueError("Interval end must be after start")
+        limit_end = time(22, 0)
+        if v > limit_end:
+            raise ValueError("End time must be at or before 10:00 PM")
         return v
 
 class ScheduleCreate(BaseModel):

@@ -24,6 +24,15 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
         + timedelta(minutes=service.duration_minutes)
     ).time()
 
+    from datetime import time
+    limit_start = time(6, 0)
+    limit_end = time(22, 0)
+    if data.start_time < limit_start or end_time > limit_end:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Bookings must start and end between 6:00 AM and 10:00 PM.",
+        )
+
     # Conflict check — no double booking for same staff on same date
     existing = (
         db.query(Booking)

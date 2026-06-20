@@ -6,6 +6,19 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.4] - 2026-06-19
+
+### Added
+- **Detalle de Cita Interactivo (Agenda Detail Drawer)**:
+  - **Ficha del Cliente**: Panel lateral derecho con diseño Apple-inspired y transiciones fluidas de `framer-motion` que se despliega al hacer clic en las citas de la línea de tiempo. Muestra la información del cliente, el profesional a cargo y notas.
+  - **Contactabilidad Directa**: Incorporación de botones de acción rápida para realizar llamadas (`tel:`) y abrir chats de WhatsApp pre-configurados.
+  - **Confirmación y Acciones**: Controles interactivos directos desde el Drawer para Confirmar y Cancelar la cita al instante.
+
+### Changed
+- **Restricción Horaria (6 AM - 10 PM)**:
+  - **Modelo de Negocio Estricto**: Validación en el backend (`booking_service.py` y `schedule.py` schema) para prohibir la creación de turnos u horarios laborales fuera del rango de 06:00 a 22:00.
+  - **Timeline de Agenda Limpio**: Reducción del canvas en `AgendaTimeline.tsx` a un rango de 16 horas. Se recalculó la coordenada de altura y el posicionamiento dinámico de las tarjetas, y se condicionó el indicador de hora actual (`CurrentTimeLine`) para ocultarse fuera del horario comercial.
+
 ## [0.4.3] - 2026-06-19
 
 ### Changed
