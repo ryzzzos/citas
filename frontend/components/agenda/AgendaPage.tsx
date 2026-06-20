@@ -84,7 +84,10 @@ export default function AgendaPage() {
     return enrichedBookings.filter((booking) => booking.endAt >= now).slice(0, 4);
   }, [enrichedBookings, timezone]);
 
-  async function handleStatusUpdate(bookingId: string, status: "confirmed" | "cancelled") {
+  async function handleStatusUpdate(
+    bookingId: string,
+    status: "pending" | "confirmed" | "cancelled" | "completed"
+  ) {
     try {
       await updateBookingStatus(bookingId, status);
       await reload();
@@ -131,6 +134,7 @@ export default function AgendaPage() {
                   timelineSlots={timelineSlots}
                   onConfirm={(bookingId) => handleStatusUpdate(bookingId, "confirmed")}
                   onCancel={(bookingId) => handleStatusUpdate(bookingId, "cancelled")}
+                  onStatusUpdate={handleStatusUpdate}
                   onReschedule={handleReschedule}
                 />
               </div>

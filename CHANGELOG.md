@@ -6,6 +6,18 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.5] - 2026-06-20
+
+### Added
+- **Diseño Adaptable de Citas por Densidad**:
+  - **Tres Niveles de Densidad**: Rediseño de las tarjetas en `AgendaTimeline.tsx` según su altura (Compacta < 45px, Mediana 45px-90px, Grande >= 90px) para acomodar la información de manera óptima según la duración de la cita.
+  - **Control de Estado de Citas en Drawer**: Integración de un componente `SegmentedControl` en el panel de detalles que permite alternar dinámicamente entre los estados de la cita (*Pendiente*, *Confirmada*, *Completada*) y un botón dedicado para *Cancelar*.
+  - **Efectos Premium de Tarjetas**: Inclusión de contornos difuminados dinámicos con gradientes y efecto de brillo (*glow*) en hover.
+
+### Fixed
+- **Estabilidad y Reglas de React Compiler**: Eliminación de renders en cascada innecesarios al sincronizar la inicialización del estado del drawer sin `useEffect`.
+- **Casts de TypeScript**: Reemplazo de casts de tipo `any` en propiedades CSS por un tipado seguro en `AgendaTimeline.tsx`.
+
 ## [0.4.4] - 2026-06-19
 
 ### Added

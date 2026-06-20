@@ -43,4 +43,4 @@ class BookingRead(BaseModel):
 
 
 class BookingStatusUpdate(BaseModel):
-    status: Literal["confirmed", "cancelled", "completed"]
+    status: Literal["pending", "confirmed", "cancelled", "completed"]

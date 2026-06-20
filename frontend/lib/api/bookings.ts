@@ -23,7 +23,7 @@ export interface CreateBookingInput {
   notes?: string;
 }
 
-export type BookingStatusUpdate = "confirmed" | "cancelled" | "completed";
+export type BookingStatusUpdate = "pending" | "confirmed" | "cancelled" | "completed";
 
 export interface BusinessAgendaQuery {
   timezone: string;
