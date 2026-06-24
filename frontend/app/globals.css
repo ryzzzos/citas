@@ -108,9 +108,9 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration);
 }
 
-/* Map Dark Mode */
+/* Map Dark Mode - Intelligent Hue Preserving Inversion */
 .dark .leaflet-tile-pane {
-  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) saturate(130%);
 }
 
 /* Custom Scrollbar - Premium MacOS Style */
@@ -152,4 +152,10 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
 
 @utility bg-primary-gradient {
   background: linear-gradient(90deg, var(--app-primary) 0%, var(--app-primary-strong) 100%);
+}
+
+/* Transición de colores global y sincronizada para cambios de tema */
+.theme-transition,
+.theme-transition * {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, fill 300ms ease, stroke 300ms ease, box-shadow 300ms ease, filter 300ms ease !important;
 }

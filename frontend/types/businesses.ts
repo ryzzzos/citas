@@ -7,6 +7,7 @@ export interface Business {
   description: string | null;
   slug: string;
   category: string;
+  timezone: string;
   phone: string;
   whatsapp_phone: string | null;
   email: string;

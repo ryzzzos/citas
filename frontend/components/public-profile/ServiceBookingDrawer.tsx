@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Calendar as CalendarIcon, Clock, ArrowRight, User, Mail, Phone, MessageCircle, FileText } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Clock, ArrowRight, User, Mail, Phone, MessageCircle, FileText, CheckCircle2 } from "lucide-react";
 
-import type { Business, Service, Staff, Branch } from "@/types";
+import type { Business, Service, Staff, Branch, Booking } from "@/types";
 import { getAvailability, createBooking } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
@@ -42,6 +42,13 @@ export default function ServiceBookingDrawer({
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [bookedDetails, setBookedDetails] = useState<Booking | null>(null);
+
+  const selectedStaffName = useMemo(() => {
+    return staffList.find((s) => s.id === selectedStaff)?.name || "";
+  }, [selectedStaff, staffList]);
+
   const isCustomerInfoValid = customerName.trim().length > 0 && customerEmail.trim().length > 0;
 
   const minBookingDate = useMemo(() => new Date().toISOString().split("T")[0], []);
@@ -75,6 +82,8 @@ export default function ServiceBookingDrawer({
       setCustomerWhatsapp("");
       setNotes("");
       setError("");
+      setIsSuccess(false);
+      setBookedDetails(null);
     } else {
       document.body.style.overflow = "";
     }
@@ -131,7 +140,7 @@ export default function ServiceBookingDrawer({
     setError("");
 
     try {
-      await createBooking({
+      const booking = await createBooking({
         business_id: business.id,
         service_id: service.id,
         staff_id: selectedStaff,
@@ -144,8 +153,8 @@ export default function ServiceBookingDrawer({
         customer_whatsapp: customerWhatsapp.trim() || undefined,
         notes: notes.trim() || undefined,
       });
-      onClose();
-      router.push("/dashboard"); 
+      setBookedDetails(booking);
+      setIsSuccess(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error al reservar";
       setError(message);
@@ -197,275 +206,371 @@ export default function ServiceBookingDrawer({
           >
             <div className="absolute left-1/2 top-2 h-1.5 w-12 -translate-x-1/2 rounded-full bg-[var(--border-strong)]" />
 
-            <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-2)]/90 px-6 pb-4 pt-8 backdrop-blur-md">
-              <div>
-                <h3 className="text-[18px] font-bold tracking-tight text-[var(--text-primary)]">
-                  Reservar {service.name}
-                </h3>
-                <p className="mt-0.5 text-[13.5px] text-[var(--text-secondary)]">
-                  {branch.name} • {service.duration_minutes} min
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-muted)] transition-colors hover:bg-[var(--border-strong)] hover:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]"
-                aria-label="Cerrar modal"
-              >
-                ✕
-              </button>
-            </header>
-
-            <div className="flex-1 overflow-y-auto px-6 py-6">
-              <div className="flex flex-col gap-8 max-w-xl mx-auto">
-                
-                {/* 1. Seleccionar Fecha */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">1</div>
-                    <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Fecha</h4>
+            {isSuccess ? (
+              <div className="flex flex-col h-full overflow-hidden">
+                <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-2)]/90 px-6 pb-4 pt-8 backdrop-blur-md">
+                  <div>
+                    <h3 className="text-[18px] font-bold tracking-tight text-[var(--text-primary)]">
+                      Reserva Confirmada
+                    </h3>
+                    <p className="mt-0.5 text-[13.5px] text-[var(--text-secondary)]">
+                      {branch.name}
+                    </p>
                   </div>
-                  <div className="relative">
-                    <CalendarIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-muted)]" />
-                    <input
-                      type="date"
-                      value={date}
-                      min={minBookingDate}
-                      onChange={(e) => {
-                        setDate(e.target.value);
-                      }}
-                      className="dashboard-focusable w-full pl-11 pr-4 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] text-[14px] font-medium text-[var(--text-primary)] focus:bg-[var(--surface-1)] focus:border-[var(--app-primary)] transition-colors"
-                    />
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-muted)] transition-colors hover:bg-[var(--border-strong)] hover:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]"
+                    aria-label="Cerrar modal"
+                  >
+                    ✕
+                  </button>
+                </header>
+
+                <div className="flex-1 overflow-y-auto px-6 py-8">
+                  <div className="flex flex-col items-center max-w-md mx-auto text-center">
+                    {/* Animated Check Icon */}
+                    <motion.div
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)] mb-5"
+                    >
+                      <CheckCircle2 className="h-9 w-9" />
+                    </motion.div>
+
+                    <h4 className="text-[20px] font-bold tracking-tight text-[var(--text-primary)]">
+                      ¡Tu cita ha sido agendada!
+                    </h4>
+                    <p className="mt-1 text-[13.5px] text-[var(--text-secondary)]">
+                      Te esperamos en la sede seleccionada. A continuación encontrarás el resumen de tu reserva:
+                    </p>
+
+                    {/* Receipt Card */}
+                    <div className="w-full mt-6 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] text-left space-y-4">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Servicio</span>
+                        <p className="text-[15px] font-bold text-[var(--text-primary)] mt-0.5">{service.name}</p>
+                        <p className="text-[12px] text-[var(--text-muted)]">{service.duration_minutes} minutos de duración</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--border-soft)]">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Fecha</span>
+                          <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">
+                            {new Date(date + "T00:00:00").toLocaleDateString("es-ES", { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Horario</span>
+                          <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">
+                            {selectedSlot.substring(0, 5)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--border-soft)]">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Profesional</span>
+                          <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">{selectedStaffName}</p>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Sucursal</span>
+                          <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">{branch.name}</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-[var(--border-soft)]">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Cliente</span>
+                        <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">{customerName}</p>
+                        <p className="text-[12px] text-[var(--text-muted)]">{customerEmail}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* 2. Seleccionar Hora */}
-                <AnimatePresence>
-                  {date && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-4 overflow-hidden"
-                    >
-                      <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">2</div>
-                        <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Horario</h4>
-                      </div>
-
-                      {loadingSlots ? (
-                        <div className="flex flex-col items-center justify-center py-6 text-[var(--text-muted)]">
-                          <Loader2 className="h-6 w-6 animate-spin mb-2 text-[var(--app-primary)]" />
-                          <span className="text-[13px]">Buscando horarios disponibles...</span>
-                        </div>
-                      ) : Object.keys(slotsMap).length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-6 text-center">
-                          <Clock className="h-6 w-6 mx-auto mb-2 text-[var(--text-muted)] opacity-50" />
-                          <p className="text-[14px] font-medium text-[var(--text-secondary)]">No hay horarios disponibles</p>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-1">Intenta seleccionando otra fecha.</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-5">
-                          {groupedSlots.map((group) => (
-                            <div key={group.label}>
-                              <h5 className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3 pl-1">
-                                {group.label}
-                              </h5>
-                              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5">
-                                {group.slots.map((slot) => {
-                                  const isSelected = selectedSlot === slot;
-                                  return (
-                                    <button
-                                      key={slot}
-                                      onClick={() => {
-                                        setSelectedSlot(slot);
-                                        setSelectedStaff("");
-                                      }}
-                                      className={`py-2 px-1 rounded-lg text-[13.5px] font-medium transition-all ${
-                                        isSelected
-                                          ? "bg-[var(--app-primary)] text-white shadow-md scale-105 border border-transparent"
-                                          : "bg-[var(--surface-3)] text-[var(--text-primary)] border border-[var(--border-strong)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
-                                      }`}
-                                    >
-                                      {slot.substring(0, 5)}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* 3. Seleccionar Profesional */}
-                <AnimatePresence>
-                  {selectedSlot && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-4 overflow-hidden"
-                    >
-                      <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">3</div>
-                        <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Profesional</h4>
-                      </div>
-                      
-                      {slotAvailableStaff.length === 0 ? (
-                        <p className="text-sm text-[var(--color-error)]">No hay profesionales disponibles en este horario.</p>
-                      ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {slotAvailableStaff.map((staff) => (
-                            <button
-                              key={staff.id}
-                              onClick={() => setSelectedStaff(staff.id)}
-                              className={`flex flex-col items-center p-3 rounded-xl border transition-all ${
-                                selectedStaff === staff.id
-                                  ? "border-[var(--app-primary)] bg-[var(--app-primary)]/5 shadow-sm"
-                                  : "border-[var(--border-strong)] bg-[var(--surface-3)] hover:border-[var(--text-muted)]"
-                              }`}
-                            >
-                              <div className="h-10 w-10 mb-2 flex items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-primary)] font-semibold border border-[var(--border-strong)]">
-                                {staff.name.charAt(0).toUpperCase()}
-                              </div>
-                              <span className="text-[13px] font-medium text-[var(--text-primary)] truncate w-full text-center">{staff.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* 4. Tus Datos */}
-                <AnimatePresence>
-                  {selectedStaff && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-4 overflow-hidden"
-                    >
-                      <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-success)]/10 text-[12px] font-bold text-[var(--color-success)]">4</div>
-                        <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Tus Datos</h4>
-                      </div>
-
-                      <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-4">
-                        {/* Nombre */}
-                        <div className="space-y-1.5">
-                          <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Nombre completo *</label>
-                          <div className="relative">
-                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
-                            <input
-                              type="text"
-                              value={customerName}
-                              onChange={(e) => setCustomerName(e.target.value)}
-                              placeholder="Tu nombre completo"
-                              className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                          <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Correo electrónico *</label>
-                          <div className="relative">
-                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
-                            <input
-                              type="email"
-                              value={customerEmail}
-                              onChange={(e) => setCustomerEmail(e.target.value)}
-                              placeholder="correo@ejemplo.com"
-                              className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Phone + WhatsApp row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-1.5">
-                            <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Teléfono</label>
-                            <div className="relative">
-                              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
-                              <input
-                                type="tel"
-                                value={customerPhone}
-                                onChange={(e) => setCustomerPhone(e.target.value)}
-                                placeholder="+57 300 000 0000"
-                                className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
-                              />
-                            </div>
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">WhatsApp</label>
-                            <div className="relative">
-                              <MessageCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-success)]" />
-                              <input
-                                type="tel"
-                                value={customerWhatsapp}
-                                onChange={(e) => setCustomerWhatsapp(e.target.value)}
-                                placeholder="+57 300 000 0000"
-                                className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--color-success)] focus:outline-none focus:ring-1 focus:ring-[var(--color-success)]/30 transition-colors"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Observaciones */}
-                        <div className="space-y-1.5">
-                          <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Observaciones</label>
-                          <div className="relative">
-                            <FileText className="absolute left-3.5 top-3 h-4 w-4 text-[var(--text-muted)]" />
-                            <textarea
-                              value={notes}
-                              onChange={(e) => setNotes(e.target.value)}
-                              placeholder="Información relevante para tu cita..."
-                              rows={3}
-                              className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors resize-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {error && (
-                  <div className="rounded-xl border border-[var(--color-error)] bg-[var(--color-error)]/10 p-3">
-                    <p className="text-[13px] text-[var(--color-error)] text-center">{error}</p>
-                  </div>
-                )}
+                <footer className="sticky bottom-0 z-10 border-t border-[var(--border-strong)] bg-[var(--surface-2)] p-4 sm:px-6 sm:py-5 flex justify-center">
+                  <Button
+                    onClick={onClose}
+                    className="w-full sm:w-auto min-w-[150px] shadow-[var(--shadow-sm)]"
+                  >
+                    Listo
+                  </Button>
+                </footer>
               </div>
-            </div>
-
-            <footer className="sticky bottom-0 z-10 border-t border-[var(--border-strong)] bg-[var(--surface-2)] p-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex-1 w-full text-center sm:text-left">
-                {selectedSlot && selectedStaff && isCustomerInfoValid ? (
-                  <>
-                    <p className="text-[13px] text-[var(--text-secondary)]">Confirmando cita para el</p>
-                    <p className="text-[14px] font-semibold text-[var(--text-primary)]">
-                      {new Date(date + "T00:00:00").toLocaleDateString("es-ES", { weekday: 'long', day: 'numeric', month: 'long' })} a las {selectedSlot.substring(0, 5)}
+            ) : (
+              <>
+                <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border-strong)] bg-[var(--surface-2)]/90 px-6 pb-4 pt-8 backdrop-blur-md">
+                  <div>
+                    <h3 className="text-[18px] font-bold tracking-tight text-[var(--text-primary)]">
+                      Reservar {service.name}
+                    </h3>
+                    <p className="mt-0.5 text-[13.5px] text-[var(--text-secondary)]">
+                      {branch.name} • {service.duration_minutes} min
                     </p>
-                  </>
-                ) : (
-                  <p className="text-[13px] text-[var(--text-muted)]">Completa todos los pasos para reservar</p>
-                )}
-              </div>
-              
-              <Button
-                onClick={handleBook}
-                disabled={!selectedSlot || !selectedStaff || !isCustomerInfoValid || bookingLoading}
-                isLoading={bookingLoading}
-                className="w-full sm:w-auto shadow-[var(--shadow-sm)]"
-              >
-                Confirmar Reserva
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </footer>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-muted)] transition-colors hover:bg-[var(--border-strong)] hover:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]"
+                    aria-label="Cerrar modal"
+                  >
+                    ✕
+                  </button>
+                </header>
+
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                  <div className="flex flex-col gap-8 max-w-xl mx-auto">
+                    
+                    {/* 1. Seleccionar Fecha */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">1</div>
+                        <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Fecha</h4>
+                      </div>
+                      <div className="relative">
+                        <CalendarIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-muted)]" />
+                        <input
+                          type="date"
+                          value={date}
+                          min={minBookingDate}
+                          onChange={(e) => {
+                            setDate(e.target.value);
+                          }}
+                          className="dashboard-focusable w-full pl-11 pr-4 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] text-[14px] font-medium text-[var(--text-primary)] focus:bg-[var(--surface-1)] focus:border-[var(--app-primary)] transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 2. Seleccionar Hora */}
+                    <AnimatePresence>
+                      {date && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-4 overflow-hidden"
+                        >
+                          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">2</div>
+                            <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Horario</h4>
+                          </div>
+
+                          {loadingSlots ? (
+                            <div className="flex flex-col items-center justify-center py-6 text-[var(--text-muted)]">
+                              <Loader2 className="h-6 w-6 animate-spin mb-2 text-[var(--app-primary)]" />
+                              <span className="text-[13px]">Buscando horarios disponibles...</span>
+                            </div>
+                          ) : Object.keys(slotsMap).length === 0 ? (
+                            <div className="rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-6 text-center">
+                              <Clock className="h-6 w-6 mx-auto mb-2 text-[var(--text-muted)] opacity-50" />
+                              <p className="text-[14px] font-medium text-[var(--text-secondary)]">No hay horarios disponibles</p>
+                              <p className="text-[12px] text-[var(--text-muted)] mt-1">Intenta seleccionando otra fecha.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-5">
+                              {groupedSlots.map((group) => (
+                                <div key={group.label}>
+                                  <h5 className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3 pl-1">
+                                    {group.label}
+                                  </h5>
+                                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5">
+                                    {group.slots.map((slot) => {
+                                      const isSelected = selectedSlot === slot;
+                                      return (
+                                        <button
+                                          key={slot}
+                                          onClick={() => {
+                                            setSelectedSlot(slot);
+                                            setSelectedStaff("");
+                                          }}
+                                          className={`py-2 px-1 rounded-lg text-[13.5px] font-medium transition-all ${
+                                            isSelected
+                                              ? "bg-[var(--app-primary)] text-white shadow-md scale-105 border border-transparent"
+                                              : "bg-[var(--surface-3)] text-[var(--text-primary)] border border-[var(--border-strong)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
+                                          }`}
+                                        >
+                                          {slot.substring(0, 5)}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* 3. Seleccionar Profesional */}
+                    <AnimatePresence>
+                      {selectedSlot && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-4 overflow-hidden"
+                        >
+                          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[12px] font-bold text-[var(--app-primary)]">3</div>
+                            <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Profesional</h4>
+                          </div>
+                          
+                          {slotAvailableStaff.length === 0 ? (
+                            <p className="text-sm text-[var(--color-error)]">No hay profesionales disponibles en este horario.</p>
+                          ) : (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              {slotAvailableStaff.map((staff) => (
+                                <button
+                                  key={staff.id}
+                                  onClick={() => setSelectedStaff(staff.id)}
+                                  className={`flex flex-col items-center p-3 rounded-xl border transition-all ${
+                                    selectedStaff === staff.id
+                                      ? "border-[var(--app-primary)] bg-[var(--app-primary)]/5 shadow-sm"
+                                      : "border-[var(--border-strong)] bg-[var(--surface-3)] hover:border-[var(--text-muted)]"
+                                  }`}
+                                >
+                                  <div className="h-10 w-10 mb-2 flex items-center justify-center rounded-full bg-[var(--surface-1)] text-[var(--text-primary)] font-semibold border border-[var(--border-strong)]">
+                                    {staff.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <span className="text-[13px] font-medium text-[var(--text-primary)] truncate w-full text-center">{staff.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* 4. Tus Datos */}
+                    <AnimatePresence>
+                      {selectedStaff && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-4 overflow-hidden"
+                        >
+                          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-soft)]">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-success)]/10 text-[12px] font-bold text-[var(--color-success)]">4</div>
+                            <h4 className="text-[15px] font-semibold text-[var(--text-primary)]">Tus Datos</h4>
+                          </div>
+
+                          <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-4">
+                            {/* Nombre */}
+                            <div className="space-y-1.5">
+                              <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Nombre completo *</label>
+                              <div className="relative">
+                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+                                <input
+                                  type="text"
+                                  value={customerName}
+                                  onChange={(e) => setCustomerName(e.target.value)}
+                                  placeholder="Tu nombre completo"
+                                  className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Email */}
+                            <div className="space-y-1.5">
+                              <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Correo electrónico *</label>
+                              <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+                                <input
+                                  type="email"
+                                  value={customerEmail}
+                                  onChange={(e) => setCustomerEmail(e.target.value)}
+                                  placeholder="correo@ejemplo.com"
+                                  className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Phone + WhatsApp row */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Teléfono</label>
+                                <div className="relative">
+                                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+                                  <input
+                                    type="tel"
+                                    value={customerPhone}
+                                    onChange={(e) => setCustomerPhone(e.target.value)}
+                                    placeholder="+57 300 000 0000"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">WhatsApp</label>
+                                <div className="relative">
+                                  <MessageCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-success)]" />
+                                  <input
+                                    type="tel"
+                                    value={customerWhatsapp}
+                                    onChange={(e) => setCustomerWhatsapp(e.target.value)}
+                                    placeholder="+57 300 000 0000"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--color-success)] focus:outline-none focus:ring-1 focus:ring-[var(--color-success)]/30 transition-colors"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Observaciones */}
+                            <div className="space-y-1.5">
+                              <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-muted)] pl-0.5">Observaciones</label>
+                              <div className="relative">
+                                <FileText className="absolute left-3.5 top-3 h-4 w-4 text-[var(--text-muted)]" />
+                                <textarea
+                                  value={notes}
+                                  onChange={(e) => setNotes(e.target.value)}
+                                  placeholder="Información relevante para tu cita..."
+                                  rows={3}
+                                  className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/60 focus:border-[var(--app-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]/30 transition-colors resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {error && (
+                      <div className="rounded-xl border border-[var(--color-error)] bg-[var(--color-error)]/10 p-3">
+                        <p className="text-[13px] text-[var(--color-error)] text-center">{error}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <footer className="sticky bottom-0 z-10 border-t border-[var(--border-strong)] bg-[var(--surface-2)] p-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex-1 w-full text-center sm:text-left">
+                    {selectedSlot && selectedStaff && isCustomerInfoValid ? (
+                      <>
+                        <p className="text-[13px] text-[var(--text-secondary)]">Confirmando cita para el</p>
+                        <p className="text-[14px] font-semibold text-[var(--text-primary)]">
+                          {new Date(date + "T00:00:00").toLocaleDateString("es-ES", { weekday: 'long', day: 'numeric', month: 'long' })} a las {selectedSlot.substring(0, 5)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-[13px] text-[var(--text-muted)]">Completa todos los pasos para reservar</p>
+                    )}
+                  </div>
+                  
+                  <Button
+                    onClick={handleBook}
+                    disabled={!selectedSlot || !selectedStaff || !isCustomerInfoValid || bookingLoading}
+                    isLoading={bookingLoading}
+                    className="w-full sm:w-auto shadow-[var(--shadow-sm)]"
+                  >
+                    Confirmar Reserva
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </footer>
+              </>
+            )}
           </motion.div>
         </>
       )}

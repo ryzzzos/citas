@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
-import { useTheme } from "next-themes";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import { Plus, Minus } from "lucide-react";
 
 import SucursalesMapMarkers from "@/components/sucursales/SucursalesMapMarkers";
 import type { BusinessMapPoint } from "@/types";
@@ -27,22 +28,11 @@ function ViewportReporter({
   onViewportChange: (nextViewport: ViewportState) => void;
 }) {
   const map = useMapEvents({
-    moveend: emitViewport,
-    zoomend: emitViewport,
+    moveend: () => emitViewport(),
+    zoomend: () => emitViewport(),
   });
 
-  function emitViewport() {
-    const bounds = map.getBounds();
-    onViewportChange({
-      north: bounds.getNorth(),
-      south: bounds.getSouth(),
-      east: bounds.getEast(),
-      west: bounds.getWest(),
-      zoom: map.getZoom(),
-    });
-  }
-
-  useEffect(() => {
+  const emitViewport = useCallback(() => {
     const bounds = map.getBounds();
     onViewportChange({
       north: bounds.getNorth(),
@@ -52,6 +42,10 @@ function ViewportReporter({
       zoom: map.getZoom(),
     });
   }, [map, onViewportChange]);
+
+  useEffect(() => {
+    emitViewport();
+  }, [emitViewport]);
 
   return null;
 }
@@ -100,6 +94,31 @@ function UserLocationController({
   return null;
 }
 
+function MapZoomControls() {
+  const map = useMap();
+
+  return (
+    <div className="absolute right-5 top-1/2 -translate-y-1/2 z-[400] flex flex-col gap-2 pointer-events-auto">
+      <button
+        type="button"
+        onClick={() => map.zoomIn()}
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--surface-3)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] hover:bg-[var(--surface-1)] active:scale-95 transition-all duration-200 cursor-pointer"
+        aria-label="Acercar"
+      >
+        <Plus className="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        onClick={() => map.zoomOut()}
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--surface-3)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] hover:bg-[var(--surface-1)] active:scale-95 transition-all duration-200 cursor-pointer"
+        aria-label="Alejar"
+      >
+        <Minus className="h-5 w-5" />
+      </button>
+    </div>
+  );
+}
+
 export default function SucursalesMapCanvas({
   businesses,
   viewport,
@@ -109,7 +128,6 @@ export default function SucursalesMapCanvas({
   onSelectBusiness,
   onViewportChange,
 }: SucursalesMapCanvasProps) {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -117,9 +135,24 @@ export default function SucursalesMapCanvas({
     setMounted(true);
   }, []);
 
-  const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileUrl = "https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=PvIiQ0nO1t77BEI61zKQ";
   
-  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const attribution = '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+  const userLocationIcon = useMemo(() => {
+    if (!mounted) return null;
+    return L.divIcon({
+      className: "bg-transparent border-none",
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      html: `
+        <div class="relative flex items-center justify-center w-6 h-6">
+          <div class="absolute w-6 h-6 bg-[var(--app-primary)] rounded-full opacity-35 animate-ping"></div>
+          <div class="relative w-4 h-4 bg-[var(--app-primary)] rounded-full border-2 border-white dark:border-[var(--surface-0)] shadow-[var(--shadow-md)]"></div>
+        </div>
+      `,
+    });
+  }, [mounted]);
 
   return (
     <MapContainer
@@ -127,11 +160,11 @@ export default function SucursalesMapCanvas({
       zoom={DEFAULT_ZOOM}
       minZoom={3}
       maxZoom={22}
-      zoomControl
+      zoomControl={false}
       className="h-full w-full"
     >
       <TileLayer
-        key={tileUrl}
+        key="maptiler-tile-layer"
         url={tileUrl}
         maxNativeZoom={19}
         maxZoom={22}
@@ -142,22 +175,17 @@ export default function SucursalesMapCanvas({
       <ViewportReporter onViewportChange={onViewportChange} />
       <FocusBusinessController focusBusiness={focusBusiness} />
       <UserLocationController userLocation={userLocation} />
+      <MapZoomControls />
 
-      {userLocation ? (
-        <CircleMarker
-          center={[userLocation.latitude, userLocation.longitude]}
-          radius={8}
-          pathOptions={{
-            color: "var(--text-primary)",
-            weight: 2,
-            fillColor: "var(--surface-3)",
-            fillOpacity: 0.95,
-          }}
+      {userLocation && userLocationIcon ? (
+        <Marker
+          position={[userLocation.latitude, userLocation.longitude]}
+          icon={userLocationIcon}
         >
           <Tooltip direction="top" offset={[0, -8]}>
-            Tu ubicacion
+            Tu ubicación
           </Tooltip>
-        </CircleMarker>
+        </Marker>
       ) : null}
 
       <SucursalesMapMarkers

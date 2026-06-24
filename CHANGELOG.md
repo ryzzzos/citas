@@ -6,6 +6,27 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.6] - 2026-06-24
+
+### Added
+- **Soporte Multizona (Timezone Awareness)**:
+  - **Backend**: El servicio de disponibilidad (`availability_service.py`) ahora resuelve y calcula las ranuras de tiempo usando la zona horaria del negocio respectivo (`business.timezone`), previniendo desajustes horários.
+  - **Frontend**: Sincronización dinámica de la zona horaria del negocio en `AgendaPage.tsx` durante el renderizado, recalculando la fecha de anclaje de manera automática.
+- **Transiciones de Tema Fluidas**:
+  - **Animación Coordinada**: Introducción de la clase `.theme-transition` en `globals.css` para suavizar los cambios de color y fondo en un intervalo de 300ms.
+  - **Compatibilidad con Mapas**: El toggler de tema detecta elementos de mapas Leaflet (`.leaflet-container`) y evita el uso del View Transition API en estos casos para prevenir parpadeos visuals molestos.
+- **Optimizaciones de Rendimiento en Mapas**:
+  - **Memoización de Marcadores**: Migración a componentes React `memo` (`SucursalMarker` y `ClusterMarker`) en `SucursalesMapMarkers.tsx`.
+  - **Caché de Iconos Leaflet**: Almacenamiento en caché (`Map`) de los objetos `DivIcon` para evitar la recreación y el desbordamiento de memoria al arrastrar o hacer zoom en el mapa.
+- **Ficha de Cita Exitosa (Ticket Receipt)**:
+  - Rediseño completo en `ServiceBookingDrawer.tsx` para mostrar un recibo/ticket de reserva al confirmar la cita en lugar de redirigir al usuario hacia la vista del dashboard.
+- **Separación de Roles de Usuario**:
+  - Se eliminó el enlace de exploración pública del dashboard de administrador (`layout.tsx`) respetando las directrices de `AGENTS.md`.
+
+### Fixed
+- **Validaciones en Calentadrio**: Prevención de reservas en fechas pasadas en la disponibilidad del backend.
+- **Estabilidad de Renders**: Eliminación de linter warnings de renderizado en cascada y casts `any` de Typescript en componentes del mapa y agenda.
+
 ## [0.4.5] - 2026-06-20
 
 ### Added

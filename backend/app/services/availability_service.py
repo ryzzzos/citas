@@ -1,6 +1,7 @@
 import uuid
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
 
@@ -8,6 +9,8 @@ from app.models.booking import Booking
 from app.models.schedule import Schedule
 from app.models.service import Service
 from app.models.staff import Staff
+from app.models.business import Business
+
 
 
 def _get_staff_slots(
@@ -94,6 +97,21 @@ def get_available_slots(
     if not service or not service.is_active:
         return {}
     
+    # Get current date/time in business's timezone
+    business = db.get(Business, business_id)
+    tz_str = business.timezone if business else "America/Bogota"
+    try:
+        tz = ZoneInfo(tz_str)
+    except Exception:
+        tz = ZoneInfo("America/Bogota")
+        
+    now_in_tz = datetime.now(tz)
+    current_date = now_in_tz.date()
+    current_time = now_in_tz.time()
+
+    if target_date < current_date:
+        return {}
+    
     if staff_id:
         staff_members = [db.get(Staff, staff_id)]
     else:
@@ -112,6 +130,9 @@ def get_available_slots(
         if not staff: continue
         staff_slots = _get_staff_slots(db, staff.id, business_id, service, target_date)
         for t in staff_slots:
+            # Skip times that are in the past for today
+            if target_date == current_date and t <= current_time:
+                continue
             time_str = t.strftime("%H:%M:%S")
             slots_map[time_str].append(staff.id)
             

@@ -181,11 +181,21 @@ export const AnimatedThemeToggler = ({
     const applyTheme = () => {
       const newTheme = !isDark
       setIsDark(newTheme)
+      
+      // Aplicar transición suave temporalmente
+      document.documentElement.classList.add("theme-transition")
+      
       document.documentElement.classList.toggle("dark")
       localStorage.setItem("theme", newTheme ? "dark" : "light")
+      
+      setTimeout(() => {
+        document.documentElement.classList.remove("theme-transition")
+      }, 350)
     }
 
-    if (typeof document.startViewTransition !== "function") {
+    const hasMap = typeof document !== "undefined" && document.querySelector(".leaflet-container")
+
+    if (hasMap || typeof document.startViewTransition !== "function") {
       applyTheme()
       return
     }

@@ -7,6 +7,9 @@ import type { AgendaBooking, AgendaDayColumn, AgendaView } from "./types";
 const DEFAULT_BUSINESS_TIMEZONE = "UTC";
 
 export function getCanonicalTimezone(): string {
+  if (typeof window !== "undefined") {
+    return process.env.NEXT_PUBLIC_BUSINESS_TIMEZONE ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
   return process.env.NEXT_PUBLIC_BUSINESS_TIMEZONE ?? DEFAULT_BUSINESS_TIMEZONE;
 }
 

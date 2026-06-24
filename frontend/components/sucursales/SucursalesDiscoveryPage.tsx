@@ -84,6 +84,17 @@ export default function SucursalesDiscoveryPage() {
   const [requestingLocation, setRequestingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
+  const handleSelectBusiness = useCallback((businessId: string) => {
+    setSelectedBusinessId(businessId);
+    setDetailDismissed(false);
+  }, []);
+
+  const handleSelectBusinessFromFilters = useCallback((businessId: string) => {
+    setSelectedBusinessId(businessId);
+    setDetailDismissed(false);
+    setFiltersOpenMobile(false);
+  }, []);
+
   const total = items.length;
 
   const requestSequence = useRef(0);
@@ -307,10 +318,7 @@ export default function SucursalesDiscoveryPage() {
           focusBusiness={selectedBusiness}
           userLocation={userLocation}
           onViewportChange={setViewport}
-          onSelectBusiness={(businessId) => {
-            setSelectedBusinessId(businessId);
-            setDetailDismissed(false);
-          }}
+          onSelectBusiness={handleSelectBusiness}
         />
       </section>
 
@@ -324,11 +332,7 @@ export default function SucursalesDiscoveryPage() {
           loading={loading}
           error={error}
           selectedBusinessId={selectedBusinessId}
-          onSelectBusiness={(businessId) => {
-            setSelectedBusinessId(businessId);
-            setDetailDismissed(false);
-            setFiltersOpenMobile(false);
-          }}
+          onSelectBusiness={handleSelectBusinessFromFilters}
           requestingLocation={requestingLocation}
           hasUserLocation={Boolean(userLocation)}
           locationError={locationError}

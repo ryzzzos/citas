@@ -161,9 +161,25 @@ agenda-web/
   5. Create a local annotated Git tag: `git tag -a vMAJOR.MINOR.PATCH -m "Release vMAJOR.MINOR.PATCH"`.
   6. Push the tag to the remote origin: `git push origin vMAJOR.MINOR.PATCH`.
 
+## UX & Role Separation Paradigm (Customer vs. Entrepreneur)
+
+Always maintain a strict separation of concerns between customer-facing views and business owner (entrepreneur) dashboards:
+
+1. **Customer-Facing Views (`/[slug]`, `/sucursales`)**:
+   - The user profile, branch map, and booking drawer are designed exclusively for customers.
+   - Dialogues, text copy, and instructions must be simple, welcoming, and completely free of business jargon (e.g. "Workspace", "Overview", "Filtro mensual").
+   - Upon successful appointment booking, **do NOT redirect the customer to `/dashboard`**. Instead, show a dedicated success view/confirmation directly in the booking interface (like a wallet receipt card in the drawer) so they stay on the business profile.
+
+2. **Business Owner/Entrepreneur Dashboard (`/dashboard/*`)**:
+   - The dashboard is exclusively for business owners to manage schedules, view statistics, and adjust parameters.
+   - It must NOT contain customer-focused navigation or features (e.g. do not show the "Explorar sucursales" or "Explorar" compass button in the dashboard shell). Keep the owner focused on operational metrics.
+
+---
+
 ## Agent Usage Notes
 
 - This file is the canonical repository-wide instruction file for coding agents.
 - Keep `README.md` focused on human contributors; keep agent-specific operational guidance here.
 - If nested `AGENTS.md` files are added later, the nearest one to the modified code takes precedence.
 - As the project grows, continuously update this file when architecture, design direction, workflows, or business rules change.
+

@@ -22,6 +22,7 @@ import {
 import type { AgendaBooking, AgendaFilters, AgendaView } from "@/lib/agenda/types";
 import { useAgendaData } from "@/lib/agenda/useAgendaData";
 import { updateBookingStatus } from "@/lib/api/bookings";
+import { useBranchContext } from "@/contexts/BranchContext";
 
 const DEFAULT_FILTERS: AgendaFilters = {
   status: "all",
@@ -40,11 +41,22 @@ function mapBookingsByDay(bookings: AgendaBooking[]): Record<string, AgendaBooki
 }
 
 export default function AgendaPage() {
-  const timezone = getCanonicalTimezone();
+  const { business } = useBranchContext();
+  const timezone = useMemo(() => {
+    return business?.timezone || getCanonicalTimezone();
+  }, [business?.timezone]);
+
   const [view, setView] = useState<AgendaView>("day");
   // const [filters, setFilters] = useState<AgendaFilters>(DEFAULT_FILTERS);
   const filters = DEFAULT_FILTERS;
   const [anchorDate, setAnchorDate] = useState(() => getNowInTimezone(timezone));
+
+  // Sync state during render if timezone changes to avoid cascading effects
+  const [prevTimezone, setPrevTimezone] = useState(timezone);
+  if (timezone !== prevTimezone) {
+    setPrevTimezone(timezone);
+    setAnchorDate((prev) => prev.setZone(timezone));
+  }
 
   const range = useMemo(() => getViewRange(anchorDate, view), [anchorDate, view]);
 

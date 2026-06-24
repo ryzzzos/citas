@@ -85,13 +85,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <AppIcon icon={CalendarDays} size="xs" />
                     Agenda
                   </Link>
-                  <Link
-                    href="/sucursales"
-                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--app-primary)] px-5 text-[13px] font-semibold tracking-tight text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98] border border-[var(--border-soft)]"
-                  >
-                    <AppIcon icon={Compass} size="xs" />
-                    Explorar
-                  </Link>
                 </div>
               </div>
             </header>

@@ -125,6 +125,7 @@ class BusinessRead(BaseModel):
     description: str | None
     slug: str
     category: str
+    timezone: str
     phone: str
     whatsapp_phone: str | None
     email: str
