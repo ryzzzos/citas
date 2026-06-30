@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.7] - 2026-06-30
+
+### Refactored
+- **Panel de Filtros de Sucursales**:
+  - **Simplificación de Props**: Extracción de propiedades comunes del panel a un objeto compartido (`sharedPanelProps`), reduciendo la duplicación de código en los layouts de escritorio y móvil.
+  - **Refinamiento de Diseño de Escritorio**: Ajuste del ancho del panel lateral de búsqueda a 380px, agregando espaciado uniforme y comentarios delimitadores claros.
+  - **Pulido Visual de Dispositivos Móviles**: Reducción de la intensidad del fondo oscuro en el cajón de filtros (`bg-black/50` con desenfoque suave) y ajuste de dimensiones y padding en el botón flotante de exploración.
+  - **Cumplimiento Estricto de Tokens**: Adaptación del panel de filtros para utilizar estrictamente las variables de diseño declaradas en `globals.css` (sombras, bordes y superficies).
+  - **Limpieza de Código**: Eliminación de imports y variables sin uso (como `MapPin` en `SucursalesFiltersPanel.tsx`).
+
 ## [0.4.6] - 2026-06-24
 
 ### Added

@@ -123,6 +123,7 @@ agenda-web/
 - Backend has no automated test suite yet; run the manual onboarding smoke tests documented in `README.md`.
 - When changing booking or schedule logic, validate no double-booking scenarios with manual API checks.
 - After schema changes, create and apply migration files with `alembic revision --autogenerate -m "<message>"` and `alembic upgrade head`.
+- **CRITICAL:** DO NOT use the browser subagent (`browser_subagent`) to test or verify UI changes. It is slow, not optimal, and prone to environmental failures. Always rely on static analysis, `pnpm build` / `tsc` checks, or developer/manual browser testing. Never invoke browser automation.
 
 ## Coding Conventions
 

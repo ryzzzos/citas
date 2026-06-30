@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { ChevronDown, MapPin, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { ChevronRight, Compass, Search, SlidersHorizontal, X } from "lucide-react";
 
 import type { BusinessMapPoint } from "@/types";
 import type { DiscoveryFilters } from "@/components/sucursales/types";
@@ -42,15 +42,22 @@ function toInitials(name: string): string {
     .join("") || "BS";
 }
 
-function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name: string }) {
+/* ── Avatar ─────────────────────────────────────────────────── */
+
+function BusinessProfileAvatar({ logoUrl, name, size = "md" }: { logoUrl: string | null; name: string; size?: "sm" | "md" }) {
   const [erroredLogoUrl, setErroredLogoUrl] = useState<string | null>(null);
   const canRenderLogo = Boolean(logoUrl && logoUrl !== erroredLogoUrl);
+
+  const sizeClasses = size === "sm"
+    ? "h-11 w-11 rounded-[var(--radius-sm)]"
+    : "h-12 w-12 rounded-[var(--radius-sm)]";
 
   return (
     <div
       className={cn(
-        "bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-3)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]",
-        "relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-xl)]"
+        "relative grid shrink-0 place-items-center overflow-hidden",
+        "bg-[var(--surface-2)] border border-[var(--border-strong)]",
+        sizeClasses,
       )}
     >
       {canRenderLogo ? (
@@ -58,13 +65,13 @@ function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name
           src={logoUrl as string}
           alt={`Logo de ${name}`}
           fill
-          sizes="56px"
+          sizes={size === "sm" ? "44px" : "48px"}
           className="object-cover"
           unoptimized
           onError={() => setErroredLogoUrl(logoUrl)}
         />
       ) : (
-        <span className="text-[0.7rem] font-bold uppercase tracking-[0.05em] text-[var(--app-primary)]">
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.06em] text-[var(--text-muted)]">
           {toInitials(name)}
         </span>
       )}
@@ -72,11 +79,12 @@ function BusinessProfileAvatar({ logoUrl, name }: { logoUrl: string | null; name
   );
 }
 
+/* ── PanelBody (shared between desktop & mobile) ───────────── */
+
 function PanelBody({
   filters,
   onFiltersChange,
   items,
-  viewportItems,
   loading,
   selectedBusinessId,
   onSelectBusiness,
@@ -145,240 +153,255 @@ function PanelBody({
     return nextItems;
   }, [items, nameQuery, sortMode]);
 
-  return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-1">
-      {/* QUICK SEARCH & CONTROLS */}
-      <header className="shrink-0 flex flex-col gap-3">
-        <div className="flex flex-col mb-1 px-1">
-          <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)] flex items-center gap-2">
-            Descubre lugares <Sparkles className="h-5 w-5 text-[var(--app-primary)]" />
-          </h2>
-          <p className="text-[0.8rem] text-[var(--text-muted)] mt-0.5">Encuentra los mejores negocios cerca de ti</p>
-        </div>
+  const hasActiveFilters = filters.category || filters.city || sortMode !== "viewport";
 
-        <div className="relative group">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--app-primary)] opacity-70 group-focus-within:opacity-100 transition-opacity" />
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      {/* ── HEADER ─────────────────────────────────────────── */}
+      <header className="shrink-0 px-1 pb-4">
+        <h2 className="text-[1.35rem] font-extrabold tracking-tight text-[var(--text-primary)]">
+          Explorar
+        </h2>
+        <p className="text-[0.78rem] text-[var(--text-muted)] mt-0.5 leading-snug">
+          {loading
+            ? "Buscando negocios..."
+            : `${filteredItems.length} negocio${filteredItems.length !== 1 ? "s" : ""} en esta zona`}
+        </p>
+      </header>
+
+      {/* ── SEARCH ─────────────────────────────────────────── */}
+      <div className="shrink-0 px-1 pb-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             type="text"
             value={nameQuery}
             onChange={(event) => onNameQueryChange(event.target.value)}
-            placeholder="¿Qué estás buscando hoy?"
-            className="w-full rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] py-4 pl-11 pr-12 text-[0.92rem] font-medium text-[var(--text-primary)] shadow-[var(--shadow-sm)] outline-none transition-all duration-300 focus:border-[var(--app-primary)] focus:ring-4 focus:ring-[var(--app-primary)]/10 placeholder:text-[var(--text-muted)] hover:shadow-[var(--shadow-md)]"
+            placeholder="Buscar negocio, categoría..."
+            className={cn(
+              "w-full rounded-[var(--radius-sm)] border bg-[var(--surface-2)] py-2.5 pl-10 pr-10 text-[0.85rem] text-[var(--text-primary)] outline-none transition-all duration-200",
+              "border-[var(--border-strong)] placeholder:text-[var(--text-muted)]",
+              "focus:border-[var(--app-primary)] focus:ring-2 focus:ring-[var(--app-primary)]/12",
+            )}
           />
           {nameQuery.trim() && (
             <button
               type="button"
               onClick={() => onNameQueryChange("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--surface-1)] rounded-full p-1 transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
+      </div>
 
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-1">
+      {/* ── CHIPS ──────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center gap-2 overflow-x-auto pb-3 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button
+          type="button"
+          onClick={onToggleFilters}
+          aria-expanded={filtersExpanded}
+          aria-controls={filtersRegionId}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-[7px] text-[0.75rem] font-semibold transition-all duration-200",
+            filtersExpanded
+              ? "bg-[var(--app-primary)] text-white"
+              : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-3)]",
+          )}
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+          Filtros
+        </button>
+
+        <button
+          type="button"
+          onClick={onRequestUserLocation}
+          disabled={requestingLocation}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-[7px] text-[0.75rem] font-semibold transition-all duration-200 disabled:opacity-60",
+            hasUserLocation
+              ? "bg-[color-mix(in_oklab,var(--color-success)_12%,transparent)] text-[var(--color-success)] border border-[var(--color-success)]/20"
+              : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-3)]",
+          )}
+        >
+          <Compass className="h-3.5 w-3.5" />
+          {requestingLocation ? "..." : hasUserLocation ? "Cerca de mí" : "Mi ubicación"}
+        </button>
+
+        {hasActiveFilters && (
           <button
             type="button"
-            onClick={onToggleFilters}
-            aria-expanded={filtersExpanded}
-            aria-controls={filtersRegionId}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-[0.8rem] font-bold transition-all duration-300 shadow-[var(--shadow-sm)]",
-              filtersExpanded
-                ? "bg-[var(--app-primary)] text-white shadow-[var(--shadow-md)] scale-[1.02]"
-                : "bg-[var(--surface-3)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)]"
-            )}
+            onClick={onClearAll}
+            className="inline-flex shrink-0 items-center rounded-full px-3 py-[7px] text-[0.7rem] font-semibold text-[var(--color-error)] bg-[color-mix(in_oklab,var(--color-error)_8%,transparent)] border border-[var(--color-error)]/15 hover:bg-[color-mix(in_oklab,var(--color-error)_14%,transparent)] transition-colors"
           >
-            <SlidersHorizontal className="h-4 w-4" />
-            Filtros
+            Limpiar
           </button>
+        )}
+      </div>
 
-          <button
-            type="button"
-            onClick={onRequestUserLocation}
-            disabled={requestingLocation}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-[0.8rem] font-bold transition-all duration-300 disabled:opacity-70 shadow-[var(--shadow-sm)]",
-              hasUserLocation
-                ? "bg-[color-mix(in_oklab,var(--app-primary)_15%,transparent)] text-[var(--app-primary-strong)] border border-[var(--app-primary)]/30"
-                : "bg-[var(--surface-3)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)]"
-            )}
-          >
-            <MapPin className="h-4 w-4" />
-            {requestingLocation ? "Buscando..." : hasUserLocation ? "Cerca de mí" : "Ubicación"}
-          </button>
-
-          {(filters.category || filters.city || sortMode !== "viewport") ? (
-            <button
-              type="button"
-              onClick={onClearAll}
-              className="inline-flex shrink-0 items-center rounded-full bg-[var(--surface-2)] border border-[var(--border-strong)] px-3.5 py-2.5 text-[0.75rem] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-3)] transition-colors shadow-sm"
-            >
-              Limpiar
-            </button>
-          ) : null}
-        </div>
-      </header>
-
-      {/* EXPANDABLE FILTERS */}
+      {/* ── EXPANDABLE FILTERS ─────────────────────────────── */}
       <div
         id={filtersRegionId}
         className={cn(
-          "shrink-0 flex flex-col overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          filtersExpanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          "shrink-0 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          filtersExpanded ? "max-h-[500px] opacity-100 pb-3" : "max-h-0 opacity-0",
         )}
       >
-        <div className="rounded-[var(--radius-xl)] bg-[var(--surface-3)] border border-[var(--border-strong)] p-4 shadow-[var(--shadow-md)] grid grid-cols-1 sm:grid-cols-2 gap-4 mx-1">
-          <label className="text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Ciudad
-            <input
-              type="text"
-              value={filters.city}
-              onChange={(event) => onFiltersChange({ ...filters, city: event.target.value })}
-              placeholder="Ej: Santiago"
-              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] placeholder:text-[var(--text-muted)]"
-            />
-          </label>
+        <div className="rounded-[var(--radius-lg)] bg-[var(--surface-2)] border border-[var(--border-strong)] p-4 mx-1 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <label className="space-y-1.5">
+              <span className="text-[0.68rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                Ciudad
+              </span>
+              <input
+                type="text"
+                value={filters.city}
+                onChange={(event) => onFiltersChange({ ...filters, city: event.target.value })}
+                placeholder="Ej: Medellín"
+                className="w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-[0.82rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] placeholder:text-[var(--text-muted)]"
+              />
+            </label>
 
-          <label className="text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Categoría
-            <select
-              value={filters.category}
-              onChange={(event) => onFiltersChange({ ...filters, category: event.target.value })}
-              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] cursor-pointer"
-            >
-              {categories.map((category) => (
-                <option key={category || "all"} value={category}>
-                  {category || "Todas"}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="space-y-1.5">
+              <span className="text-[0.68rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                Categoría
+              </span>
+              <select
+                value={filters.category}
+                onChange={(event) => onFiltersChange({ ...filters, category: event.target.value })}
+                className="w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-[0.82rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] cursor-pointer"
+              >
+                {categories.map((category) => (
+                  <option key={category || "all"} value={category}>
+                    {category || "Todas"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-          <label className="sm:col-span-2 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Ordenar por
+          <label className="block space-y-1.5">
+            <span className="text-[0.68rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+              Ordenar
+            </span>
             <select
               value={sortMode}
               onChange={(event) => onSortModeChange(event.target.value as SortMode)}
-              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-2.5 text-[0.9rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] cursor-pointer"
+              className="w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-2 text-[0.82rem] text-[var(--text-primary)] outline-none transition focus:border-[var(--app-primary)] cursor-pointer"
             >
-              <option value="viewport">Visibles en el mapa (Recomendado)</option>
-              <option value="name-asc">Nombre A-Z</option>
-              <option value="name-desc">Nombre Z-A</option>
+              <option value="viewport">Mapa visible</option>
+              <option value="name-asc">A → Z</option>
+              <option value="name-desc">Z → A</option>
               <option value="category">Categoría</option>
             </select>
           </label>
 
           {categorySummary.length > 0 && (
-            <div className="sm:col-span-2 mt-2">
-              <div className="flex flex-wrap gap-2">
-                {categorySummary.map(([category, count]) => {
-                  const active = filters.category === category;
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[0.75rem] font-bold transition-all duration-200",
-                        active
-                          ? "bg-[var(--app-primary)] text-white shadow-[var(--shadow-sm)] scale-105"
-                          : "bg-[var(--surface-1)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
-                      )}
-                    >
-                      {category} <span className="opacity-70 ml-0.5 text-[0.65rem] bg-black/10 px-1.5 rounded-full">{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {categorySummary.map(([category, count]) => {
+                const active = filters.category === category;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => onFiltersChange({ ...filters, category: active ? "" : category })}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.7rem] font-semibold transition-all duration-200",
+                      active
+                        ? "bg-[var(--app-primary)] text-white"
+                        : "bg-[var(--surface-3)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:text-[var(--text-primary)]",
+                    )}
+                  >
+                    {category}
+                    <span className={cn("text-[0.6rem]", active ? "opacity-80" : "opacity-50")}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
       {locationError && (
-        <div className="shrink-0 rounded-[var(--radius-md)] border border-[var(--color-error)] bg-[color-mix(in_oklab,var(--color-error)_10%,transparent)] px-4 py-3 text-[0.8rem] font-medium text-[var(--color-error)] mx-1 shadow-[var(--shadow-sm)]">
+        <div className="shrink-0 rounded-[var(--radius-sm)] border border-[var(--color-error)]/20 bg-[color-mix(in_oklab,var(--color-error)_6%,transparent)] px-3.5 py-2.5 text-[0.78rem] font-medium text-[var(--color-error)] mx-1 mb-3">
           {locationError}
         </div>
       )}
 
-      {/* RESULTS LIST */}
-      <section className="flex min-h-0 flex-1 flex-col rounded-[var(--radius-xl)] bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-md)] mx-1 mt-1 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-[var(--border-strong)] px-5 py-4 shrink-0 bg-[var(--surface-2)]/50">
-          <p className="text-[0.85rem] font-bold uppercase tracking-[0.1em] text-[var(--text-primary)]">
-            Resultados
-          </p>
-          <div className="inline-flex items-center rounded-full bg-[var(--surface-3)] px-3 py-1 shadow-sm border border-[var(--border-strong)]">
-            <span className="text-[0.7rem] font-bold text-[var(--app-primary)]">
-              {loading ? "..." : `${filteredItems.length} negocios`}
-            </span>
-          </div>
-        </div>
+      {/* ── RESULTS LIST ───────────────────────────────────── */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-1 space-y-1.5">
+        {filteredItems.map((business) => {
+          const active = selectedBusinessId === business.id;
+          return (
+            <button
+              key={business.id}
+              type="button"
+              onClick={() => onSelectBusiness(business.id)}
+              className={cn(
+                "w-full flex items-center gap-3 rounded-[var(--radius-sm)] p-2.5 text-left transition-all duration-200 group",
+                active
+                  ? "bg-[color-mix(in_oklab,var(--app-primary)_8%,transparent)] border border-[var(--app-primary)]/25"
+                  : "bg-transparent border border-transparent hover:bg-[var(--surface-2)]",
+              )}
+            >
+              <BusinessProfileAvatar logoUrl={business.logo_image_url} name={business.name} size="sm" />
 
-        <ul className="h-full min-h-0 flex-1 overflow-y-auto p-2.5 space-y-2">
-          {filteredItems.map((business) => {
-            const active = selectedBusinessId === business.id;
-            return (
-              <li key={business.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectBusiness(business.id)}
-                  className={cn(
-                    "w-full rounded-[var(--radius-lg)] p-3 text-left transition-all duration-300 group",
-                    active
-                      ? "bg-[var(--surface-1)] border-2 border-[var(--app-primary)] shadow-[var(--shadow-sm)]"
-                      : "bg-[var(--surface-3)] border-2 border-transparent hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]"
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className={cn(
+                    "truncate text-[0.88rem] font-semibold transition-colors",
+                    active ? "text-[var(--app-primary)]" : "text-[var(--text-primary)] group-hover:text-[var(--app-primary)]",
+                  )}>
+                    {business.name}
+                  </p>
+                  {active && (
+                    <span className="shrink-0 inline-block h-1.5 w-1.5 rounded-full bg-[var(--app-primary)]" />
                   )}
-                >
-                  <div className="flex items-center gap-4">
-                    <BusinessProfileAvatar logoUrl={business.logo_image_url} name={business.name} />
+                </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-[1rem] font-bold text-[var(--text-primary)] group-hover:text-[var(--app-primary)] transition-colors">
-                          {business.name}
-                        </p>
-                        {active && (
-                          <span className="shrink-0 inline-flex items-center justify-center h-5 px-2 rounded-full bg-[var(--app-primary)] text-white text-[0.6rem] font-bold tracking-wider uppercase shadow-[var(--shadow-sm)]">
-                            Viendo
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="mt-0.5 text-[0.75rem] font-bold uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                        {business.category}
-                      </p>
-
-                      <p className="mt-1 truncate text-[0.8rem] text-[var(--text-muted)] flex items-center gap-1">
-                        <MapPin className="h-3 w-3" /> {business.city} • {business.address}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              </li>
-            );
-          })}
-
-          {!loading && filteredItems.length === 0 ? (
-            <li className="flex flex-col items-center justify-center p-10 text-center gap-4">
-              <div className="grid h-16 w-16 place-items-center rounded-full bg-[var(--surface-2)] border-2 border-dashed border-[var(--border-strong)]">
-                <Search className="h-6 w-6 text-[var(--text-muted)] opacity-50" />
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    {business.category}
+                  </span>
+                  <span className="text-[var(--text-muted)] opacity-30">·</span>
+                  <span className="truncate text-[0.72rem] text-[var(--text-muted)]">
+                    {business.city}
+                  </span>
+                </div>
               </div>
-              <div>
-                <p className="text-[0.95rem] font-bold text-[var(--text-primary)]">Sin resultados</p>
-                <p className="text-[0.8rem] text-[var(--text-secondary)] mt-1 max-w-[200px] mx-auto">
-                  {nameQuery.trim()
-                    ? "No encontramos nada con esa búsqueda."
-                    : "Intenta mover el mapa a otra zona."}
-                </p>
-              </div>
-            </li>
-          ) : null}
-        </ul>
-      </section>
+
+              <ChevronRight className={cn(
+                "h-4 w-4 shrink-0 transition-all duration-200",
+                active
+                  ? "text-[var(--app-primary)] opacity-100"
+                  : "text-[var(--text-muted)] opacity-0 group-hover:opacity-50",
+              )} />
+            </button>
+          );
+        })}
+
+        {!loading && filteredItems.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-[var(--surface-2)] border border-[var(--border-strong)] mb-4">
+              <Search className="h-5 w-5 text-[var(--text-muted)] opacity-40" />
+            </div>
+            <p className="text-[0.88rem] font-semibold text-[var(--text-primary)]">Sin resultados</p>
+            <p className="text-[0.78rem] text-[var(--text-muted)] mt-1 max-w-[200px]">
+              {nameQuery.trim()
+                ? "No encontramos negocios con esa búsqueda."
+                : "Mueve el mapa para descubrir otros negocios."}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+/* ── Main Export ────────────────────────────────────────────── */
 
 export default function SucursalesFiltersPanel({
   filters,
@@ -421,58 +444,62 @@ export default function SucursalesFiltersPanel({
     setSortMode("viewport");
   };
 
+  const sharedPanelProps = {
+    filters,
+    onFiltersChange,
+    items,
+    viewportItems,
+    loading,
+    selectedBusinessId,
+    onSelectBusiness,
+    requestingLocation,
+    hasUserLocation,
+    locationError,
+    onRequestUserLocation,
+    nameQuery,
+    onNameQueryChange: setNameQuery,
+    sortMode,
+    onSortModeChange: setSortMode,
+    onClearAll: handleClearAll,
+  };
+
   return (
     <>
-      {/* DESKTOP ASIDE */}
+      {/* ── DESKTOP ASIDE ──────────────────────────────────── */}
       <aside
         className={cn(
-          "pointer-events-auto absolute left-6 z-[460] hidden w-[min(420px,calc(100%-3rem))] min-h-0 rounded-[var(--radius-xl)] p-4 lg:flex flex-col",
+          "pointer-events-auto absolute left-6 z-[460] hidden w-[min(380px,calc(100%-3rem))] min-h-0 rounded-[var(--radius-xl)] p-5 lg:flex flex-col",
           "top-[calc(env(safe-area-inset-top)+6.5rem)] h-[calc(100%-env(safe-area-inset-top)-8.5rem)]",
-          "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
+          "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]",
         )}
       >
         <PanelBody
-          filters={filters}
-          onFiltersChange={onFiltersChange}
-          items={items}
-          viewportItems={viewportItems}
-          loading={loading}
-          selectedBusinessId={selectedBusinessId}
-          onSelectBusiness={onSelectBusiness}
-          requestingLocation={requestingLocation}
-          hasUserLocation={hasUserLocation}
-          locationError={locationError}
-          onRequestUserLocation={onRequestUserLocation}
-          nameQuery={nameQuery}
-          onNameQueryChange={setNameQuery}
-          sortMode={sortMode}
-          onSortModeChange={setSortMode}
+          {...sharedPanelProps}
           filtersExpanded={desktopFiltersExpanded}
           onToggleFilters={() => setDesktopFiltersExpanded((current) => !current)}
           filtersRegionId="sucursales-filters-controls-desktop"
-          onClearAll={handleClearAll}
         />
       </aside>
 
-      {/* MOBILE TRIGGER */}
+      {/* ── MOBILE TRIGGER ─────────────────────────────────── */}
       <button
         type="button"
         onClick={() => onMobileOpenChange(true)}
         className={cn(
-          "dashboard-focusable pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 z-[800] inline-flex min-h-14 items-center gap-2.5 rounded-full px-6 text-[0.9rem] font-bold text-[var(--text-primary)] lg:hidden",
-          "bg-[var(--surface-glass)] backdrop-blur-2xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)] transition-transform active:scale-95"
+          "dashboard-focusable pointer-events-auto fixed bottom-6 left-1/2 -translate-x-1/2 z-[800] inline-flex min-h-12 items-center gap-2 rounded-full px-5 text-[0.85rem] font-semibold text-[var(--text-primary)] lg:hidden",
+          "bg-[var(--surface-glass)] backdrop-blur-2xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)] transition-transform active:scale-95",
         )}
       >
-        <Search className="h-5 w-5 text-[var(--app-primary)]" />
-        Explorar lugares
+        <Search className="h-4 w-4 text-[var(--app-primary)]" />
+        Explorar
         {activeFiltersCount > 0 && (
-          <span className="ml-1 grid h-6 min-w-6 place-items-center rounded-full bg-[var(--app-primary)] px-2 text-[0.7rem] font-bold text-white shadow-sm">
+          <span className="ml-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[var(--app-primary)] px-1.5 text-[0.65rem] font-bold text-white">
             {activeFiltersCount}
           </span>
         )}
       </button>
 
-      {/* MOBILE DRAWER */}
+      {/* ── MOBILE DRAWER ──────────────────────────────────── */}
       <div
         className={`fixed inset-0 z-[900] transition-opacity duration-300 ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
         aria-hidden={!mobileOpen}
@@ -480,52 +507,37 @@ export default function SucursalesFiltersPanel({
         <button
           type="button"
           onClick={() => onMobileOpenChange(false)}
-          className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity"
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
           aria-label="Cerrar filtros"
         />
 
         <section
           className={cn(
-            "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+5rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-4 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+5rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-5 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
             mobileOpen ? "translate-y-0" : "translate-y-12",
-            "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
+            "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]",
           )}
         >
-          <div className="mb-4 flex items-center justify-end shrink-0">
+          <div className="mb-3 flex items-center justify-end shrink-0">
             <button
               type="button"
               onClick={() => onMobileOpenChange(false)}
               className={cn(
-                "dashboard-focusable inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--text-secondary)]",
-                "bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-all"
+                "dashboard-focusable inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)]",
+                "bg-[var(--surface-2)] border border-[var(--border-strong)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)] transition-all",
               )}
               aria-label="Cerrar filtros"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="min-h-0 flex-1 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
             <PanelBody
-              filters={filters}
-              onFiltersChange={onFiltersChange}
-              items={items}
-              viewportItems={viewportItems}
-              loading={loading}
-              selectedBusinessId={selectedBusinessId}
-              onSelectBusiness={onSelectBusiness}
-              requestingLocation={requestingLocation}
-              hasUserLocation={hasUserLocation}
-              locationError={locationError}
-              onRequestUserLocation={onRequestUserLocation}
-              nameQuery={nameQuery}
-              onNameQueryChange={setNameQuery}
-              sortMode={sortMode}
-              onSortModeChange={setSortMode}
+              {...sharedPanelProps}
               filtersExpanded={mobileFiltersExpanded}
               onToggleFilters={() => setMobileFiltersExpanded((current) => !current)}
               filtersRegionId="sucursales-filters-controls-mobile"
-              onClearAll={handleClearAll}
             />
           </div>
         </section>
