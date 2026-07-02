@@ -79,6 +79,14 @@ agenda-web/
   - Always use `framer-motion` (`<AnimatePresence>` and `<motion.div>`) for mounting/unmounting modals.
   - Use custom easing curves for premium slide-in/slide-out effects (e.g., `ease: [0.32, 0.72, 0, 1]`) instead of default linear animations.
 
+### Custom Selects & Dropdowns (No Native Selects)
+
+- **CRITICAL:** Do NOT use native HTML `<select>` elements anywhere in the application. They render generic browser lists that clash with our premium design standards.
+- **Implementation:** Always design dropdowns as custom React components composed of:
+  - A toggle button mimicking a select field styled with design tokens (`bg-[var(--surface-3)]`, `border-[var(--border-strong)]`, `rounded-[var(--radius-sm)]`).
+  - An absolute-positioned menu container wrapping item options, animated smoothly with `framer-motion` (`AnimatePresence` + `<motion.div>`).
+  - Event listeners (e.g. click-outside) to handle toggle states, closing, and keyboard navigation.
+
 ### Backend (backend/)
 - **Framework**: FastAPI (Python)
 - **Responsibilities**: business logic, authentication, bookings, payments, geolocation, user management

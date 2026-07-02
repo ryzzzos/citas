@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import { Clock, User, Check, X as XIcon, CalendarClock, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,6 +16,7 @@ interface AgendaTimelineProps {
     bookingId: string,
     status: "pending" | "confirmed" | "cancelled" | "completed"
   ) => void;
+  initialBookingId?: string | null;
 }
 
 const PX_PER_MINUTE = 2.0;
@@ -354,9 +355,40 @@ export default function AgendaTimeline({
   onCancel,
   onReschedule,
   onStatusUpdate,
+  initialBookingId,
 }: AgendaTimelineProps) {
   const [selectedBooking, setSelectedBooking] = useState<AgendaBooking | null>(null);
   const [drawerStatus, setDrawerStatus] = useState<AgendaBooking["status"] | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sync state during render if initialBookingId changes
+  const [prevInitialBookingId, setPrevInitialBookingId] = useState<string | null | undefined>(undefined);
+  if (initialBookingId !== prevInitialBookingId) {
+    setPrevInitialBookingId(initialBookingId);
+    if (initialBookingId) {
+      let found: AgendaBooking | undefined;
+      for (const day of Object.keys(bookingsByDay)) {
+        found = bookingsByDay[day]?.find((b) => b.id === initialBookingId);
+        if (found) break;
+      }
+      if (found) {
+        setSelectedBooking(found);
+        setDrawerStatus(found.status);
+      }
+    }
+  }
+
+  // Smooth scroll to selected booking on open
+  useEffect(() => {
+    if (selectedBooking && scrollContainerRef.current) {
+      const { start } = toMinutes(selectedBooking);
+      const top = (start - 6 * 60) * PX_PER_MINUTE;
+      scrollContainerRef.current.scrollTo({
+        top: Math.max(0, top - 60),
+        behavior: "smooth",
+      });
+    }
+  }, [selectedBooking]);
 
   const handleSelectBooking = (booking: AgendaBooking) => {
     setSelectedBooking(booking);
@@ -370,6 +402,13 @@ export default function AgendaTimeline({
       }
     }
     setSelectedBooking(null);
+    // Remove query params from URL to clean up the address bar
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("bookingId");
+      url.searchParams.delete("date");
+      window.history.replaceState({}, "", url.toString());
+    }
   };
 
   const hourMarkers = timelineSlots.filter((slot) => slot.endsWith(":00"));
@@ -380,7 +419,7 @@ export default function AgendaTimeline({
       aria-label="Timeline de citas"
       className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] sm:p-5 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
     >
-      <div className="min-h-0 overflow-auto">
+      <div ref={scrollContainerRef} className="min-h-0 overflow-auto">
         <div className="min-w-[880px]">
         <div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
             {/* ── Sticky Header Row ── */}

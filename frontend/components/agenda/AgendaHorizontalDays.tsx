@@ -2,9 +2,81 @@
 
 import { useMemo, useEffect, useRef, useState } from "react";
 import { DateTime } from "luxon";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, ChevronDown } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+function CustomDropdownSelect<T extends string | number>({
+  value,
+  options,
+  onChange,
+  label,
+}: {
+  value: T;
+  options: { value: T; label: string | number }[];
+  onChange: (value: T) => void;
+  label: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div ref={containerRef} className="relative flex-1 flex flex-col gap-1">
+      <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)]">{label}</span>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="w-full flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-1)] transition-all cursor-pointer text-left focus:outline-none focus:ring-1 focus:ring-[var(--app-primary)]"
+      >
+        <span className="truncate">{selectedOption?.label ?? value}</span>
+        <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0 ml-1" />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.12, ease: [0.32, 0.72, 0, 1] }}
+            className="absolute top-[calc(100%+4px)] left-0 z-[100] w-full max-h-40 overflow-y-auto rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] py-1 shadow-[var(--shadow-md)] scrollbar-thin"
+          >
+            {options.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={String(opt.value)}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={`w-full px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] focus:outline-none cursor-pointer ${
+                    isSelected ? "bg-[var(--app-primary)]/10 font-bold text-[var(--app-primary)]" : "text-[var(--text-primary)]"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 interface AgendaHorizontalDaysProps {
   anchorDate: DateTime;
@@ -21,6 +93,53 @@ export default function AgendaHorizontalDays({
 }: AgendaHorizontalDaysProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [prevView, setPrevView] = useState(view);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  const MONTHS = [
+    { value: 1, label: "Enero" },
+    { value: 2, label: "Febrero" },
+    { value: 3, label: "Marzo" },
+    { value: 4, label: "Abril" },
+    { value: 5, label: "Mayo" },
+    { value: 6, label: "Junio" },
+    { value: 7, label: "Julio" },
+    { value: 8, label: "Agosto" },
+    { value: 9, label: "Septiembre" },
+    { value: 10, label: "Octubre" },
+    { value: 11, label: "Noviembre" },
+    { value: 12, label: "Diciembre" },
+  ];
+
+  const currentYear = DateTime.local().year;
+  const YEARS = Array.from({ length: 7 }).map((_, i) => currentYear - 2 + i);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleMonthChange = (monthNum: number) => {
+    const newDate = anchorDate.set({ month: monthNum });
+    onDateSelect(newDate);
+  };
+
+  const handleYearChange = (yearNum: number) => {
+    const newDate = anchorDate.set({ year: yearNum });
+    onDateSelect(newDate);
+  };
+
+  const handleGoToToday = () => {
+    const now = DateTime.local().setZone(timezone);
+    onDateSelect(now);
+    setPickerOpen(false);
+  };
+
   const viewChanged = prevView !== view;
 
   if (viewChanged) {
@@ -86,14 +205,58 @@ export default function AgendaHorizontalDays({
 
   return (
     <div className="mb-2 flex">
-      <div className="flex min-w-max shrink-0 items-center pr-2 pb-4 pt-1">
-        <div className="flex h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2.5 sm:p-3 shadow-[var(--shadow-sm)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
-          <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)]" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] ">
+      <div ref={pickerRef} className="relative flex min-w-max shrink-0 items-center pr-2 pb-4 pt-1">
+        <button
+          type="button"
+          onClick={() => setPickerOpen((prev) => !prev)}
+          className="flex h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2.5 sm:p-3 shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] hover:border-[var(--app-primary)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] cursor-pointer group"
+        >
+          <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)] group-hover:text-[var(--app-primary)] transition-colors duration-300" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
             {anchorDate.setZone(timezone).setLocale("es").toFormat("MMM, yyyy")}
           </span>
-        </div>
+        </button>
         <div className="ml-2 h-10 w-[1px] bg-[var(--border-strong)]" />
+
+        <AnimatePresence>
+          {pickerOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+              className="absolute top-[calc(100%-8px)] left-0 z-50 w-60 bg-[var(--surface-3)] border border-[var(--border-strong)] rounded-[var(--radius-lg)] p-3.5 shadow-[var(--shadow-lg)] flex flex-col gap-3"
+            >
+              <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-primary)]">Seleccionar fecha</span>
+              </div>
+              <div className="flex gap-2">
+                <CustomDropdownSelect
+                  label="Mes"
+                  value={anchorDate.month}
+                  options={MONTHS}
+                  onChange={handleMonthChange}
+                />
+
+                <CustomDropdownSelect
+                  label="Año"
+                  value={anchorDate.year}
+                  options={YEARS.map((y) => ({ value: y, label: y }))}
+                  onChange={handleYearChange}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoToToday}
+                className="w-full py-2 rounded-xl bg-[linear-gradient(135deg,var(--app-primary),var(--app-primary-strong))] text-xs font-bold text-white shadow-[var(--shadow-sm)] hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Fijar día actual
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="relative flex-1 min-w-0" style={{ maxWidth: "100%" }}>

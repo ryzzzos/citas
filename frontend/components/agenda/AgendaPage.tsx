@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { sileo } from "sileo";
 import { DateTime } from "luxon";
 
@@ -47,10 +48,35 @@ export default function AgendaPage() {
     return business?.timezone || getCanonicalTimezone();
   }, [business?.timezone]);
 
+  const searchParams = useSearchParams();
+  const dateParam = searchParams.get("date");
+  const initialBookingId = searchParams.get("bookingId");
+
   const [view, setView] = useState<AgendaView>("day");
   // const [filters, setFilters] = useState<AgendaFilters>(DEFAULT_FILTERS);
   const filters = DEFAULT_FILTERS;
-  const [anchorDate, setAnchorDate] = useState(() => getNowInTimezone(timezone));
+
+  const [anchorDate, setAnchorDate] = useState(() => {
+    if (dateParam) {
+      const parsed = DateTime.fromISO(dateParam, { zone: timezone });
+      if (parsed.isValid) {
+        return parsed;
+      }
+    }
+    return getNowInTimezone(timezone);
+  });
+
+  // Sync state during render if dateParam changes
+  const [prevDateParam, setPrevDateParam] = useState<string | null>(null);
+  if (dateParam !== prevDateParam) {
+    setPrevDateParam(dateParam);
+    if (dateParam) {
+      const parsed = DateTime.fromISO(dateParam, { zone: timezone });
+      if (parsed.isValid) {
+        setAnchorDate(parsed);
+      }
+    }
+  }
 
   // Sync state during render if timezone changes to avoid cascading effects
   const [prevTimezone, setPrevTimezone] = useState(timezone);
@@ -172,6 +198,7 @@ export default function AgendaPage() {
                   onCancel={(bookingId) => handleStatusUpdate(bookingId, "cancelled")}
                   onStatusUpdate={handleStatusUpdate}
                   onReschedule={handleReschedule}
+                  initialBookingId={initialBookingId}
                 />
               </div>
             </div>

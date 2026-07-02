@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.9] - 2026-07-02
+
+### Added
+- **Navegación e Integración de Agenda**:
+  - Soporte para parámetros de búsqueda en URL (`date` y `bookingId`) en `AgendaPage.tsx` para inicializar el calendario y auto-seleccionar citas específicas.
+  - Comportamiento de auto-selección de cita y desplazamiento suave (scroll) al elemento correspondiente al cargar la agenda con un ID inicial en `AgendaTimeline.tsx`.
+  - Limpieza automática de los parámetros `bookingId` y `date` en la barra de direcciones del navegador al cerrar la cita seleccionada.
+  - Implementación del componente `CustomDropdownSelect` en `AgendaHorizontalDays.tsx` eliminando los `<select>` nativos para "Mes" y "Año", en pleno cumplimiento con la directiva de diseño que prohíbe el uso de desplegables nativos del navegador.
+  - Efectos visuales interactivos enriquecidos (`hover:border-[var(--app-primary)] hover:scale-105 transition-all`) en el botón de selección de fecha.
+
 ## [0.4.8] - 2026-07-02
 
 ### Added

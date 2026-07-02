@@ -381,9 +381,10 @@ export default function DashboardPage() {
                 }[b.status] ?? "var(--color-pending)";
 
                 return (
-                  <div
+                  <Link
                     key={b.id}
-                    className="group flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)]"
+                    href={`/dashboard/agenda?date=${b.booking_date}&bookingId=${b.id}`}
+                    className="group flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)] cursor-pointer"
                   >
                     {/* Vertical status accent */}
                     <div
@@ -433,7 +434,7 @@ export default function DashboardPage() {
                         {format(new Date(b.booking_date + "T" + b.start_time), "h:mm a", { locale: es })}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
