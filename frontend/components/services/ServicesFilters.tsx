@@ -1,7 +1,7 @@
 import { Search, ShieldCheck, LayoutGrid, List, Tags } from "lucide-react";
 import { motion } from "framer-motion";
 import AppIcon from "@/components/ui/AppIcon";
-import { useServiceCategories } from "@/lib/services/useServiceCategories";
+import type { ServiceCategory } from "@/types";
 import type { ServiceStatusFilter, ServicesFiltersState } from "@/lib/services/useServices";
 
 interface ServicesFiltersProps {
@@ -9,6 +9,7 @@ interface ServicesFiltersProps {
   onFiltersChange: (next: ServicesFiltersState) => void;
   viewMode: "grid" | "list";
   onViewModeChange: (mode: "grid" | "list") => void;
+  categories: ServiceCategory[];
 }
 
 const STATUS_OPTIONS: Array<{ value: ServiceStatusFilter; label: string }> = [
@@ -22,8 +23,8 @@ export default function ServicesFilters({
   onFiltersChange,
   viewMode,
   onViewModeChange,
+  categories,
 }: ServicesFiltersProps) {
-  const { categories } = useServiceCategories();
 
   return (
     <section className="flex flex-col xl:flex-row items-center gap-3 w-full">

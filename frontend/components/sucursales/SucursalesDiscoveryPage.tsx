@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useDiscoverySearchRegistration } from "@/components/sucursales/DiscoverySearchContext";
 import SucursalesDetailSheet from "@/components/sucursales/SucursalesDetailSheet";
 import SucursalesFiltersPanel from "@/components/sucursales/SucursalesFiltersPanel";
 import type { DiscoveryFilters, UserLocation, ViewportState } from "@/components/sucursales/types";
@@ -132,19 +133,41 @@ export default function SucursalesDiscoveryPage() {
         setRequestingLocation(false);
       },
       (geoError) => {
-        const messageByCode: Record<number, string> = {
-          1: "Permiso de ubicacion denegado. Activalo en el navegador para centrar el mapa en tu ciudad.",
-          2: "No pudimos determinar tu ubicacion actual.",
-          3: "La solicitud de ubicacion expiro. Intenta nuevamente.",
-        };
+        // Fallback to low accuracy if high accuracy fails or times out
+        console.warn("High accuracy geolocation failed, trying fallback...", geoError);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const nextLocation: UserLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
 
-        setLocationError(messageByCode[geoError.code] ?? "No fue posible obtener tu ubicacion.");
-        setRequestingLocation(false);
+            setUserLocation(nextLocation);
+            setViewport(viewportFromLocation(nextLocation));
+            setLocationError(null);
+            setRequestingLocation(false);
+          },
+          (fallbackError) => {
+            const messageByCode: Record<number, string> = {
+              1: "Permiso de ubicacion denegado. Activalo en el navegador para centrar el mapa en tu ciudad.",
+              2: "No pudimos determinar tu ubicacion actual.",
+              3: "La solicitud de ubicacion expiro. Intenta nuevamente.",
+            };
+
+            setLocationError(messageByCode[fallbackError.code] ?? "No fue posible obtener tu ubicacion.");
+            setRequestingLocation(false);
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 60 * 1000,
+          }
+        );
       },
       {
-        enableHighAccuracy: false,
-        timeout: 12000,
-        maximumAge: 5 * 60 * 1000,
+        enableHighAccuracy: true,
+        timeout: 9000,
+        maximumAge: 0,
       }
     );
   }, []);
@@ -237,14 +260,8 @@ export default function SucursalesDiscoveryPage() {
         setError(null);
 
         setSelectedBusinessId((current) => {
-          const fallbackBusinessId = payload.items[0]?.id ?? null;
-
-          if (!fallbackBusinessId) {
-            return null;
-          }
-
           if (!current) {
-            return detailDismissed ? null : fallbackBusinessId;
+            return null;
           }
 
           const stillVisible = payload.items.some((business) => business.id === current);
@@ -252,7 +269,7 @@ export default function SucursalesDiscoveryPage() {
             return current;
           }
 
-          return detailDismissed ? null : fallbackBusinessId;
+          return null;
         });
       } catch (fetchError) {
         if (requestId !== requestSequence.current) {
@@ -279,34 +296,29 @@ export default function SucursalesDiscoveryPage() {
     };
   }, [detailDismissed, filters.category, filters.city, viewport.east, viewport.north, viewport.south, viewport.west]);
 
-  useEffect(() => {
-    if (viewportItems.length === 0) {
-      return;
-    }
-
-    if (detailDismissed) {
-      return;
-    }
-
-    if (!selectedBusinessId || !viewportItems.some((business) => business.id === selectedBusinessId)) {
-      setSelectedBusinessId(viewportItems[0].id);
-    }
-  }, [detailDismissed, selectedBusinessId, viewportItems]);
-
   const selectedBusiness = useMemo(() => {
     if (selectedBusinessId) {
-      const selectedFromCache = items.find((business) => business.id === selectedBusinessId);
-      if (selectedFromCache) {
-        return selectedFromCache;
-      }
+      return items.find((business) => business.id === selectedBusinessId) ?? null;
     }
+    return null;
+  }, [items, selectedBusinessId]);
 
-    if (detailDismissed) {
-      return null;
-    }
+  /* ── Register discovery data into the layout-level context ── */
+  const { register, unregister } = useDiscoverySearchRegistration();
 
-    return viewportItems[0] ?? null;
-  }, [detailDismissed, items, selectedBusinessId, viewportItems]);
+  useEffect(() => {
+    register({
+      items,
+      filters,
+      onFiltersChange: setFilters,
+      onSelectBusiness: handleSelectBusinessFromFilters,
+      loading,
+    });
+  }, [items, filters, handleSelectBusinessFromFilters, loading, register]);
+
+  useEffect(() => {
+    return () => unregister();
+  }, [unregister]);
 
   return (
     <main className="relative h-[100dvh] min-h-screen w-full overflow-hidden">
@@ -324,11 +336,7 @@ export default function SucursalesDiscoveryPage() {
 
       <section className="pointer-events-none relative z-[420] h-full">
         <SucursalesFiltersPanel
-          filters={filters}
-          onFiltersChange={setFilters}
-          items={items}
-          viewportItems={viewportItems}
-          total={total}
+          items={viewportItems}
           loading={loading}
           error={error}
           selectedBusinessId={selectedBusinessId}

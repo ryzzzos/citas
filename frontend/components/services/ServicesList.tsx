@@ -2,8 +2,7 @@ import Image from "next/image";
 import { LayoutGrid } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import ServiceActionsMenu from "@/components/services/ServiceActionsMenu";
-import { useServiceCategories } from "@/lib/services/useServiceCategories";
-import type { Service } from "@/types";
+import type { Service, ServiceCategory } from "@/types";
 
 interface ServicesListProps {
   services: Service[];
@@ -12,6 +11,7 @@ interface ServicesListProps {
   onEdit: (service: Service) => void;
   onToggleActive: (service: Service) => void;
   onDelete: (service: Service) => void;
+  categories: ServiceCategory[];
 }
 
 function formatPrice(value: string): string {
@@ -71,8 +71,8 @@ export default function ServicesList({
   onEdit,
   onToggleActive,
   onDelete,
+  categories,
 }: ServicesListProps) {
-  const { categories } = useServiceCategories();
 
   return (
     <section className="flex flex-col gap-5">

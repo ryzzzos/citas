@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { sileo } from "sileo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Calendar as CalendarIcon, Clock, ArrowRight, User, Mail, Phone, MessageCircle, FileText, CheckCircle2 } from "lucide-react";
 
@@ -139,20 +140,34 @@ export default function ServiceBookingDrawer({
     setBookingLoading(true);
     setError("");
 
+    const promise = createBooking({
+      business_id: business.id,
+      service_id: service.id,
+      staff_id: selectedStaff,
+      booking_date: date,
+      start_time: selectedSlot,
+      branch_id: branch.id,
+      customer_name: customerName.trim() || undefined,
+      customer_email: customerEmail.trim() || undefined,
+      customer_phone: customerPhone.trim() || undefined,
+      customer_whatsapp: customerWhatsapp.trim() || undefined,
+      notes: notes.trim() || undefined,
+    });
+
+    sileo.promise(promise, {
+      loading: { title: "Procesando tu reserva..." },
+      success: { 
+        title: "¡Reserva realizada!",
+        description: `Tu cita para ${service.name} ha sido agendada.`
+      },
+      error: (err) => ({ 
+        title: "Error al reservar", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
     try {
-      const booking = await createBooking({
-        business_id: business.id,
-        service_id: service.id,
-        staff_id: selectedStaff,
-        booking_date: date,
-        start_time: selectedSlot,
-        branch_id: branch.id,
-        customer_name: customerName.trim() || undefined,
-        customer_email: customerEmail.trim() || undefined,
-        customer_phone: customerPhone.trim() || undefined,
-        customer_whatsapp: customerWhatsapp.trim() || undefined,
-        notes: notes.trim() || undefined,
-      });
+      const booking = await promise;
       setBookedDetails(booking);
       setIsSuccess(true);
     } catch (err) {

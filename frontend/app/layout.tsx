@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SessionOnboardingGuard from "@/components/auth/SessionOnboardingGuard";
 import Navbar from "@/components/layout/Navbar";
+import AppProviders from "@/components/AppProviders";
+import { CustomToaster } from "@/components/ui/CustomToaster";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,9 +46,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300`}
       >
-        <SessionOnboardingGuard />
-        <Navbar />
-        {children}
+        <CustomToaster />
+        <AppProviders>
+          <SessionOnboardingGuard />
+          <Navbar />
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

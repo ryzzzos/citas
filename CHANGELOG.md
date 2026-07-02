@@ -6,6 +6,27 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.8] - 2026-07-02
+
+### Added
+- **Sistema Global de Notificaciones**:
+  - Integración de la biblioteca de notificaciones elásticas `sileo` a nivel de aplicación (`layout.tsx`).
+  - Creación del componente cliente reactivo `CustomToaster` (`frontend/components/ui/CustomToaster.tsx`) que sincroniza dinámicamente el tema de sileo (`light`/`dark`) según las preferencias del tema de la aplicación mediante un `MutationObserver` en el elemento raíz `<html>`.
+  - Integración de toasts de promesas asíncronas (`sileo.promise`) con retroalimentación en tiempo real para flujos críticos:
+    - Creación, actualización y eliminación de servicios.
+    - Creación, actualización y eliminación de categorías de catálogo.
+    - Registro, edición y eliminación de miembros del personal.
+    - Actualización de horarios de atención semanales del personal.
+    - Alta, edición y eliminación de sedes/sucursales comerciales.
+    - Modificaciones del perfil de negocio y cargas de logotipos/portadas.
+    - Cambios de estado en la agenda de reservas (confirmar, pendiente, completar, cancelar).
+    - Proceso de reserva de citas del lado del cliente.
+
+### Fixed
+- **Visualización de Notificaciones en Modales**:
+  - Reubicación del proveedor de notificaciones toast directamente bajo la etiqueta `<body>` (fuera del contexto de proveedores de estado) para evitar bloqueos del contexto de apilamiento (*stacking context*).
+  - Ajuste de selectores de atributos en `globals.css` (`[data-sileo-viewport]`) y aplicación de prioridad visual con `z-index: 2147483647 !important` para sobreponerse consistentemente ante fondos desenfocados y capas translúcidas.
+
 ## [0.4.7] - 2026-06-30
 
 ### Refactored

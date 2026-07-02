@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass, 
-  Hourglass, TrendingUp, Minus, XCircle, ChevronLeft, ChevronRight, User, MapPin
+  Hourglass, TrendingUp, TrendingDown, Minus, XCircle, ChevronLeft, ChevronRight, User, MapPin
 } from "lucide-react";
 import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
 import AppIcon from "@/components/ui/AppIcon";
+import { NumberTicker } from "@/components/ui/NumberTicker";
 import type { Booking, User as UserType } from "@/types";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 import { es } from "date-fns/locale";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -23,8 +24,9 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserType | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [weeklyBookings, setWeeklyBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     let mounted = true;
@@ -35,13 +37,19 @@ export default function DashboardPage() {
         if (!mounted) return;
         setUser(me);
 
-        let bks: Booking[] = [];
+        let weekBks: Booking[] = [];
+
+        // Monday of last week to Sunday of selected week
+        const startOfLastWeek = startOfWeek(subWeeks(currentDate, 1), { weekStartsOn: 1 });
+        const endOfThisWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
+        
+        const startStr = format(startOfLastWeek, "yyyy-MM-dd");
+        const endStr = format(endOfThisWeek, "yyyy-MM-dd");
+
         if (me.role === "business_owner") {
           const myBiz = await getMyBusiness().catch(() => null);
           if (myBiz) {
-            const startStr = format(startOfMonth(currentMonth), "yyyy-MM-dd");
-            const endStr = format(endOfMonth(currentMonth), "yyyy-MM-dd");
-            bks = await businessAgenda(myBiz.id, {
+            weekBks = await businessAgenda(myBiz.id, {
               timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
               from_at: new Date(startStr + "T00:00:00").toISOString(),
               to_at: new Date(endStr + "T23:59:59").toISOString(),
@@ -49,13 +57,17 @@ export default function DashboardPage() {
           }
         } else {
           const allBks = await myBookings();
-          bks = allBks.filter((b) => {
+          // Filter locally for customer
+          weekBks = allBks.filter((b) => {
             const d = new Date(b.booking_date + "T12:00:00");
-            return isSameMonth(d, currentMonth);
+            return d >= startOfLastWeek && d <= endOfThisWeek;
           });
         }
         
-        if (mounted) setBookings(bks);
+        if (mounted) {
+          setBookings(weekBks);
+          setWeeklyBookings(weekBks);
+        }
       } catch {
         router.push("/auth/login");
       } finally {
@@ -64,7 +76,7 @@ export default function DashboardPage() {
     }
     load();
     return () => { mounted = false; };
-  }, [router, currentMonth]);
+  }, [router, currentDate]);
 
   if (loading && !user) {
     return (
@@ -74,16 +86,63 @@ export default function DashboardPage() {
     );
   }
 
-  const totalBookings = bookings.length;
-  const pendingBookings = bookings.filter((b) => b.status === "pending").length;
-  const confirmedBookings = bookings.filter((b) => b.status === "confirmed").length;
-  const completedBookings = bookings.filter((b) => b.status === "completed").length;
-  const cancelledBookings = bookings.filter((b) => b.status === "cancelled").length;
+  const startOfThisWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const endOfThisWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
+  const startOfLastWeek = startOfWeek(subWeeks(currentDate, 1), { weekStartsOn: 1 });
+  const endOfLastWeek = endOfWeek(subWeeks(currentDate, 1), { weekStartsOn: 1 });
 
-  const pendingPct = totalBookings > 0 ? Math.round((pendingBookings / totalBookings) * 100) : 0;
-  const confirmedPct = totalBookings > 0 ? Math.round((confirmedBookings / totalBookings) * 100) : 0;
-  const completedPct = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0;
-  const cancelledPct = totalBookings > 0 ? Math.round((cancelledBookings / totalBookings) * 100) : 0;
+  const isBetween = (dateStr: string, start: Date, end: Date) => {
+    const d = new Date(dateStr + "T00:00:00");
+    return d >= start && d <= end;
+  };
+
+  const thisWeekBks = weeklyBookings.filter((b) => isBetween(b.booking_date, startOfThisWeek, endOfThisWeek));
+  const lastWeekBks = weeklyBookings.filter((b) => isBetween(b.booking_date, startOfLastWeek, endOfLastWeek));
+
+  // Reservas
+  const thisWeekTotal = thisWeekBks.length;
+  const lastWeekTotal = lastWeekBks.length;
+  const totalPct = 100;
+  const totalBar = lastWeekTotal > 0 ? Math.min(100, Math.round((thisWeekTotal / lastWeekTotal) * 100)) : (thisWeekTotal > 0 ? 100 : 0);
+
+  // Pendientes
+  const thisWeekPending = thisWeekBks.filter((b) => b.status === "pending").length;
+  const lastWeekPending = lastWeekBks.filter((b) => b.status === "pending").length;
+  const pendingPct = thisWeekTotal > 0 ? Math.round((thisWeekPending / thisWeekTotal) * 100) : 0;
+  const pendingBar = lastWeekPending > 0 ? Math.min(100, Math.round((thisWeekPending / lastWeekPending) * 100)) : (thisWeekPending > 0 ? 100 : 0);
+
+  // Confirmadas
+  const thisWeekConfirmed = thisWeekBks.filter((b) => b.status === "confirmed").length;
+  const lastWeekConfirmed = lastWeekBks.filter((b) => b.status === "confirmed").length;
+  const confirmedPct = thisWeekTotal > 0 ? Math.round((thisWeekConfirmed / thisWeekTotal) * 100) : 0;
+  const confirmedBar = lastWeekConfirmed > 0 ? Math.min(100, Math.round((thisWeekConfirmed / lastWeekConfirmed) * 100)) : (thisWeekConfirmed > 0 ? 100 : 0);
+
+  // Completadas
+  const thisWeekCompleted = thisWeekBks.filter((b) => b.status === "completed").length;
+  const lastWeekCompleted = lastWeekBks.filter((b) => b.status === "completed").length;
+  const completedPct = thisWeekTotal > 0 ? Math.round((thisWeekCompleted / thisWeekTotal) * 100) : 0;
+  const completedBar = lastWeekCompleted > 0 ? Math.min(100, Math.round((thisWeekCompleted / lastWeekCompleted) * 100)) : (thisWeekCompleted > 0 ? 100 : 0);
+
+  // Canceladas
+  const thisWeekCancelled = thisWeekBks.filter((b) => b.status === "cancelled").length;
+  const lastWeekCancelled = lastWeekBks.filter((b) => b.status === "cancelled").length;
+  const cancelledPct = thisWeekTotal > 0 ? Math.round((thisWeekCancelled / thisWeekTotal) * 100) : 0;
+  const cancelledBar = lastWeekCancelled > 0 ? Math.min(100, Math.round((thisWeekCancelled / lastWeekCancelled) * 100)) : (thisWeekCancelled > 0 ? 100 : 0);
+
+  // Construct weekly label
+  const startW = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const endW = endOfWeek(currentDate, { weekStartsOn: 1 });
+
+  let weekLabel = "";
+  if (startW.getFullYear() === endW.getFullYear()) {
+    if (startW.getMonth() === endW.getMonth()) {
+      weekLabel = `${format(startW, "d")} - ${format(endW, "d MMM, yyyy", { locale: es })}`;
+    } else {
+      weekLabel = `${format(startW, "d MMM", { locale: es })} - ${format(endW, "d MMM, yyyy", { locale: es })}`;
+    }
+  } else {
+    weekLabel = `${format(startW, "d MMM yyyy", { locale: es })} - ${format(endW, "d MMM yyyy", { locale: es })}`;
+  }
 
   return (
     <div className="flex flex-col h-full space-y-6 lg:space-y-8">
@@ -102,19 +161,19 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Month selector */}
+          {/* Week selector */}
           <div className="flex items-center gap-1 sm:gap-2.5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-1.5 py-1 shadow-[var(--shadow-sm)] shrink-0 self-start sm:self-auto">
             <button 
-              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              onClick={() => setCurrentDate(subWeeks(currentDate, 1))}
               className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="min-w-[110px] text-center text-[13px] sm:text-sm font-semibold capitalize text-[var(--text-primary)]">
-              {format(currentMonth, "MMMM yyyy", { locale: es })}
+            <span className="min-w-[160px] text-center text-[13px] sm:text-sm font-semibold capitalize text-[var(--text-primary)]">
+              {weekLabel}
             </span>
             <button 
-              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              onClick={() => setCurrentDate(addWeeks(currentDate, 1))}
               className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
             >
               <ChevronRight size={16} />
@@ -142,7 +201,6 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Metric cards */}
       <section className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
         <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between">
@@ -154,13 +212,21 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-1 text-sm font-bold text-[var(--text-primary)]">
               <AppIcon icon={TrendingUp} size="md" className="h-4 w-4" />
-              <span>100%</span>
+              <span><NumberTicker value={totalPct} />%</span>
             </div>
           </div>
           <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{totalBookings}</p>
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--text-primary)]" style={{ width: totalBookings > 0 ? '100%' : '0%' }} />
+            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              <NumberTicker value={thisWeekTotal} />
+            </p>
+            <div className="group relative">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--text-primary)]" style={{ width: `${totalBar}%` }} />
+              </div>
+              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
+                Volumen total de citas esta semana vs. la semana anterior (Meta: {lastWeekTotal} citas).
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
+              </div>
             </div>
           </div>
         </article>
@@ -174,14 +240,22 @@ export default function DashboardPage() {
               <p className="text-[16px] font-semibold text-[var(--text-primary)]">Pendientes</p>
             </div>
             <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-pending)]">
-              <AppIcon icon={pendingPct > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span>{pendingPct}%</span>
+              <AppIcon icon={thisWeekPending > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
+              <span><NumberTicker value={pendingPct} />%</span>
             </div>
           </div>
           <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{pendingBookings}</p>
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-pending)]" style={{ width: `${pendingPct}%` }} />
+            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              <NumberTicker value={thisWeekPending} />
+            </p>
+            <div className="group relative">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-pending)]" style={{ width: `${pendingBar}%` }} />
+              </div>
+              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
+                Citas pendientes esta semana vs. la semana anterior ({thisWeekPending} vs. {lastWeekPending}).
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
+              </div>
             </div>
           </div>
         </article>
@@ -195,14 +269,22 @@ export default function DashboardPage() {
               <p className="text-[16px] font-semibold text-[var(--text-primary)]">Confirmadas</p>
             </div>
             <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-info)]">
-              <AppIcon icon={confirmedPct > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span>{confirmedPct}%</span>
+              <AppIcon icon={thisWeekConfirmed > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
+              <span><NumberTicker value={confirmedPct} />%</span>
             </div>
           </div>
           <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{confirmedBookings}</p>
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-info)]" style={{ width: `${confirmedPct}%` }} />
+            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              <NumberTicker value={thisWeekConfirmed} />
+            </p>
+            <div className="group relative">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-info)]" style={{ width: `${confirmedBar}%` }} />
+              </div>
+              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
+                Citas confirmadas esta semana vs. la semana anterior ({thisWeekConfirmed} vs. {lastWeekConfirmed}).
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
+              </div>
             </div>
           </div>
         </article>
@@ -216,14 +298,22 @@ export default function DashboardPage() {
               <p className="text-[16px] font-semibold text-[var(--text-primary)]">Completadas</p>
             </div>
             <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-success)]">
-              <AppIcon icon={completedPct > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span>{completedPct}%</span>
+              <AppIcon icon={thisWeekCompleted > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
+              <span><NumberTicker value={completedPct} />%</span>
             </div>
           </div>
           <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{completedBookings}</p>
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-success)]" style={{ width: `${completedPct}%` }} />
+            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              <NumberTicker value={thisWeekCompleted} />
+            </p>
+            <div className="group relative">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-success)]" style={{ width: `${completedBar}%` }} />
+              </div>
+              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
+                Citas completadas esta semana vs. la semana anterior ({thisWeekCompleted} vs. {lastWeekCompleted}).
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
+              </div>
             </div>
           </div>
         </article>
@@ -237,30 +327,37 @@ export default function DashboardPage() {
               <p className="text-[16px] font-semibold text-[var(--text-primary)]">Canceladas</p>
             </div>
             <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-error)]">
-              <AppIcon icon={cancelledPct > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span>{cancelledPct}%</span>
+              <AppIcon icon={thisWeekCancelled > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
+              <span><NumberTicker value={cancelledPct} />%</span>
             </div>
           </div>
           <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">{cancelledBookings}</p>
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)]">
-              <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-error)]" style={{ width: `${cancelledPct}%` }} />
+            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              <NumberTicker value={thisWeekCancelled} />
+            </p>
+            <div className="group relative">
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-error)]" style={{ width: `${cancelledBar}%` }} />
+              </div>
+              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
+                Citas canceladas esta semana vs. la semana anterior ({thisWeekCancelled} vs. {lastWeekCancelled}).
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
+              </div>
             </div>
           </div>
         </article>
       </section>
       </div>
 
-      {/* Booking list */}
       <section className={`flex-1 min-h-0 flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)] ${loading ? 'opacity-50' : ''} transition-opacity`}>
         <h3 className="shrink-0 text-[17px] font-bold tracking-tight text-[var(--text-primary)]">
           {user?.role === "business_owner" ? "Últimas reservas" : "Mis reservas"}
         </h3>
 
-        {bookings.length === 0 ? (
+        {thisWeekBks.length === 0 ? (
           <div className="mt-5 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] p-8 text-center text-[14px] font-medium text-[var(--text-muted)]">
             <AppIcon icon={CircleDashed} size="md" className="mx-auto mb-3" />
-            No hay reservas para este mes.{" "}
+            No hay reservas para esta semana.{" "}
             {user?.role !== "business_owner" && (
               <>
                 <Link href="/sucursales" className="text-[var(--app-primary)] underline underline-offset-4">
@@ -275,7 +372,7 @@ export default function DashboardPage() {
             className="mt-4 flex-1 min-h-0 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)]"
           >
             <div className="space-y-2">
-              {bookings.map((b) => {
+              {thisWeekBks.map((b) => {
                 const statusColor = {
                   pending: "var(--color-pending)",
                   confirmed: "var(--color-info)",

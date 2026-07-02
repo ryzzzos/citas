@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { sileo } from "sileo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, X } from "lucide-react";
 
@@ -106,15 +107,15 @@ export default function StaffFormModal({
       return;
     }
 
-    try {
-      const data = {
-        name,
-        email: email || undefined,
-        phone: phone || undefined,
-        is_active: form.isActive,
-        service_ids: form.serviceIds,
-      };
+    const data = {
+      name,
+      email: email || undefined,
+      phone: phone || undefined,
+      is_active: form.isActive,
+      service_ids: form.serviceIds,
+    };
 
+    const promise = (async () => {
       let savedStaff;
       if (mode === "create") {
         savedStaff = await create(data);
@@ -125,7 +126,23 @@ export default function StaffFormModal({
       if (savedStaff && photoFile) {
         await uploadPhoto(savedStaff.id, photoFile);
       }
+      return savedStaff;
+    })();
 
+    sileo.promise(promise, {
+      loading: { title: mode === "create" ? "Agregando empleado..." : "Guardando cambios..." },
+      success: { 
+        title: mode === "create" ? "Empleado agregado" : "Cambios guardados",
+        description: `"${name}" se guardó correctamente.`
+      },
+      error: (err) => ({ 
+        title: "Error al guardar", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
+    try {
+      await promise;
       onClose();
     } catch (err) {
       setValidationError(err instanceof Error ? err.message : "Error al guardar el empleado.");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { sileo } from "sileo";
 import { DateTime } from "luxon";
 
 // import AgendaFiltersBar from "@/components/agenda/AgendaFiltersBar";
@@ -100,9 +101,32 @@ export default function AgendaPage() {
     bookingId: string,
     status: "pending" | "confirmed" | "cancelled" | "completed"
   ) {
-    try {
+    const statusLabel = {
+      pending: "Cita puesta en pendiente",
+      confirmed: "Cita confirmada con éxito",
+      cancelled: "Cita cancelada con éxito",
+      completed: "Cita completada con éxito",
+    }[status];
+
+    const promise = (async () => {
       await updateBookingStatus(bookingId, status);
       await reload();
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Actualizando estado de la cita..." },
+      success: { 
+        title: statusLabel,
+        description: `El estado de la cita fue cambiado a "${status === "pending" ? "pendiente" : status === "confirmed" ? "confirmada" : status === "cancelled" ? "cancelada" : "completada"}".`
+      },
+      error: (err) => ({ 
+        title: "Error al actualizar estado", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
+    try {
+      await promise;
     } catch {
       // Keep optimistic UX simple while preserving explicit error state from reload.
     }

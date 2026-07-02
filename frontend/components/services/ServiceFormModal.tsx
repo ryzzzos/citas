@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import type { CreateServiceInput, Service } from "@/types";
+import type { CreateServiceInput, Service, ServiceCategory } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Loader2 } from "lucide-react";
 
@@ -14,6 +14,8 @@ interface ServiceFormModalProps {
   service?: Service | null;
   saving?: boolean;
   error?: string | null;
+  categories: ServiceCategory[];
+  categoriesLoading?: boolean;
   onClose: () => void;
   onSubmit: (data: CreateServiceInput) => Promise<void>;
   onUploadImage: (file: File) => Promise<{ image_url: string }>;
@@ -55,8 +57,6 @@ function toFormState(service?: Service | null): FormState {
   };
 }
 
-import { useServiceCategories } from "@/lib/services/useServiceCategories";
-
 function isValidHttpImageUrl(value: string): boolean {
   try {
     const parsed = new URL(value);
@@ -72,6 +72,8 @@ export default function ServiceFormModal({
   service,
   saving,
   error,
+  categories,
+  categoriesLoading,
   onClose,
   onSubmit,
   onUploadImage,
@@ -83,8 +85,6 @@ export default function ServiceFormModal({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const { categories, loading: categoriesLoading } = useServiceCategories();
 
   useEffect(() => {
     if (!open) {
@@ -104,7 +104,7 @@ export default function ServiceFormModal({
     setUploadError(null);
     setSelectedFile(null);
     setPreviewUrl(service?.image_url ?? null);
-  }, [open, service]);
+  }, [open, service, categories]);
 
   useEffect(() => {
     if (!selectedFile) {

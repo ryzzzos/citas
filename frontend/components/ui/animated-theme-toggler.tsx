@@ -178,25 +178,29 @@ export const AnimatedThemeToggler = ({
       Math.max(y, viewportHeight - y)
     )
 
-    const applyTheme = () => {
+    const applyTheme = (useCSSFallback: boolean) => {
       const newTheme = !isDark
       setIsDark(newTheme)
       
-      // Aplicar transición suave temporalmente
-      document.documentElement.classList.add("theme-transition")
+      if (useCSSFallback) {
+        // Aplicar transición suave temporalmente sólo como fallback
+        document.documentElement.classList.add("theme-transition")
+      }
       
       document.documentElement.classList.toggle("dark")
       localStorage.setItem("theme", newTheme ? "dark" : "light")
       
-      setTimeout(() => {
-        document.documentElement.classList.remove("theme-transition")
-      }, 350)
+      if (useCSSFallback) {
+        setTimeout(() => {
+          document.documentElement.classList.remove("theme-transition")
+        }, 350)
+      }
     }
 
     const hasMap = typeof document !== "undefined" && document.querySelector(".leaflet-container")
 
     if (hasMap || typeof document.startViewTransition !== "function") {
-      applyTheme()
+      applyTheme(true); // Usar fallback CSS suave en navegadores sin soporte o con mapas cargados
       return
     }
 
@@ -225,7 +229,7 @@ export const AnimatedThemeToggler = ({
     }
 
     const transition = document.startViewTransition(() => {
-      flushSync(applyTheme)
+      flushSync(() => applyTheme(false)) // Cambiar instantáneamente sin transiciones CSS lentas
     })
     if (typeof transition?.finished?.finally === "function") {
       transition.finished.finally(cleanup)

@@ -10,6 +10,7 @@ interface AgendaRightRailProps {
 
 import { ClipboardList, Hourglass, CheckCircle2, XCircle } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
+import { NumberTicker } from "@/components/ui/NumberTicker";
 
 export default function AgendaRightRail({ total, pending, confirmed, completed, cancelled }: AgendaRightRailProps) {
   return (
@@ -25,7 +26,9 @@ export default function AgendaRightRail({ total, pending, confirmed, completed, 
             </div>
             <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Reservas</dt>
           </div>
-          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{total}</dd>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
+            <NumberTicker value={total} />
+          </dd>
         </div>
 
         {/* Pendientes */}
@@ -36,7 +39,9 @@ export default function AgendaRightRail({ total, pending, confirmed, completed, 
             </div>
             <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Pendientes</dt>
           </div>
-          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{pending}</dd>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
+            <NumberTicker value={pending} />
+          </dd>
         </div>
 
         {/* Confirmadas */}
@@ -47,7 +52,9 @@ export default function AgendaRightRail({ total, pending, confirmed, completed, 
             </div>
             <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Confirmadas</dt>
           </div>
-          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{confirmed}</dd>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
+            <NumberTicker value={confirmed} />
+          </dd>
         </div>
 
         {/* Completadas */}
@@ -58,7 +65,9 @@ export default function AgendaRightRail({ total, pending, confirmed, completed, 
             </div>
             <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Completadas</dt>
           </div>
-          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{completed}</dd>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
+            <NumberTicker value={completed} />
+          </dd>
         </div>
 
         {/* Canceladas */}
@@ -69,7 +78,9 @@ export default function AgendaRightRail({ total, pending, confirmed, completed, 
             </div>
             <dt className="text-[14px] font-bold tracking-tight text-[var(--text-primary)]">Canceladas</dt>
           </div>
-          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">{cancelled}</dd>
+          <dd className="text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
+            <NumberTicker value={cancelled} />
+          </dd>
         </div>
       </dl>
     </aside>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { sileo } from "sileo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Save } from "lucide-react";
 
@@ -99,8 +100,21 @@ export default function StaffScheduleModal({ open, staff, onClose }: StaffSchedu
       }
     }
 
+    const promise = updateStaffSchedules(business.id, staff.id, { schedules: payloadSchedules });
+    sileo.promise(promise, {
+      loading: { title: "Guardando horarios de atención..." },
+      success: { 
+        title: "Horarios guardados",
+        description: `Los horarios de ${staff.name} fueron actualizados.`
+      },
+      error: (err) => ({ 
+        title: "Error al guardar horarios", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
     try {
-      await updateStaffSchedules(business.id, staff.id, { schedules: payloadSchedules });
+      await promise;
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al guardar los horarios.");

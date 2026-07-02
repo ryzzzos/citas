@@ -159,3 +159,22 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
 .theme-transition * {
   transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, fill 300ms ease, stroke 300ms ease, box-shadow 300ms ease, filter 300ms ease !important;
 }
+
+/* Sileo Toast Theme Overrides */
+:root {
+  --sileo-fill: #09090b !important;
+  --sileo-text: #ffffff !important;
+  --sileo-z-index: 2147483647 !important;
+}
+
+.dark {
+  --sileo-fill: #ffffff !important;
+  --sileo-text: #09090b !important;
+}
+
+/* Force the sileo elements to be on top of all stacking contexts */
+[data-sileo-viewport],
+[data-sileo-toast],
+[data-sileo-viewport] * {
+  z-index: 2147483647 !important;
+}

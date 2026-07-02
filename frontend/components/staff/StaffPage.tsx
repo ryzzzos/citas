@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { sileo } from "sileo";
 import Button from "@/components/ui/Button";
 import { useStaff } from "@/lib/staff/useStaff";
 import type { Staff } from "@/types";
@@ -85,8 +86,20 @@ export default function StaffPage() {
     if (!confirmed) return;
 
     setActionError(null);
+    const promise = remove(member.id);
+    sileo.promise(promise, {
+      loading: { title: "Eliminando empleado..." },
+      success: { 
+        title: "Empleado eliminado",
+        description: `"${member.name}" fue eliminado con éxito.`
+      },
+      error: (err) => ({ 
+        title: "Error al eliminar empleado", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
     try {
-      await remove(member.id);
+      await promise;
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Error al eliminar empleado.");
     }

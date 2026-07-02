@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { sileo } from "sileo";
 import { useBranchContext } from "@/contexts/BranchContext";
 import Button from "@/components/ui/Button";
 import BranchFormModal from "./BranchFormModal";
@@ -56,13 +57,31 @@ export default function BranchesPage() {
     if (!business) return;
     setSaving(true);
     setActionError(null);
-    try {
+
+    const isEdit = !!editingBranch;
+    const promise = (async () => {
       if (editingBranch) {
         await updateBranch(business.id, editingBranch.id, data as UpdateBranchInput);
       } else {
         await createBranch(business.id, data as CreateBranchInput);
       }
       await refreshBranches();
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: isEdit ? "Guardando sucursal..." : "Creando sucursal..." },
+      success: { 
+        title: isEdit ? "Sucursal guardada" : "Sucursal creada",
+        description: `"${data.name}" se guardó con éxito.`
+      },
+      error: (err) => ({ 
+        title: "Error al guardar sucursal", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
+    try {
+      await promise;
       closeModal();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Error al guardar la sucursal.");
@@ -79,9 +98,25 @@ export default function BranchesPage() {
     if (!confirmed) return;
 
     setActionError(null);
-    try {
+    const promise = (async () => {
       await deleteBranch(business.id, branch.id);
       await refreshBranches();
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Eliminando sucursal..." },
+      success: { 
+        title: "Sucursal eliminada",
+        description: `"${branch.name}" fue eliminada del sistema.`
+      },
+      error: (err) => ({ 
+        title: "Error al eliminar sucursal", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
+    try {
+      await promise;
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Error al eliminar la sucursal.");
     }

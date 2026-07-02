@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { sileo } from "sileo";
 import Image from "next/image";
 import { CheckCircle2, ChevronRight, ImagePlus, Loader2, RefreshCw, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -193,8 +194,22 @@ export default function BusinessProfileEditorPage() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setSuccessMessage("");
+    const promise = saveProfile();
+
+    sileo.promise(promise, {
+      loading: { title: "Guardando cambios del perfil..." },
+      success: { 
+        title: "Perfil actualizado", 
+        description: "Los cambios del negocio se guardaron correctamente." 
+      },
+      error: (err) => ({ 
+        title: "Error al guardar", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      })
+    });
+
     try {
-      await saveProfile();
+      await promise;
       setSuccessMessage("Perfil actualizado correctamente.");
       setTimeout(() => setIsEditing(false), 1200);
     } catch {
@@ -206,8 +221,22 @@ export default function BusinessProfileEditorPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     setUploadingCover(true);
+    const promise = uploadCover(file);
+
+    sileo.promise(promise, {
+      loading: { title: "Subiendo imagen de portada..." },
+      success: { 
+        title: "Portada actualizada", 
+        description: "La nueva imagen de portada se subió correctamente." 
+      },
+      error: (err) => ({ 
+        title: "Error al subir portada", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      })
+    });
+
     try {
-      await uploadCover(file);
+      await promise;
       setSuccessMessage("Portada actualizada correctamente.");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch {
@@ -222,8 +251,22 @@ export default function BusinessProfileEditorPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     setUploadingLogo(true);
+    const promise = uploadLogo(file);
+
+    sileo.promise(promise, {
+      loading: { title: "Subiendo imagen de logo..." },
+      success: { 
+        title: "Logo actualizado", 
+        description: "El nuevo logo se subió correctamente." 
+      },
+      error: (err) => ({ 
+        title: "Error al subir logo", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      })
+    });
+
     try {
-      await uploadLogo(file);
+      await promise;
       setSuccessMessage("Logo actualizado correctamente.");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch {

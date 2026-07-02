@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { sileo } from "sileo";
 
 import ServiceFormModal from "@/components/services/ServiceFormModal";
 import ServiceCategoriesModal from "@/components/services/ServiceCategoriesModal";
@@ -9,6 +10,7 @@ import ServicesHeader from "@/components/services/ServicesHeader";
 import ServicesList from "@/components/services/ServicesList";
 import Button from "@/components/ui/Button";
 import { useServices } from "@/lib/services/useServices";
+import { useServiceCategories } from "@/lib/services/useServiceCategories";
 import type { CreateServiceInput, Service } from "@/types";
 
 export default function ServicesPage() {
@@ -27,6 +29,12 @@ export default function ServicesPage() {
     toggle,
     uploadImage,
   } = useServices();
+
+  const {
+    categories,
+    loading: categoriesLoading,
+    reload: reloadCategories,
+  } = useServiceCategories();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
@@ -61,12 +69,26 @@ export default function ServicesPage() {
   }
 
   async function handleSubmit(data: CreateServiceInput) {
+    const promise = editingService 
+      ? update(editingService.id, data)
+      : create(data);
+
+    sileo.promise(promise, {
+      loading: { 
+        title: editingService ? "Guardando cambios..." : "Creando servicio..." 
+      },
+      success: { 
+        title: editingService ? "Servicio guardado" : "Servicio creado con éxito",
+        description: `El servicio "${data.name}" se guardó correctamente.`
+      },
+      error: (err) => ({ 
+        title: "Error al guardar servicio", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
     try {
-      if (editingService) {
-        await update(editingService.id, data);
-      } else {
-        await create(data);
-      }
+      await promise;
       closeModal();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "No se pudo guardar el servicio.");
@@ -75,8 +97,24 @@ export default function ServicesPage() {
 
   async function handleToggle(service: Service) {
     setActionError(null);
+    const action = !service.is_active ? "Activando" : "Desactivando";
+    const actionSuccess = !service.is_active ? "activado" : "desactivado";
+    const promise = toggle(service.id, !service.is_active);
+
+    sileo.promise(promise, {
+      loading: { title: `${action} servicio...` },
+      success: { 
+        title: `Servicio ${actionSuccess}`,
+        description: `"${service.name}" ha sido ${actionSuccess}.`
+      },
+      error: (err) => ({ 
+        title: "Error al cambiar estado", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
     try {
-      await toggle(service.id, !service.is_active);
+      await promise;
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "No se pudo cambiar el estado.");
     }
@@ -91,8 +129,22 @@ export default function ServicesPage() {
     }
 
     setActionError(null);
+    const promise = remove(service.id);
+
+    sileo.promise(promise, {
+      loading: { title: "Eliminando servicio..." },
+      success: { 
+        title: "Servicio eliminado",
+        description: `"${service.name}" se eliminó del catálogo.`
+      },
+      error: (err) => ({ 
+        title: "Error al eliminar servicio", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+
     try {
-      await remove(service.id);
+      await promise;
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "No se pudo eliminar el servicio.");
     }
@@ -130,6 +182,7 @@ export default function ServicesPage() {
         onFiltersChange={setFilters} 
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        categories={categories}
       />
       </div>
 
@@ -158,6 +211,7 @@ export default function ServicesPage() {
           onEdit={openEditModal}
           onToggleActive={handleToggle}
           onDelete={handleDelete}
+          categories={categories}
         />
       )}
       </div>
@@ -168,6 +222,8 @@ export default function ServicesPage() {
         service={editingService}
         saving={saving}
         error={actionError}
+        categories={categories}
+        categoriesLoading={categoriesLoading}
         onClose={closeModal}
         onSubmit={handleSubmit}
         onUploadImage={uploadImage}
@@ -175,7 +231,11 @@ export default function ServicesPage() {
 
       <ServiceCategoriesModal 
         open={categoriesModalOpen} 
-        onClose={() => { setCategoriesModalOpen(false); reload(); }} 
+        onClose={() => { 
+          setCategoriesModalOpen(false); 
+          reload(); 
+          reloadCategories(); 
+        }} 
       />
     </div>
   );

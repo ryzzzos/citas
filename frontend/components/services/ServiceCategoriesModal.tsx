@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { sileo } from "sileo";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useServiceCategories } from "@/lib/services/useServiceCategories";
@@ -23,16 +24,69 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!newName.trim()) return;
-    await create({ name: newName.trim(), position: categories.length });
-    setNewName("");
+    const trimmed = newName.trim();
+    const promise = create({ name: trimmed, position: categories.length });
+    sileo.promise(promise, {
+      loading: { title: "Creando categoría..." },
+      success: { 
+        title: "Categoría creada", 
+        description: `Se creó la categoría "${trimmed}".` 
+      },
+      error: (err) => ({ 
+        title: "Error al crear categoría", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+    try {
+      await promise;
+      setNewName("");
+    } catch {}
   }
 
   async function handleUpdate(e: React.FormEvent, cat: ServiceCategory) {
     e.preventDefault();
     if (!editName.trim()) return;
-    await update(cat.id, { name: editName.trim() });
-    setEditingId(null);
-    setEditName("");
+    const trimmed = editName.trim();
+    const promise = update(cat.id, { name: trimmed });
+    sileo.promise(promise, {
+      loading: { title: "Actualizando categoría..." },
+      success: { 
+        title: "Categoría actualizada", 
+        description: `Se renombró a "${trimmed}".` 
+      },
+      error: (err) => ({ 
+        title: "Error al actualizar categoría", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+    try {
+      await promise;
+      setEditingId(null);
+      setEditName("");
+    } catch {}
+  }
+
+  async function handleDeleteCategory(cat: ServiceCategory) {
+    const confirmed = window.confirm(
+      `¿Deseas eliminar la categoría "${cat.name}"? Los servicios asociados pasarán a "Sin categoría".`
+    );
+    if (!confirmed) return;
+
+    const promise = remove(cat.id);
+    sileo.promise(promise, {
+      loading: { title: "Eliminando categoría..." },
+      success: { 
+        title: "Categoría eliminada", 
+        description: `La categoría "${cat.name}" fue eliminada.` 
+      },
+      error: (err) => ({ 
+        title: "Error al eliminar categoría", 
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      }),
+    });
+    try {
+      await promise;
+    } catch {}
   }
 
   function startEdit(cat: ServiceCategory) {
@@ -178,7 +232,7 @@ export default function ServiceCategoriesModal({ open, onClose }: ServiceCategor
                               </button>
                               {cat.name !== "Sin categoría" && (
                                 <button 
-                                  onClick={() => remove(cat.id)} 
+                                  onClick={() => handleDeleteCategory(cat)} 
                                   className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--color-error)] transition-colors"
                                   title="Eliminar"
                                 >
