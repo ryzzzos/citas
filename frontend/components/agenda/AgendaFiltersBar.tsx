@@ -2,6 +2,7 @@ import type { AgendaFilters } from "@/lib/agenda/types";
 import { Search, ShieldCheck, UserRound, WandSparkles } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import type { BookingStatus, Service, Staff } from "@/types";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface AgendaFiltersBarProps {
   filters: AgendaFilters;
@@ -26,61 +27,50 @@ export default function AgendaFiltersBar({ filters, staff, services, onFiltersCh
   return (
     <section aria-label="Filtros de agenda" className="rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <label className="space-y-2">
+        <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
             <AppIcon icon={ShieldCheck} size="xs" />
             Estado
           </span>
-          <select
+          <CustomSelect<AgendaFilters["status"]>
             value={filters.status}
-            onChange={(event) => onFiltersChange(updateStatus(filters, event.target.value as AgendaFilters["status"]))}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(val) => onFiltersChange(updateStatus(filters, val))}
+            options={STATUS_OPTIONS}
+            buttonClassName="!h-[3.25rem] !bg-[var(--surface-3)]"
+          />
+        </div>
 
-        <label className="space-y-2">
+        <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
             <AppIcon icon={UserRound} size="xs" />
             Staff
           </span>
-          <select
+          <CustomSelect<string>
             value={filters.staffId}
-            onChange={(event) => onFiltersChange({ ...filters, staffId: event.target.value })}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
-          >
-            <option value="all">Todo el staff</option>
-            {staff.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(val) => onFiltersChange({ ...filters, staffId: val })}
+            options={[
+              { value: "all", label: "Todo el staff" },
+              ...staff.map((member) => ({ value: member.id, label: member.name })),
+            ]}
+            buttonClassName="!h-[3.25rem] !bg-[var(--surface-3)]"
+          />
+        </div>
 
-        <label className="space-y-2">
+        <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
             <AppIcon icon={WandSparkles} size="xs" />
             Servicio
           </span>
-          <select
+          <CustomSelect<string>
             value={filters.serviceId}
-            onChange={(event) => onFiltersChange({ ...filters, serviceId: event.target.value })}
-            className="w-full appearance-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus:border-[var(--app-primary)] focus:bg-[var(--surface-3)] focus:outline-none focus:ring-4 focus:ring-[var(--app-primary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:focus:border-[var(--app-primary)] dark:focus:bg-[var(--surface-1)] dark:focus:ring-[var(--app-primary)]"
-          >
-            <option value="all">Todos los servicios</option>
-            {services.map((service) => (
-              <option key={service.id} value={service.id}>
-                {service.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(val) => onFiltersChange({ ...filters, serviceId: val })}
+            options={[
+              { value: "all", label: "Todos los servicios" },
+              ...services.map((service) => ({ value: service.id, label: service.name })),
+            ]}
+            buttonClassName="!h-[3.25rem] !bg-[var(--surface-3)]"
+          />
+        </div>
 
         <label className="space-y-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">

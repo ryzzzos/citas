@@ -31,7 +31,7 @@ export default function SegmentedControl({
 
   return (
     <div
-      className="relative flex flex-row items-center p-[2px] bg-[#dadadb] dark:bg-[var(--surface-1)] rounded-[9px] w-max select-none"
+      className="relative flex flex-row items-center p-[2px] bg-[var(--surface-0)] dark:bg-[var(--surface-1)] rounded-[9px] w-max select-none"
       style={{ height: "32px" }}
     >
       {options.map((option, index) => {
@@ -48,14 +48,15 @@ export default function SegmentedControl({
             {isSelected && (
               <motion.div
                 layoutId={`segmented-indicator-${controlId}`}
-                className="absolute inset-0 bg-white dark:bg-[var(--surface-3)] rounded-[7px] z-0 pointer-events-none shadow-[0px_3px_8px_rgba(0,0,0,0.12),0px_3px_1px_rgba(0,0,0,0.04)]"
+                className="absolute inset-0 bg-white dark:bg-[var(--surface-3)] rounded-[7px] z-0 pointer-events-none shadow-[0_2px_4px_rgba(0,0,0,0.06)]"
                 style={{
-                  border: "0.5px solid rgba(0, 0, 0, 0.04)",
-                  backgroundColor: option.activeColor && colorizeSelected
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: (colorizeSelected && option.activeColor)
+                    ? `color-mix(in srgb, ${option.activeColor} 30%, var(--border-strong))`
+                    : "color-mix(in srgb, var(--text-primary) 10%, transparent)",
+                  backgroundColor: (colorizeSelected && option.activeColor)
                     ? `color-mix(in srgb, ${option.activeColor} 8%, var(--surface-3))`
-                    : undefined,
-                  borderColor: option.activeColor && colorizeSelected
-                    ? `color-mix(in srgb, ${option.activeColor} 30%, rgba(0, 0, 0, 0.04))`
                     : undefined,
                 }}
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}

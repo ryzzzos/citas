@@ -7,6 +7,7 @@ import Input from "@/components/ui/Input";
 import type { CreateServiceInput, Service, ServiceCategory } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Loader2 } from "lucide-react";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface ServiceFormModalProps {
   open: boolean;
@@ -278,25 +279,18 @@ export default function ServiceFormModal({
                   {categoriesLoading ? (
                     <div className="text-[13px] text-[var(--text-muted)] py-2">Cargando categorías...</div>
                   ) : (
-                    <div className="relative">
-                      <select
-                        id="service-category"
-                        value={form.categoryId}
-                        onChange={(event) => setForm((previous) => ({ ...previous, categoryId: event.target.value }))}
-                        className="dashboard-focusable w-full h-[3.25rem] pl-4 pr-8 rounded-[1.125rem] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[0.925rem] font-medium text-[var(--text-primary)] appearance-none transition-colors focus:border-[var(--app-primary)] focus:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:focus:bg-[var(--surface-1)] cursor-pointer"
-                        required
-                      >
-                        <option value="" disabled>Seleccione una categoría</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                        <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
+                    <CustomSelect<string>
+                      id="service-category"
+                      value={form.categoryId}
+                      onChange={(val) => setForm((prev) => ({ ...prev, categoryId: val }))}
+                      options={categories.map((cat) => ({
+                        value: cat.id,
+                        label: cat.name,
+                      }))}
+                      placeholder="Seleccione una categoría"
+                      buttonClassName="!h-[3.25rem] !rounded-[1.125rem] !bg-[var(--surface-2)]"
+                      menuClassName="!rounded-[1.125rem]"
+                    />
                   )}
                 </div>
 

@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BriefcaseBusiness, Building2, CalendarDays, Compass, LayoutDashboard, Users, Store } from "lucide-react";
+import { BriefcaseBusiness, Building2, CalendarDays, Compass, LayoutDashboard, Users, Store, Wallet } from "lucide-react";
 
 export type DashboardMatchMode = "exact" | "prefix";
 
@@ -38,6 +38,14 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
         match: "prefix",
         icon: CalendarDays,
         hint: "Operacion diaria y semanal",
+      },
+      {
+        id: "balance",
+        label: "Balance",
+        href: "/dashboard/balance",
+        match: "prefix",
+        icon: Wallet,
+        hint: "Métricas económicas de la empresa",
       },
       {
         id: "services",

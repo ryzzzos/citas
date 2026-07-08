@@ -25,6 +25,7 @@ import { getMe, getMyBusiness, logout } from "@/lib/api";
 import type { User } from "@/types";
 import { useDiscoverySearch } from "@/components/sucursales/DiscoverySearchContext";
 import type { DiscoveryFilters } from "@/components/sucursales/types";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -407,23 +408,21 @@ export default function Navbar() {
                         onClick={(e) => e.stopPropagation()}
                       />
                     </label>
-                    <label className="space-y-0.5">
+                    <div className="space-y-0.5" onClick={(e) => e.stopPropagation()}>
                       <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                         Categoría
                       </span>
-                      <select
+                      <CustomSelect<string>
                         value={filters.category}
-                        onChange={(e) => handleFilterChange({ category: e.target.value })}
-                        className="w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-1 text-[0.75rem] text-[var(--text-primary)] outline-none focus:border-[var(--app-primary)] cursor-pointer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {categories.map((cat) => (
-                          <option key={cat || "__all__"} value={cat}>
-                            {cat || "Todas"}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                        onChange={(val) => handleFilterChange({ category: val })}
+                        options={categories.map((cat) => ({
+                          value: cat,
+                          label: cat || "Todas",
+                        }))}
+                        buttonClassName="!h-[26px] !py-0.5 !px-2 !rounded-[var(--radius-sm)] !text-[0.75rem] !bg-[var(--surface-2)] font-semibold"
+                        menuClassName="!rounded-[var(--radius-sm)]"
+                      />
+                    </div>
                   </div>
                 )}
 

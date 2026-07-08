@@ -82,7 +82,7 @@ export default function AgendaPage() {
   const [prevTimezone, setPrevTimezone] = useState(timezone);
   if (timezone !== prevTimezone) {
     setPrevTimezone(timezone);
-    setAnchorDate((prev) => prev.setZone(timezone));
+    setAnchorDate((prev) => prev.setZone(timezone) as DateTime);
   }
 
   const range = useMemo(() => getViewRange(anchorDate, view), [anchorDate, view]);

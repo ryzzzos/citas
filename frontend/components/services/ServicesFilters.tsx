@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import AppIcon from "@/components/ui/AppIcon";
 import type { ServiceCategory } from "@/types";
 import type { ServiceStatusFilter, ServicesFiltersState } from "@/lib/services/useServices";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface ServicesFiltersProps {
   filters: ServicesFiltersState;
@@ -48,63 +49,37 @@ export default function ServicesFilters({
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
-        <div className="relative flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <AppIcon icon={ShieldCheck} className="text-[var(--text-muted)]" size="sm" />
-          </div>
-          <select
-            id="services-status"
-            value={filters.status}
-            onChange={(event) =>
-              onFiltersChange({
-                ...filters,
-                status: event.target.value as ServiceStatusFilter,
-              })
-            }
-            className="w-full h-11 pl-10 pr-8 rounded-xl bg-[var(--surface-3)] border border-[var(--border-strong)] text-[14px] text-[var(--text-primary)] appearance-none focus:outline-none focus:border-[var(--app-primary)] focus:ring-1 focus:ring-[var(--app-primary)] transition-all shadow-[var(--shadow-sm)] cursor-pointer"
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-             <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-             </svg>
-          </div>
-        </div>
+        <CustomSelect<ServiceStatusFilter>
+          id="services-status"
+          value={filters.status}
+          onChange={(val) =>
+            onFiltersChange({
+              ...filters,
+              status: val,
+            })
+          }
+          options={STATUS_OPTIONS}
+          icon={ShieldCheck}
+          className="flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto"
+        />
 
-        <div className="relative flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <AppIcon icon={Tags} className="text-[var(--text-muted)]" size="sm" />
-          </div>
-          <select
-            id="services-category"
-            value={filters.categoryId}
-            onChange={(event) =>
-              onFiltersChange({
-                ...filters,
-                categoryId: event.target.value,
-              })
-            }
-            className="w-full h-11 pl-10 pr-8 rounded-xl bg-[var(--surface-3)] border border-[var(--border-strong)] text-[14px] text-[var(--text-primary)] appearance-none focus:outline-none focus:border-[var(--app-primary)] focus:ring-1 focus:ring-[var(--app-primary)] transition-all shadow-[var(--shadow-sm)] cursor-pointer"
-          >
-            <option value="all">Todas las categorías</option>
-            <option value="null">Sin categoría</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-          <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-             <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-             </svg>
-          </div>
-        </div>
+        <CustomSelect<string>
+          id="services-category"
+          value={filters.categoryId}
+          onChange={(val) =>
+            onFiltersChange({
+              ...filters,
+              categoryId: val,
+            })
+          }
+          options={[
+            { value: "all", label: "Todas las categorías" },
+            { value: "null", label: "Sin categoría" },
+            ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+          ]}
+          icon={Tags}
+          className="flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto"
+        />
 
         <div className="inline-flex h-11 items-center gap-1 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-1 shadow-[var(--shadow-sm)] shrink-0 w-full sm:w-auto justify-center">
           <button

@@ -117,3 +117,63 @@ export async function uploadBusinessLogoImage(
 ): Promise<BusinessImageUpload> {
   return uploadBusinessImage(businessId, "logo", file);
 }
+
+export interface BalanceKPI {
+  value: number;
+  delta: number;
+}
+
+export interface PaymentMethodBreakdown {
+  cash: number;
+  credit_card: number;
+  transfer: number;
+  online: number;
+}
+
+export interface StaffCommissionItem {
+  staff_id: string;
+  staff_name: string;
+  bookings_count: number;
+  income: number;
+  commission: number;
+  status: string;
+}
+
+export interface ProfitableServiceItem {
+  name: string;
+  bookings_count: number;
+  income: number;
+}
+
+export interface ExpensesBreakdown {
+  commissions: number;
+  fixed_costs: number;
+  variable_costs: number;
+}
+
+export interface BalanceResponse {
+  period: string;
+  start_date: string;
+  end_date: string;
+  gross_income: BalanceKPI;
+  expenses: BalanceKPI;
+  expenses_breakdown: ExpensesBreakdown;
+  net_profit: BalanceKPI;
+  new_customers: BalanceKPI;
+  payment_methods: PaymentMethodBreakdown;
+  staff_commissions: StaffCommissionItem[];
+  profitable_services: ProfitableServiceItem[];
+}
+
+export interface GetBusinessBalanceParams {
+  branch_id?: string | null;
+  period?: string;
+}
+
+export async function getBusinessBalance(
+  businessId: string,
+  params: GetBusinessBalanceParams = {}
+): Promise<BalanceResponse> {
+  const query = toQueryString(params);
+  return request<BalanceResponse>(`/businesses/${businessId}/balance${query ? `?${query}` : ""}`);
+}

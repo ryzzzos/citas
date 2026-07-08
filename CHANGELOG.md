@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.10] - 2026-07-08
+
+### Added
+- **Módulo de Balance Financiero (Dashboard)**:
+  - Creación de la página del módulo de balances en `frontend/app/dashboard/balance/page.tsx`. Muestra métricas financieras clave: ingresos brutos, gastos, comisiones de personal, ganancias netas y desglose de métodos de pago (efectivo, tarjeta, transferencia, online), además de clientes nuevos.
+  - Implementación del componente `CustomSelect` en `frontend/components/ui/CustomSelect.tsx` para ajustarse estrictamente a la guía de diseño del proyecto (eliminación de controles select nativos).
+  - Añadido el endpoint de balance financiero `/businesses/{business_id}/balance` en el backend (`backend/app/routers/balance.py`) para consolidar transacciones y comisiones.
+  - Actualizados los selectores de servicios en `frontend/components/services/ServicesFilters.tsx` para hacer uso del nuevo `CustomSelect` de alto diseño.
+  - Mejoras de diseño en `SegmentedControl.tsx` para el cálculo de colores activos y sombras más suaves.
+
 ## [0.4.9] - 2026-07-02
 
 ### Added
