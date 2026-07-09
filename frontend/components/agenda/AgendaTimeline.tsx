@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
-import { Clock, User, Check, X as XIcon, CalendarClock, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Clock, User, Check, X as XIcon, CalendarClock, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2, Wallet, Banknote, CreditCard, ArrowLeftRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AgendaBooking, AgendaDayColumn } from "@/lib/agenda/types";
+import type { PaymentMethod } from "@/lib/api/bookings";
 import SegmentedControl from "@/components/ui/SegmentedControl";
+import BookingTimeline from "./BookingTimeline";
 
 interface AgendaTimelineProps {
   columns: AgendaDayColumn[];
@@ -16,6 +18,7 @@ interface AgendaTimelineProps {
     bookingId: string,
     status: "pending" | "confirmed" | "cancelled" | "completed"
   ) => void;
+  onPaymentRegister?: (bookingId: string, method: PaymentMethod) => void;
   initialBookingId?: string | null;
 }
 
@@ -355,11 +358,23 @@ export default function AgendaTimeline({
   onCancel,
   onReschedule,
   onStatusUpdate,
+  onPaymentRegister,
   initialBookingId,
 }: AgendaTimelineProps) {
   const [selectedBooking, setSelectedBooking] = useState<AgendaBooking | null>(null);
   const [drawerStatus, setDrawerStatus] = useState<AgendaBooking["status"] | null>(null);
+  const [statusBeforeCancel, setStatusBeforeCancel] = useState<AgendaBooking["status"] | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleCopy = (text: string, type: "tel" | "wa") => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedText(type);
+      setTimeout(() => setCopiedText(null), 2000);
+    }
+  };
 
   // Sync state during render if initialBookingId changes
   const [prevInitialBookingId, setPrevInitialBookingId] = useState<string | null | undefined>(undefined);
@@ -374,6 +389,7 @@ export default function AgendaTimeline({
       if (found) {
         setSelectedBooking(found);
         setDrawerStatus(found.status);
+        setCopiedText(null);
       }
     }
   }
@@ -393,15 +409,27 @@ export default function AgendaTimeline({
   const handleSelectBooking = (booking: AgendaBooking) => {
     setSelectedBooking(booking);
     setDrawerStatus(booking.status);
+    setStatusBeforeCancel(null);
+    setSelectedPaymentMethod(null);
+    setCopiedText(null);
   };
 
   const handleCloseAndSave = () => {
-    if (selectedBooking && drawerStatus && drawerStatus !== selectedBooking.status) {
-      if (onStatusUpdate) {
-        onStatusUpdate(selectedBooking.id, drawerStatus);
+    if (selectedBooking) {
+      // 1. Persist status change if it differs
+      if (drawerStatus && drawerStatus !== selectedBooking.status) {
+        if (onStatusUpdate) {
+          onStatusUpdate(selectedBooking.id, drawerStatus);
+        }
+      }
+      // 2. Persist payment method if one was selected and booking wasn't already paid
+      if (selectedPaymentMethod && onPaymentRegister && !(selectedBooking.payment?.status === "paid" || selectedBooking.paid_at)) {
+        onPaymentRegister(selectedBooking.id, selectedPaymentMethod);
       }
     }
     setSelectedBooking(null);
+    setSelectedPaymentMethod(null);
+    setCopiedText(null);
     // Remove query params from URL to clean up the address bar
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
@@ -553,145 +581,262 @@ export default function AgendaTimeline({
               </header>
 
               {/* Body */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 space-y-6">
-                {/* Time Slot & Staff */}
-                <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-3">
-                  <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
-                    <Clock className="h-4 w-4 text-[var(--text-muted)]" />
-                    <div>
-                      <p className="font-semibold text-[var(--text-primary)]">
-                        {selectedBooking.startAt.toFormat("cccc, dd LLL yyyy")}
-                      </p>
-                      <p className="text-[11px] text-[var(--text-muted)]">
-                        {selectedBooking.startAt.toFormat("HH:mm")} - {selectedBooking.endAt.toFormat("HH:mm")}
-                      </p>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <div className="flex flex-col min-h-full p-4 justify-between gap-3.5">
+                  {/* Top content group */}
+                  <div className="space-y-3.5">
+                    {/* 1. Card de Cita y Cliente (Combined & Compact) */}
+                    <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3.5 shadow-[var(--shadow-sm)] space-y-3">
+                      <div className="flex items-start justify-between gap-4">
+                        {/* Left Side: Client Name & Booking Details */}
+                        <div className="min-w-0 flex-1 space-y-2.5">
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                              Cliente
+                            </p>
+                            <p className="text-base font-extrabold text-[var(--text-primary)] mt-0.5 break-words">
+                              {selectedBooking.customer_name ?? "Cliente sin nombre"}
+                            </p>
+                          </div>
+
+                          {/* Date, Time, and Staff info */}
+                          <div className="space-y-1 text-xs text-[var(--text-secondary)] font-semibold">
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0" />
+                              <span className="truncate">
+                                {selectedBooking.startAt.toFormat("dd LLL yyyy")}
+                                <span className="mx-1 text-[var(--text-muted)] font-normal">|</span>
+                                <span className="text-[var(--text-primary)]">
+                                  {selectedBooking.startAt.toFormat("HH:mm")}-{selectedBooking.endAt.toFormat("HH:mm")}
+                                </span>
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <User className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0" />
+                              <span className="truncate">
+                                Prof: <span className="text-[var(--text-primary)]">{selectedBooking.staffName}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Right Side: Stacking contact items vertically */}
+                        <div className="space-y-2 shrink-0 text-right">
+                          {selectedBooking.customer_phone && (
+                            <div className="flex items-center justify-end gap-2.5">
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedBooking.customer_phone!, "tel")}
+                                className="text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-right"
+                                title="Haga clic para copiar número"
+                              >
+                                {copiedText === "tel" ? (
+                                  <span className="text-[var(--color-info)] font-bold">✓ ¡Copiado!</span>
+                                ) : (
+                                  selectedBooking.customer_phone
+                                )}
+                              </button>
+                              <a
+                                href={`tel:${selectedBooking.customer_phone}`}
+                                title="Llamar"
+                                className="flex h-7.5 w-7.5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--color-info)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.90]"
+                              >
+                                <Phone className="h-3.5 w-3.5" />
+                              </a>
+                            </div>
+                          )}
+
+                          {selectedBooking.customer_whatsapp && (
+                            <div className="flex items-center justify-end gap-2.5">
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedBooking.customer_whatsapp!, "wa")}
+                                className="text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-right"
+                                title="Haga clic para copiar WhatsApp"
+                              >
+                                {copiedText === "wa" ? (
+                                  <span className="text-[var(--color-success)] font-bold">✓ ¡Copiado!</span>
+                                ) : (
+                                  selectedBooking.customer_whatsapp
+                                )}
+                              </button>
+                              <a
+                                href={`https://wa.me/${selectedBooking.customer_whatsapp.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Abrir en WhatsApp"
+                                className="flex h-7.5 w-7.5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--color-success)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.90]"
+                              >
+                                <MessageSquare className="h-3.5 w-3.5" />
+                              </a>
+                            </div>
+                          )}
+
+                          {selectedBooking.customer_email && (
+                            <div className="flex items-center justify-end gap-2.5">
+                              <span className="text-[11px] font-semibold text-[var(--text-secondary)] truncate max-w-[160px]" title={selectedBooking.customer_email}>
+                                {selectedBooking.customer_email}
+                              </span>
+                              <div className="flex h-7.5 w-7.5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-muted)]">
+                                <Mail className="h-3.5 w-3.5" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Unified Observaciones (Booking Notes) inside the client card below the columns */}
+                      {selectedBooking.notes && selectedBooking.notes.trim() !== "" && (
+                        <div className="border-t border-[var(--border-soft)] pt-2.5 space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                            Observaciones
+                          </p>
+                          <p className="text-xs leading-relaxed text-[var(--text-secondary)] italic bg-[var(--surface-2)] p-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)]">
+                            {selectedBooking.notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2. BookingTimeline (Rendered transparent on the base surface var(--surface-2)) */}
+                    <div className="px-1.5">
+                      <BookingTimeline booking={selectedBooking} statusOverride={drawerStatus} statusBeforeCancel={statusBeforeCancel} />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)] border-t border-[var(--border-strong)] pt-3">
-                    <User className="h-4 w-4 text-[var(--text-muted)]" />
-                    <div>
-                      <p className="font-semibold text-[var(--text-primary)]">
-                        {selectedBooking.staffName}
-                      </p>
-                      <p className="text-[11px] text-[var(--text-muted)]">
-                        Profesional asignado
-                      </p>
+                  {/* Bottom content group (Actions unified in a single Card) */}
+                  <div className="space-y-3.5 mt-auto">
+                    <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3.5 shadow-[var(--shadow-sm)]">
+                      {/* Cobro en Sucursal Section (only if not cancelled) */}
+                      <AnimatePresence initial={false}>
+                        {(drawerStatus || selectedBooking.status) !== "cancelled" && (
+                          <motion.div
+                            key="cobro-section"
+                            initial={{ opacity: 0, height: 0, overflow: "hidden" }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                          >
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Wallet className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                                  Cobro en Sucursal
+                                </h3>
+                              </div>
+
+                              <AnimatePresence mode="wait">
+                                {selectedBooking.payment?.status === "paid" || selectedBooking.paid_at ? (
+                                  <motion.div
+                                    key="paid-badge"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-success)]/10 border border-[var(--color-success)]/20 px-3 py-2"
+                                  >
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-success)] shrink-0" />
+                                    <p className="text-xs font-bold text-[var(--color-success)]">
+                                      Pagado vía {selectedBooking.payment?.payment_method === "cash" ? "Efectivo" : selectedBooking.payment?.payment_method === "credit_card" ? "Tarjeta" : selectedBooking.payment?.payment_method === "transfer" ? "Transferencia" : "—"}
+                                    </p>
+                                  </motion.div>
+                                ) : (
+                                  <motion.div
+                                    key="pay-options"
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="grid grid-cols-3 gap-2"
+                                  >
+                                    {([
+                                      { method: "cash" as PaymentMethod, label: "Efectivo", icon: Banknote },
+                                      { method: "credit_card" as PaymentMethod, label: "Tarjeta", icon: CreditCard },
+                                      { method: "transfer" as PaymentMethod, label: "Transfer.", icon: ArrowLeftRight },
+                                    ]).map((option) => (
+                                      <button
+                                        key={option.method}
+                                        type="button"
+                                        onClick={() => setSelectedPaymentMethod(option.method)}
+                                        className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-2 transition-all active:scale-[0.96] ${
+                                          selectedPaymentMethod === option.method
+                                            ? "border-[var(--color-success)] bg-[var(--color-success)]/10 text-[var(--color-success)] shadow-[0_0_0_1px_var(--color-success)]"
+                                            : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-secondary)] hover:border-[var(--color-success)]/40 hover:bg-[var(--color-success)]/5 hover:text-[var(--color-success)]"
+                                        }`}
+                                      >
+                                        <option.icon className="h-4 w-4" />
+                                        <span className="text-[10px] font-bold">{option.label}</span>
+                                      </button>
+                                    ))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            <div className="border-t border-[var(--border-soft)] mt-3 mb-2.5" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Estado de la Cita Section */}
+                      <div className="space-y-3 flex flex-col items-center">
+                        <div className="flex items-center gap-2 w-full">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                          <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] text-left">
+                            Estado de la Cita
+                          </h3>
+                        </div>
+
+                        <SegmentedControl
+                          name="booking-status-selector"
+                          width={108}
+                          colorizeSelected={true}
+                          value={drawerStatus || selectedBooking.status}
+                          onChange={(newStatus) => {
+                            setDrawerStatus(newStatus as AgendaBooking["status"]);
+                            setStatusBeforeCancel(null);
+                          }}
+                          options={[
+                            { value: "pending", label: "Pendiente", icon: Clock, activeColor: "var(--color-pending)" },
+                            { value: "confirmed", label: "Confirmada", icon: Check, activeColor: "var(--color-info)" },
+                            { value: "completed", label: "Completada", icon: CheckCircle2, activeColor: "var(--color-success)" },
+                          ]}
+                        />
+
+                        <div className="relative w-full group">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setStatusBeforeCancel(drawerStatus || selectedBooking.status);
+                              setDrawerStatus("cancelled");
+                            }}
+                            disabled={(drawerStatus || selectedBooking.status) === "cancelled" || (drawerStatus || selectedBooking.status) === "completed"}
+                            className="w-full py-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] text-xs font-bold text-[var(--color-error)] transition-all hover:bg-[var(--color-error)]/10 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+                          >
+                            Cancelar Cita
+                          </button>
+                          {((drawerStatus || selectedBooking.status) === "cancelled" || (drawerStatus || selectedBooking.status) === "completed") && (
+                            <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[var(--text-primary)] px-3.5 py-2 text-xs font-bold text-[var(--surface-3)] opacity-0 group-hover:opacity-100 transition-opacity shadow-[var(--shadow-lg)] border border-[var(--border-strong)] z-30">
+                              {(drawerStatus || selectedBooking.status) === "cancelled" ? "Esta cita ya fue cancelada" : "No se puede cancelar una cita completada"}
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[var(--text-primary)]" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Customer Info Card */}
-                <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                    Datos del Cliente
-                  </h3>
-
-                  <div className="space-y-1">
-                    <p className="text-base font-bold text-[var(--text-primary)]">
-                      {selectedBooking.customer_name ?? "Cliente sin nombre"}
-                    </p>
-                    {selectedBooking.customer_email && (
-                      <p className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
-                        <Mail className="h-3.5 w-3.5" />
-                        {selectedBooking.customer_email}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Quick Contact Actions */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    {selectedBooking.customer_phone ? (
-                      <a
-                        href={`tel:${selectedBooking.customer_phone}`}
-                        className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-xs font-bold text-[var(--text-primary)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.98]"
-                      >
-                        <Phone className="h-4 w-4 text-[var(--color-info)]" />
-                        Llamar
-                      </a>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-xs font-bold text-[var(--text-muted)] opacity-50">
-                        <Phone className="h-4 w-4" />
-                        Sin teléfono
-                      </div>
-                    )}
-
-                    {selectedBooking.customer_whatsapp ? (
-                      <a
-                        href={`https://wa.me/${selectedBooking.customer_whatsapp.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-xs font-bold text-[var(--text-primary)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.98]"
-                      >
-                        <MessageSquare className="h-4 w-4 text-[var(--color-success)]" />
-                        WhatsApp
-                      </a>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-xs font-bold text-[var(--text-muted)] opacity-50">
-                        <MessageSquare className="h-4 w-4" />
-                        Sin WhatsApp
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Booking Notes */}
-                <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                    Notas de Reserva
-                  </h3>
-                  <p className="text-xs leading-relaxed text-[var(--text-secondary)] italic">
-                    {selectedBooking.notes || "Sin notas adicionales."}
-                  </p>
-                </div>
-
-                {/* State & Actions Card */}
-                <div className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-sm)] space-y-4 flex flex-col items-center">
-                  <h3 className="w-full text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] text-left">
-                    Estado de la Cita
-                  </h3>
-
-                  <SegmentedControl
-                    name="booking-status-selector"
-                    width={108}
-                    colorizeSelected={true}
-                    value={drawerStatus || selectedBooking.status}
-                    onChange={(newStatus) => {
-                      setDrawerStatus(newStatus as AgendaBooking["status"]);
-                    }}
-                    options={[
-                      { value: "pending", label: "Pendiente", icon: Clock, activeColor: "var(--color-pending)" },
-                      { value: "confirmed", label: "Confirmada", icon: Check, activeColor: "var(--color-info)" },
-                      { value: "completed", label: "Completada", icon: CheckCircle2, activeColor: "var(--color-success)" },
-                    ]}
-                  />
-
-                  {/* Destructive state (Cancel Appointment) */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrawerStatus("cancelled");
-                    }}
-                    disabled={(drawerStatus || selectedBooking.status) === "cancelled"}
-                    className="w-full py-2.5 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] text-xs font-bold text-[var(--color-error)] transition-all hover:bg-[var(--color-error)]/10 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    Cancelar Cita
-                  </button>
                 </div>
               </div>
 
               {/* Footer Actions */}
-              <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] bg-[var(--surface-1)] p-4 flex flex-col items-center gap-2">
+              <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] bg-[var(--surface-1)] p-4">
                 <button
                   type="button"
                   onClick={handleCloseAndSave}
                   className="w-full py-3 rounded-xl bg-[linear-gradient(135deg,var(--app-primary),var(--app-primary-strong))] text-xs font-bold text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98]"
                 >
-                  Listo
+                  Guardar
                 </button>
-                <p className="text-[10px] text-[var(--text-muted)] font-medium">
-                  Los cambios se guardan al salir.
-                </p>
               </div>
             </motion.aside>
           </>

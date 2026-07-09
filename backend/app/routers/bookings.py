@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from datetime import date, datetime, time, timezone, tzinfo
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -11,7 +12,7 @@ from app.models.booking import Booking
 from app.models.service import Service
 from app.models.staff import Staff
 from app.models.user import User
-from app.schemas.booking import BookingCreate, BookingRead, BookingStatusUpdate
+from app.schemas.booking import BookingCreate, BookingRead, BookingStatusUpdate, BookingPayInput
 from app.services.availability_service import get_available_slots
 from app.services.booking_service import create_booking, update_booking_status
 
@@ -174,3 +175,54 @@ def change_status(
     db: Session = Depends(get_db),
 ):
     return update_booking_status(booking_id, data, current_user, db)
+
+
+@router.post("/{booking_id}/pay", response_model=BookingRead)
+def register_booking_payment(
+    booking_id: uuid.UUID,
+    data: BookingPayInput,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # 1. Fetch booking with preloaded payment
+    booking = db.query(Booking).options(
+        joinedload(Booking.service),
+        joinedload(Booking.staff),
+        joinedload(Booking.branch),
+        joinedload(Booking.payment)
+    ).filter(Booking.id == booking_id).first()
+    
+    if not booking:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+
+    # 2. Fetch business to verify owner permissions
+    from app.models.business import Business
+    business = db.get(Business, booking.business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Business not found")
+
+    # 3. Security Check: Only business owner or admin can register payment manually
+    if business.owner_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    # 4. Fetch or atomically create payment (defensive programming for legacy bookings)
+    from app.models.payment import Payment
+    payment = booking.payment
+    if not payment:
+        payment = Payment(
+            booking_id=booking.id,
+            amount=booking.service.price if booking.service else Decimal("0.00"),
+            status="pending",
+            payment_method="pending"
+        )
+        db.add(payment)
+        db.flush()
+
+    # 5. Register payment
+    payment.status = "paid"
+    payment.payment_method = data.payment_method
+    booking.paid_at = datetime.now(timezone.utc)
+
+    db.commit()
+    db.refresh(booking)
+    return booking

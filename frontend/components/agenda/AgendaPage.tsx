@@ -23,7 +23,8 @@ import {
 } from "@/lib/agenda/calendar";
 import type { AgendaBooking, AgendaFilters, AgendaView } from "@/lib/agenda/types";
 import { useAgendaData } from "@/lib/agenda/useAgendaData";
-import { updateBookingStatus } from "@/lib/api/bookings";
+import { updateBookingStatus, registerBookingPayment } from "@/lib/api/bookings";
+import type { PaymentMethod } from "@/lib/api/bookings";
 import { useBranchContext } from "@/contexts/BranchContext";
 
 const DEFAULT_FILTERS: AgendaFilters = {
@@ -162,6 +163,37 @@ export default function AgendaPage() {
     // Reserved for modal/flow integration without changing timeline architecture.
   }
 
+  async function handlePaymentRegister(bookingId: string, method: PaymentMethod) {
+    const methodLabel = {
+      cash: "Efectivo",
+      credit_card: "Tarjeta",
+      transfer: "Transferencia",
+    }[method];
+
+    const promise = (async () => {
+      await registerBookingPayment(bookingId, method);
+      await reload();
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Registrando pago..." },
+      success: {
+        title: "Pago registrado",
+        description: `Se registró el pago vía ${methodLabel}.`,
+      },
+      error: (err) => ({
+        title: "Error al registrar pago",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo.",
+      }),
+    });
+
+    try {
+      await promise;
+    } catch {
+      // Error already displayed via sileo toast.
+    }
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 lg:gap-5">
       <AgendaHeader
@@ -197,6 +229,7 @@ export default function AgendaPage() {
                   onConfirm={(bookingId) => handleStatusUpdate(bookingId, "confirmed")}
                   onCancel={(bookingId) => handleStatusUpdate(bookingId, "cancelled")}
                   onStatusUpdate={handleStatusUpdate}
+                  onPaymentRegister={handlePaymentRegister}
                   onReschedule={handleReschedule}
                   initialBookingId={initialBookingId}
                 />

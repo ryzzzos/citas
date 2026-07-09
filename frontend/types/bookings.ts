@@ -18,4 +18,15 @@ export interface Booking {
   customer_phone?: string;
   customer_whatsapp?: string;
   notes?: string;
+  created_at?: string;
+  confirmed_at?: string | null;
+  completed_at?: string | null;
+  cancelled_at?: string | null;
+  paid_at?: string | null;
+  payment?: {
+    id: string;
+    amount: number;
+    status: string;
+    payment_method: string;
+  } | null;
 }

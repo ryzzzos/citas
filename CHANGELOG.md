@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.11] - 2026-07-09
+
+### Added
+- **Fechas de Historial y Pagos en Citas**:
+  - Implementación de campos de marcas de tiempo en el modelo de base de datos de citas (`created_at`, `confirmed_at`, `completed_at`, `cancelled_at`, `paid_at`) en el backend y schemas asociados (`backend/app/models/booking.py` y `schemas/booking.py`).
+  - Creación y aplicación de migración de base de datos Alembic (`20260709_0219_45921232d8c3_add_booking_timestamps.py`).
+  - Creación del componente visual de línea de tiempo de cita `BookingTimeline` (`frontend/components/agenda/BookingTimeline.tsx`) para graficar de forma elegante el progreso del ciclo de vida de la reserva (`Creada` -> `Confirmada` -> `Completada` / `Cancelada` -> `Pagada`), con estados e iconos interactivos.
+  - Implementación del botón "Cancelar Cita" y registro de método de pago (`cash`, `credit_card`, `transfer`) en el panel de detalles de la cita (`AgendaTimeline.tsx`).
+  - Integración del endpoint `/bookings/{bookingId}/pay` en el cliente de API (`frontend/lib/api/bookings.ts`).
+
 ## [0.4.10] - 2026-07-08
 
 ### Added

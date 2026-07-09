@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -68,6 +68,16 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
         notes=data.notes,
     )
     db.add(booking)
+    db.flush()
+
+    from app.models.payment import Payment
+    payment = Payment(
+        booking_id=booking.id,
+        amount=service.price,
+        status="pending",
+        payment_method="pending"
+    )
+    db.add(payment)
     db.commit()
     db.refresh(booking)
     return booking
@@ -91,6 +101,15 @@ def update_booking_status(
             )
 
     booking.status = data.status
+    
+    now_utc = datetime.now(timezone.utc)
+    if data.status == "confirmed":
+        booking.confirmed_at = now_utc
+    elif data.status == "completed":
+        booking.completed_at = now_utc
+    elif data.status == "cancelled":
+        booking.cancelled_at = now_utc
+
     db.commit()
     db.refresh(booking)
     return booking

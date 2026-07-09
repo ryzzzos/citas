@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, time
+from datetime import date, time, datetime
 from typing import Literal
 
 from pydantic import BaseModel
@@ -17,6 +17,15 @@ class BookingCreate(BaseModel):
     customer_phone: str | None = None
     customer_whatsapp: str | None = None
     notes: str | None = None
+
+
+class BookingPaymentRead(BaseModel):
+    id: uuid.UUID
+    amount: float
+    status: str
+    payment_method: str
+
+    model_config = {"from_attributes": True}
 
 
 class BookingRead(BaseModel):
@@ -39,8 +48,20 @@ class BookingRead(BaseModel):
     staff_name: str | None = None
     branch_name: str | None = None
 
+    created_at: datetime
+    confirmed_at: datetime | None = None
+    completed_at: datetime | None = None
+    cancelled_at: datetime | None = None
+    paid_at: datetime | None = None
+    
+    payment: BookingPaymentRead | None = None
+
     model_config = {"from_attributes": True}
 
 
 class BookingStatusUpdate(BaseModel):
     status: Literal["pending", "confirmed", "cancelled", "completed"]
+
+
+class BookingPayInput(BaseModel):
+    payment_method: Literal["cash", "credit_card", "transfer"]

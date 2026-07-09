@@ -86,3 +86,15 @@ export async function updateBookingStatus(
     body: JSON.stringify({ status }),
   });
 }
+
+export type PaymentMethod = "cash" | "credit_card" | "transfer";
+
+export async function registerBookingPayment(
+  bookingId: string,
+  paymentMethod: PaymentMethod
+): Promise<Booking> {
+  return request<Booking>(`/bookings/${bookingId}/pay`, {
+    method: "POST",
+    body: JSON.stringify({ payment_method: paymentMethod }),
+  });
+}
