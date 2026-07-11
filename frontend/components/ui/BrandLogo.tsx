@@ -100,17 +100,17 @@ export default function BrandLogo({
         {showBg && <rect x="70" y="50" width="372" height="412" rx="84" fill="url(#bgGrad)" />}
 
         {/* Calendario Base */}
-        <rect x="76" y="96" width="360" height="360" rx="52" fill="url(#calendarSurface)" filter="url(#softDropShadow)" />
+        <rect x="76" y="96" width="360" height="360" rx="52" fill="url(#calendarSurface)" />
         <rect x="76" y="96" width="360" height="360" rx="52" fill="none" stroke="#FFFFFF" strokeWidth="4" />
 
         {/* Cuadros Internos Estáticos */}
-        <rect x="116" y="136" width="132" height="132" rx="32" fill="url(#gridSurface)" filter="url(#innerGridShadow)" />
+        <rect x="116" y="136" width="132" height="132" rx="32" fill="url(#gridSurface)" />
         <rect x="116" y="136" width="132" height="132" rx="32" fill="none" stroke="#FFFFFF" strokeWidth="3" />
 
-        <rect x="264" y="136" width="132" height="132" rx="32" fill="url(#gridSurface)" filter="url(#innerGridShadow)" />
+        <rect x="264" y="136" width="132" height="132" rx="32" fill="url(#gridSurface)" />
         <rect x="264" y="136" width="132" height="132" rx="32" fill="none" stroke="#FFFFFF" strokeWidth="3" />
 
-        <rect x="116" y="284" width="132" height="132" rx="32" fill="url(#gridSurface)" filter="url(#innerGridShadow)" />
+        <rect x="116" y="284" width="132" height="132" rx="32" fill="url(#gridSurface)" />
         <rect x="116" y="284" width="132" height="132" rx="32" fill="none" stroke="#FFFFFF" strokeWidth="3" />
 
         {/* Cuadro Azul Desplazado */}
@@ -141,13 +141,11 @@ export default function BrandLogo({
         <ellipse cx="346" cy="126" rx="15" ry="9" fill="url(#ringBase)" />
 
         {/* Clip Cilíndrico Izquierdo */}
-        <rect x="154" y="60" width="24" height="68" rx="12" fill="#000000" opacity="0.25" filter="url(#ringShadow)" />
         <rect x="154" y="60" width="24" height="68" rx="12" fill="url(#chromeCylinder)" />
         <rect x="158" y="63" width="5" height="62" rx="2.5" fill="#FFFFFF" opacity="0.9" />
         <rect x="173" y="64" width="2" height="60" rx="1" fill="#FFFFFF" opacity="0.5" />
 
         {/* Clip Cilíndrico Derecho */}
-        <rect x="334" y="60" width="24" height="68" rx="12" fill="#000000" opacity="0.25" filter="url(#ringShadow)" />
         <rect x="334" y="60" width="24" height="68" rx="12" fill="url(#chromeCylinder)" />
         <rect x="338" y="63" width="5" height="62" rx="2.5" fill="#FFFFFF" opacity="0.9" />
         <rect x="353" y="64" width="2" height="60" rx="1" fill="#FFFFFF" opacity="0.5" />

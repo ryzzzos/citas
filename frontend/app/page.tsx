@@ -21,6 +21,7 @@ import {
 import AppIcon from "@/components/ui/AppIcon";
 import { KineticText } from "@/components/ui/KineticText";
 import BrandLogo from "@/components/ui/BrandLogo";
+import Safari from "@/components/ui/Safari";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -206,7 +207,7 @@ export default function HomePage() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, delay: 2.0, ease: [0.16, 1, 0.3, 1] }}
           className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3.5 py-1 text-[0.7rem] font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)]"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)] animate-pulse" />
@@ -216,7 +217,7 @@ export default function HomePage() {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
           className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
         >
           <KineticText
@@ -235,7 +236,7 @@ export default function HomePage() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 2.2, ease: [0.16, 1, 0.3, 1] }}
           className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
         >
           Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
@@ -246,7 +247,7 @@ export default function HomePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 2.3, ease: [0.16, 1, 0.3, 1] }}
           className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
         >
           <Link
@@ -263,6 +264,20 @@ export default function HomePage() {
           </Link>
         </motion.div>
       </section>
+
+      {/* Safari Browser Mockup */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 2.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-12 pb-16"
+      >
+        <Safari
+          url="agendaweb.com"
+          imageSrc="/dashboard-mock.webp"
+          imageSrcDark="/dashboard-mock-dark.webp"
+        />
+      </motion.div>
 
       {/* ── INTERACTIVE MOCKUP SECTION ──────────────────────── */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-12">

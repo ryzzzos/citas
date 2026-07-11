@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.13] - 2026-07-11
+
+### Added
+- **Mockup de Navegador Safari e Identidad de Marca**:
+  - Incorporación del componente premium `Safari` (`frontend/components/ui/Safari.tsx`) para la visualización del mockup de navegador en la Landing Page.
+  - Actualización de la Landing Page principal (`frontend/app/page.tsx`) introduciendo el mockup del dashboard interactivo dentro de un navegador Safari con carga diferida/retardada mediante Framer Motion.
+  - Creación de recursos gráficos de mockup (`dashboard-mock.webp` y `dashboard-mock-dark.webp`) en `frontend/public/`.
+  - Mejoras de visualización del logo unificado de la plataforma (`BrandLogo.tsx` y `Navbar.tsx`).
+
 ## [0.4.12] - 2026-07-11
 
 ### Added

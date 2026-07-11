@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
@@ -80,6 +81,19 @@ function ResultAvatar({ logoUrl, name }: { logoUrl: string | null; name: string 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+
+  const [isIntroActive, setIsIntroActive] = useState(() => pathname === "/");
+
+  useEffect(() => {
+    if (isIntroActive) {
+      const timer = setTimeout(() => {
+        setIsIntroActive(false);
+      }, 1400);
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isIntroActive]);
   const hideOnDashboard = pathname.startsWith("/dashboard");
   const isMapRoute = pathname.startsWith("/sucursales");
 
@@ -259,28 +273,79 @@ export default function Navbar() {
   }
 
   return (
-    <header
-      className={cn(
-        "z-[760] px-4 pt-[max(env(safe-area-inset-top),0.45rem)] md:px-6",
-        isMapRoute ? "fixed inset-x-0 top-0 pb-0" : "sticky top-0 pb-1",
-      )}
-    >
-      <div
-        ref={navbarRef}
+    <>
+      <AnimatePresence>
+        {isIntroActive && (
+          <motion.div
+            key="splash-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed inset-0 z-[9998] bg-[var(--surface-1)] pointer-events-auto"
+          />
+        )}
+        {isIntroActive && (
+          <div
+            key="splash-logo-container"
+            className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              layoutId="navbar-brand-logo-svg"
+              transition={{ duration: 1.4, ease: [0.32, 0.72, 0, 1] }}
+              className="pointer-events-auto w-[160px] h-[176px]"
+            >
+              <BrandLogo size={160} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      <header
         className={cn(
-          "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-full px-3.5 sm:px-6 w-full transition-all duration-300",
-          isMapRoute ? "max-w-[78rem]" : "max-w-6xl",
-          "bg-[var(--surface-glass)] shadow-[var(--shadow-md)] backdrop-blur-md border border-[var(--border-strong)]",
+          "z-[760] px-4 pt-[max(env(safe-area-inset-top),0.45rem)] md:px-6",
+          isMapRoute ? "fixed inset-x-0 top-0 pb-0" : "sticky top-0 pb-1",
         )}
       >
-        {/* Logo/Brand */}
-        <Link
-          href="/"
-          onClick={() => setSearchExpanded(false)}
-          className="dashboard-focusable rounded-full px-1.5 shrink-0 flex items-center justify-center h-full"
+        <div
+          ref={navbarRef}
+          className={cn(
+            "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-full px-3.5 sm:px-6 w-full transition-all duration-300",
+            isMapRoute ? "max-w-[78rem]" : "max-w-6xl",
+            "bg-[var(--surface-glass)] shadow-[var(--shadow-md)] backdrop-blur-md border border-[var(--border-strong)]",
+          )}
         >
-          <BrandLogo size={36} />
-        </Link>
+          {/* Logo/Brand */}
+          <Link
+            href="/"
+            onClick={() => setSearchExpanded(false)}
+            className="dashboard-focusable rounded-full px-1.5 shrink-0 flex items-center justify-center h-full"
+          >
+            <div className="inline-flex items-center gap-2 select-none">
+              <div className="relative w-9 h-[39.6px] flex items-center justify-center shrink-0">
+                {!isIntroActive && (
+                  <motion.div
+                    layoutId="navbar-brand-logo-svg"
+                    transition={{ duration: 1.4, ease: [0.32, 0.72, 0, 1] }}
+                    className="absolute inset-0 w-9 h-[39.6px] flex items-center justify-center"
+                  >
+                    <BrandLogo size={36} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
+                  </motion.div>
+                )}
+              </div>
+              <motion.div
+                initial={isIntroActive ? { opacity: 0, x: -6 } : { opacity: 1, x: 0 }}
+                animate={!isIntroActive ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.9, ease: [0.32, 0.72, 0, 1] }}
+                className="flex items-baseline leading-none font-sans text-[1.22rem] tracking-tight"
+              >
+                <span className="font-bold text-[var(--text-primary)]">
+                  Agenda
+                </span>
+                <span className="font-light text-[var(--text-secondary)]">
+                  Web
+                </span>
+              </motion.div>
+            </div>
+          </Link>
 
         {/* ── CENTER ELONGATED SEARCH CAPSULE & COMBOBOX ── */}
         {isMapRoute && ctx && (
@@ -626,5 +691,6 @@ export default function Navbar() {
         </div>
       </div>
     </header>
+    </>
   );
 }
