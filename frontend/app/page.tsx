@@ -20,6 +20,7 @@ import {
 
 import AppIcon from "@/components/ui/AppIcon";
 import { KineticText } from "@/components/ui/KineticText";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -490,7 +491,8 @@ export default function HomePage() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
-      <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 px-6 text-center text-[0.72rem] text-[var(--text-muted)]">
+      <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 px-6 text-center text-[0.72rem] text-[var(--text-muted)] flex flex-col items-center justify-center gap-3">
+        <BrandLogo size={24} />
         <p>© {new Date().getFullYear()} Agenda Web. Todos los derechos reservados. Diseñado para simplificar tu día.</p>
       </footer>
     </main>

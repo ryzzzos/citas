@@ -1,17 +1,19 @@
 import uuid
 from pathlib import Path
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_business_owner
 from app.models.business import Business
 from app.models.branch import Branch
+from app.models.booking import Booking
 from app.models.user import User
+from app.schemas.booking import BookingAlert
 from app.schemas.business import (
     BusinessCreate,
     BusinessImageUploadRead,
@@ -491,3 +493,80 @@ def delete_business(
     business = _get_owned_business(business_id, current_user, db)
     db.delete(business)
     db.commit()
+
+
+@router.get("/{business_id}/alerts", response_model=list[BookingAlert])
+def get_business_alerts(
+    business_id: uuid.UUID,
+    timezone: str = "UTC",
+    current_user: User = Depends(require_business_owner),
+    db: Session = Depends(get_db),
+):
+    business = _get_owned_business(business_id, current_user, db)
+
+    # Resolve timezone
+    normalized_tz = timezone.strip()
+    if normalized_tz.upper() in {"UTC", "Z", "GMT"}:
+        tz_info = timezone.utc
+    else:
+        try:
+            from zoneinfo import ZoneInfo
+            tz_info = ZoneInfo(normalized_tz)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid timezone: {timezone}",
+            )
+
+    # Calculate now, today, and past date limit (7 days ago) in business local time
+    now_local = datetime.now(tz_info)
+    today_local = now_local.date()
+    time_local = now_local.time()
+    seven_days_ago = today_local - timedelta(days=7)
+
+    # Query bookings:
+    # 1. status == "pending" (all)
+    # 2. status == "confirmed" AND booking_date in [seven_days_ago, today_local] and (booking_date < today_local OR (booking_date == today_local AND start_time < time_local))
+    bookings = db.query(Booking).filter(
+        Booking.business_id == business.id,
+        or_(
+            Booking.status == "pending",
+            and_(
+                Booking.status == "confirmed",
+                Booking.booking_date >= seven_days_ago,
+                or_(
+                    Booking.booking_date < today_local,
+                    and_(
+                        Booking.booking_date == today_local,
+                        Booking.start_time <= time_local
+                    )
+                )
+            )
+        )
+    ).order_by(Booking.booking_date.asc(), Booking.start_time.asc()).all()
+
+    # Format alert list
+    alerts = []
+    for b in bookings:
+        if b.status == "pending":
+            alert_type = "pending_confirmation"
+            msg = f"Cita de {b.customer_name or 'Cliente'} por confirmar"
+        else:
+            alert_type = "past_uncompleted"
+            # Calculate days passed
+            days_diff = (today_local - b.booking_date).days
+            if days_diff == 0:
+                msg = f"Cita de {b.customer_name or 'Cliente'} sin completar hoy"
+            elif days_diff == 1:
+                msg = f"Cita de {b.customer_name or 'Cliente'} sin completar ayer"
+            else:
+                msg = f"Cita de {b.customer_name or 'Cliente'} sin completar hace {days_diff} días"
+
+        alerts.append({
+            "id": b.id,
+            "type": alert_type,
+            "message": msg,
+            "booking": b
+        })
+
+    return alerts

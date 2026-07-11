@@ -98,3 +98,21 @@ export async function registerBookingPayment(
     body: JSON.stringify({ payment_method: paymentMethod }),
   });
 }
+
+export async function rescheduleBooking(
+  bookingId: string,
+  bookingDate: string,
+  startTime: string,
+  staffId?: string
+): Promise<Booking> {
+  return request<Booking>(`/bookings/${bookingId}/reschedule`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      booking_date: bookingDate,
+      start_time: startTime,
+      staff_id: staffId || undefined,
+    }),
+  });
+}
+
+

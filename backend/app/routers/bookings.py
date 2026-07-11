@@ -12,9 +12,9 @@ from app.models.booking import Booking
 from app.models.service import Service
 from app.models.staff import Staff
 from app.models.user import User
-from app.schemas.booking import BookingCreate, BookingRead, BookingStatusUpdate, BookingPayInput
+from app.schemas.booking import BookingCreate, BookingRead, BookingStatusUpdate, BookingPayInput, BookingReschedule
 from app.services.availability_service import get_available_slots
-from app.services.booking_service import create_booking, update_booking_status
+from app.services.booking_service import create_booking, update_booking_status, reschedule_booking
 
 router = APIRouter()
 
@@ -226,3 +226,16 @@ def register_booking_payment(
     db.commit()
     db.refresh(booking)
     return booking
+
+
+@router.patch("/{booking_id}/reschedule", response_model=BookingRead)
+def reschedule_booking_endpoint(
+    booking_id: uuid.UUID,
+    data: BookingReschedule,
+    current_user: User = Depends(require_business_owner),
+    db: Session = Depends(get_db),
+):
+    return reschedule_booking(booking_id, data, current_user, db)
+
+
+

@@ -4,6 +4,7 @@ import type {
   BusinessMapResponse,
   BusinessSlugAvailability,
   UpdateBusinessInput,
+  Booking,
 } from "@/types";
 
 import { request, toQueryString } from "./client";
@@ -176,4 +177,19 @@ export async function getBusinessBalance(
 ): Promise<BalanceResponse> {
   const query = toQueryString(params);
   return request<BalanceResponse>(`/businesses/${businessId}/balance${query ? `?${query}` : ""}`);
+}
+
+export interface BookingAlert {
+  id: string;
+  type: "pending_confirmation" | "past_uncompleted";
+  message: string;
+  booking: Booking;
+}
+
+export async function getBusinessAlerts(
+  businessId: string,
+  timezone: string = "UTC"
+): Promise<BookingAlert[]> {
+  const query = toQueryString({ timezone });
+  return request<BookingAlert[]>(`/businesses/${businessId}/alerts${query ? `?${query}` : ""}`);
 }

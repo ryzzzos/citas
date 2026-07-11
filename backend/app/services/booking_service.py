@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.booking import Booking
 from app.models.service import Service
-from app.schemas.booking import BookingCreate, BookingStatusUpdate
+from app.schemas.booking import BookingCreate, BookingStatusUpdate, BookingReschedule
 from app.services.availability_service import _overlaps_any
 
 
@@ -113,3 +113,80 @@ def update_booking_status(
     db.commit()
     db.refresh(booking)
     return booking
+
+
+def reschedule_booking(
+    booking_id, data: BookingReschedule, current_user, db: Session
+) -> Booking:
+    import uuid
+    booking = db.get(Booking, booking_id)
+    if not booking:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La cita no fue encontrada")
+
+    # Security Check: Only business owner or admin can reschedule manually
+    from app.models.business import Business
+    business = db.get(Business, booking.business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El negocio no fue encontrado")
+
+    if business.owner_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permisos para realizar esta acción")
+
+    # Get service duration to calculate new end_time
+    service = booking.service
+    if not service:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La cita no tiene un servicio activo asociado",
+        )
+
+    end_time = (
+        datetime.combine(data.booking_date, data.start_time)
+        + timedelta(minutes=service.duration_minutes)
+    ).time()
+
+    # Time limits: start and end must be between 6:00 AM and 10:00 PM
+    from datetime import time as dt_time
+    limit_start = dt_time(6, 0)
+    limit_end = dt_time(22, 0)
+    if data.start_time < limit_start or end_time > limit_end:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Las citas deben comenzar y terminar entre las 6:00 AM y las 10:00 PM.",
+        )
+
+    # Use specified staff_id or fall back to booking's existing staff
+    target_staff_id = data.staff_id if data.staff_id is not None else booking.staff_id
+
+    # Conflict check - exclude the booking itself from overlaps
+    existing = (
+        db.query(Booking)
+        .filter(
+            Booking.staff_id == target_staff_id,
+            Booking.booking_date == data.booking_date,
+            Booking.status.notin_(["cancelled"]),
+            Booking.id != booking.id,
+        )
+        .all()
+    )
+
+    busy = [(b.start_time, b.end_time) for b in existing]
+    if _overlaps_any(data.start_time, end_time, busy):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El horario seleccionado no está disponible debido a un conflicto de agenda con el personal.",
+        )
+
+    # Update date and times
+    booking.booking_date = data.booking_date
+    booking.start_time = data.start_time
+    booking.end_time = end_time
+    if data.staff_id is not None:
+        booking.staff_id = data.staff_id
+
+    db.commit()
+    db.refresh(booking)
+    return booking
+
+
+

@@ -65,3 +65,21 @@ class BookingStatusUpdate(BaseModel):
 
 class BookingPayInput(BaseModel):
     payment_method: Literal["cash", "credit_card", "transfer"]
+
+
+class BookingAlert(BaseModel):
+    id: uuid.UUID
+    type: Literal["pending_confirmation", "past_uncompleted"]
+    message: str
+    booking: BookingRead
+
+    model_config = {"from_attributes": True}
+
+
+class BookingReschedule(BaseModel):
+    booking_date: date
+    start_time: time
+    staff_id: uuid.UUID | None = None
+
+
+

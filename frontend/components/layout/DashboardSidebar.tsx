@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, LogOut } from "lucide-react";
+import { X, LogOut, ChevronDown, MapPin } from "lucide-react";
 import { cva } from "class-variance-authority";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import {
   DASHBOARD_NAV_GROUPS,
@@ -14,8 +14,9 @@ import {
   isItemActive,
 } from "@/components/layout/dashboardNavigation";
 import AppIcon from "@/components/ui/AppIcon";
-import BranchSelector from "./BranchSelector";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { logout } from "@/lib/api/auth";
+import { useBranchContext } from "@/contexts/BranchContext";
 
 interface DashboardSidebarProps {
   mobileOpen: boolean;
@@ -113,6 +114,10 @@ function SidebarGroup({
 }
 
 function SidebarContent({ pathname, onItemSelect, layoutIdPrefix }: { pathname: string; onItemSelect: (href: string) => void; layoutIdPrefix: string; }) {
+  const { branches, activeBranch, setActiveBranch, isLoading, business } = useBranchContext();
+  const [sedesExpanded, setSedesExpanded] = useState(true);
+  const [isFullyOpen, setIsFullyOpen] = useState(true);
+
   const handleLogout = () => {
     logout();
     window.location.href = "/auth/login";
@@ -121,9 +126,102 @@ function SidebarContent({ pathname, onItemSelect, layoutIdPrefix }: { pathname: 
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)] pb-4 pr-1">
-        <BranchSelector />
+        <div className="px-3 mb-6 shrink-0">
+          <Link
+            href="/"
+            className="inline-flex rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] focus-visible:ring-offset-2"
+            aria-label="Ir a la página de inicio"
+          >
+            <BrandLogo variant="full" />
+          </Link>
+        </div>
 
-        <nav className="mt-6 space-y-6 px-1" aria-label="Navegacion del dashboard">
+        <nav className="space-y-6 px-1" aria-label="Navegacion del dashboard">
+          {/* Dynamic Collapsible Sedes Group */}
+          <section aria-label="Sedes" className="relative z-10">
+            <button
+              type="button"
+              onClick={() => {
+                if (sedesExpanded) {
+                  setIsFullyOpen(false);
+                  setSedesExpanded(false);
+                } else {
+                  setSedesExpanded(true);
+                }
+              }}
+              className="w-full flex items-center justify-between px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors focus:outline-none cursor-pointer"
+            >
+              <span>Sedes</span>
+              <ChevronDown
+                className="h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200"
+                style={{ transform: sedesExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {sedesExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  onAnimationComplete={() => {
+                    if (sedesExpanded) {
+                      setIsFullyOpen(true);
+                    }
+                  }}
+                  className={isFullyOpen ? "overflow-visible" : "overflow-hidden"}
+                >
+                  <ul className="mt-2 space-y-1.5 pb-2 px-1 -mx-1">
+                    {isLoading || !business ? (
+                      <div className="space-y-1.5 pt-1">
+                        {[1, 2].map((i) => (
+                          <div key={i} className="h-12 animate-pulse rounded-[var(--radius-md)] bg-[var(--surface-3)]" />
+                        ))}
+                      </div>
+                    ) : (
+                      branches.map((branch) => {
+                        const active = branch.id === activeBranch?.id;
+                        return (
+                          <li key={branch.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveBranch(branch.id);
+                                onItemSelect(pathname); // close mobile drawer if clicked
+                              }}
+                              className={`${navLinkVariants({ active })} w-full text-left relative cursor-pointer`}
+                            >
+                              {active && (
+                                <motion.div
+                                  layoutId={`${layoutIdPrefix}-sede-active-indicator`}
+                                  className="absolute inset-0 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)]"
+                                  initial={false}
+                                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                                />
+                              )}
+                              <span className="relative z-10 flex min-w-0 items-center gap-3">
+                                <AppIcon 
+                                  icon={MapPin} 
+                                  size="md"
+                                  className={`shrink-0 transition-transform duration-300 ${active ? "scale-110 text-[var(--app-primary)]" : "text-[var(--text-muted)]"}`} 
+                                />
+                                <span className="min-w-0">
+                                      <span className="block truncate text-sm font-semibold">{branch.name}</span>
+                                </span>
+                              </span>
+                              <BadgeMark active={active} />
+                            </button>
+                          </li>
+                        );
+                      })
+                    )}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+
           {DASHBOARD_NAV_GROUPS.map((group) => (
             <SidebarGroup
               key={group.id}

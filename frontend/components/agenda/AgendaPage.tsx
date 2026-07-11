@@ -23,7 +23,7 @@ import {
 } from "@/lib/agenda/calendar";
 import type { AgendaBooking, AgendaFilters, AgendaView } from "@/lib/agenda/types";
 import { useAgendaData } from "@/lib/agenda/useAgendaData";
-import { updateBookingStatus, registerBookingPayment } from "@/lib/api/bookings";
+import { updateBookingStatus, registerBookingPayment, rescheduleBooking } from "@/lib/api/bookings";
 import type { PaymentMethod } from "@/lib/api/bookings";
 import { useBranchContext } from "@/contexts/BranchContext";
 
@@ -138,6 +138,9 @@ export default function AgendaPage() {
     const promise = (async () => {
       await updateBookingStatus(bookingId, status);
       await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("booking-updated"));
+      }
     })();
 
     sileo.promise(promise, {
@@ -159,9 +162,34 @@ export default function AgendaPage() {
     }
   }
 
-  function handleReschedule() {
-    // Reserved for modal/flow integration without changing timeline architecture.
+  async function handleReschedule(bookingId: string, bookingDate: string, startTime: string, staffId?: string) {
+    const promise = (async () => {
+      await rescheduleBooking(bookingId, bookingDate, startTime, staffId);
+      await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("booking-updated"));
+      }
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Reprogramando cita..." },
+      success: {
+        title: "Cita reprogramada",
+        description: "La cita ha sido reprogramada con éxito.",
+      },
+      error: (err) => ({
+        title: "Error al reprogramar cita",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo.",
+      }),
+    });
+
+    try {
+      await promise;
+    } catch {
+      // Error handled by sileo toast
+    }
   }
+
 
   async function handlePaymentRegister(bookingId: string, method: PaymentMethod) {
     const methodLabel = {
@@ -173,6 +201,9 @@ export default function AgendaPage() {
     const promise = (async () => {
       await registerBookingPayment(bookingId, method);
       await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("booking-updated"));
+      }
     })();
 
     sileo.promise(promise, {
@@ -226,6 +257,7 @@ export default function AgendaPage() {
                   columns={columns}
                   bookingsByDay={bookingsByDay}
                   timelineSlots={timelineSlots}
+                  staff={staff}
                   onConfirm={(bookingId) => handleStatusUpdate(bookingId, "confirmed")}
                   onCancel={(bookingId) => handleStatusUpdate(bookingId, "cancelled")}
                   onStatusUpdate={handleStatusUpdate}

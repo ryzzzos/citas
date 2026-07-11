@@ -21,6 +21,7 @@ import {
 
 import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { getMe, getMyBusiness, logout } from "@/lib/api";
 import type { User } from "@/types";
 import { useDiscoverySearch } from "@/components/sucursales/DiscoverySearchContext";
@@ -276,9 +277,9 @@ export default function Navbar() {
         <Link
           href="/"
           onClick={() => setSearchExpanded(false)}
-          className="dashboard-focusable rounded-full px-1.5 text-lg font-semibold tracking-tight text-[var(--text-primary)] shrink-0"
+          className="dashboard-focusable rounded-full px-1.5 shrink-0 flex items-center justify-center h-full"
         >
-          Agenda Web
+          <BrandLogo size={36} />
         </Link>
 
         {/* ── CENTER ELONGATED SEARCH CAPSULE & COMBOBOX ── */}

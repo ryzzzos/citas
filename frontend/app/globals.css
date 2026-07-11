@@ -44,6 +44,7 @@
   /* slate-500 (el tono que se usaba antes para los párrafos, ahora usado como muted) */
 
   /* radius */
+  --radius-xs: 0.5rem;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;

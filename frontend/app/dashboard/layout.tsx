@@ -9,6 +9,7 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { getDashboardTitle } from "@/components/layout/dashboardNavigation";
 import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import NavbarNotifications from "@/components/layout/NavbarNotifications";
 import { BranchProvider } from "@/contexts/BranchContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -47,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           
           <div className="bg-[var(--surface-2)]  border border-[var(--border-strong)] shadow-[var(--shadow-md)] rounded-[var(--radius-xl)] relative flex h-full min-h-0 flex-col overflow-hidden">
-            <header className="sticky top-0 z-20 border-b border-[var(--border-soft)] bg-[var(--surface-3)] backdrop-blur-2xl">
+            <header className="sticky top-0 z-[49] border-b border-[var(--border-soft)] bg-[var(--surface-3)] backdrop-blur-2xl">
               <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button
                   type="button"
@@ -74,6 +75,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </label>
 
                 <div className="flex items-center gap-2">
+                  <NavbarNotifications />
                   <AnimatedThemeToggler
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)]"
                     aria-label="Cambiar tema"

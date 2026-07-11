@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { register } from "@/lib/api";
 
 type Role = "customer" | "business_owner";
@@ -40,8 +41,11 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm">
-        <h1 className="mb-6 text-2xl font-bold text-[var(--text-primary)]">
+      <div className="w-full max-w-sm flex flex-col">
+        <div className="flex justify-center mb-8">
+          <BrandLogo size={48} />
+        </div>
+        <h1 className="mb-6 text-2xl font-bold text-[var(--text-primary)] text-center">
           Crear cuenta
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

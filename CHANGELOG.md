@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.12] - 2026-07-11
+
+### Added
+- **Alertas de Reserva y Refactorización del Sidebar y Logo**:
+  - Implementación del endpoint `/businesses/{businessId}/alerts` en el backend (`backend/app/routers/businesses.py`) y en el cliente de la API (`frontend/lib/api/businesses.ts`) para notificar al dueño de citas pendientes de confirmación o reservas pasadas sin completar.
+  - Creación del componente `NavbarNotifications` (`frontend/components/layout/NavbarNotifications.tsx`) integrado en la barra de navegación para alertas en tiempo real.
+  - Creación del componente `BrandLogo` (`frontend/components/ui/BrandLogo.tsx`) para la unificación visual del logo de la plataforma.
+  - Refactorización de `DashboardSidebar.tsx` sustituyendo el BranchSelector anterior por un menú dinámico acordeón "Sedes" animado con Framer Motion y cargador skeleton para una navegación por sucursales más integrada.
+  - Endpoint `/bookings/{bookingId}/reschedule` en el backend y frontend para la reprogramación interactiva (drag & drop) de citas directamente sobre la agenda.
+
 ## [0.4.11] - 2026-07-09
 
 ### Added
