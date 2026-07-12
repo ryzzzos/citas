@@ -629,7 +629,7 @@ const canvasHeight = (22 - 6) * 60 * PX_PER_MINUTE;
 return (
 <section
 aria-label="Timeline de citas"
-className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] sm:p-5 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
+className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 shadow-[var(--shadow-md)] sm:p-4 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
 >
 <div ref={scrollContainerRef} className="min-h-0 overflow-auto">
 <div className="min-w-[880px]">
@@ -644,22 +644,29 @@ background: `linear-gradient(to bottom, var(--surface-3) 70%, color-mix(in srgb,
 <div className="flex items-center px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
 Hora
 </div>
-{columns.length > 1 && columns.map((column) => (
-<div
-key={column.isoDate}
-className={`rounded-2xl border px-3 py-2 text-sm shadow-[var(--shadow-sm)] ${
-column.isToday
-? "border-[var(--app-primary)] bg-[color-mix(in_srgb,var(--app-primary)_8%,var(--surface-3))] text-[var(--app-primary)]"
-: "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:text-[var(--text-muted)]"
-}`}
->
-<div className="flex items-center justify-between">
-<p className={`font-bold tracking-tight ${column.isToday ? "text-[var(--app-primary-strong)] dark:text-[var(--app-primary)]" : "text-[var(--text-primary)]"}`}>{column.dayLabel}</p>
-{column.isToday && <span className="rounded-full bg-[var(--app-primary)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--surface-3)]">Hoy</span>}
-</div>
-<p className={`text-[11px] font-bold uppercase tracking-widest ${column.isToday ? "text-[var(--app-primary)]" : "text-[var(--app-primary)]"}`}>{column.dateLabel}</p>
-</div>
-))}
+{columns.length > 1 && columns.map((column) => {
+  const dt = DateTime.fromISO(column.isoDate).setLocale("es");
+  const formattedDate = dt.isValid ? dt.toFormat("LLLL d") : column.dateLabel;
+  return (
+    <div
+      key={column.isoDate}
+      className="flex items-center justify-center py-2 text-xs text-center"
+    >
+      <span
+        className={`font-bold capitalize tracking-tight flex items-center gap-1.5 ${
+          column.isToday
+            ? "text-[var(--app-primary)] font-extrabold"
+            : "text-[var(--text-primary)] dark:text-[var(--text-secondary)]"
+        }`}
+      >
+        {formattedDate}
+        {column.isToday && (
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)]" title="Hoy" />
+        )}
+      </span>
+    </div>
+  );
+})}
 {columns.length === 1 && <div className="pointer-events-none"></div>}
 </div>
 

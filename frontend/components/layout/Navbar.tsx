@@ -88,7 +88,7 @@ export default function Navbar() {
     if (isIntroActive) {
       const timer = setTimeout(() => {
         setIsIntroActive(false);
-      }, 1400);
+      }, 800);
       return () => {
         clearTimeout(timer);
       };
@@ -280,7 +280,7 @@ export default function Navbar() {
             key="splash-overlay"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="fixed inset-0 z-[9998] bg-[var(--surface-1)] pointer-events-auto"
           />
         )}
@@ -291,7 +291,7 @@ export default function Navbar() {
           >
             <motion.div
               layoutId="navbar-brand-logo-svg"
-              transition={{ duration: 1.4, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
               className="pointer-events-auto w-[160px] h-[176px]"
             >
               <BrandLogo size={160} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
@@ -324,7 +324,7 @@ export default function Navbar() {
                 {!isIntroActive && (
                   <motion.div
                     layoutId="navbar-brand-logo-svg"
-                    transition={{ duration: 1.4, ease: [0.32, 0.72, 0, 1] }}
+                    transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
                     className="absolute inset-0 w-9 h-[39.6px] flex items-center justify-center"
                   >
                     <BrandLogo size={36} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
@@ -334,7 +334,7 @@ export default function Navbar() {
               <motion.div
                 initial={isIntroActive ? { opacity: 0, x: -6 } : { opacity: 1, x: 0 }}
                 animate={!isIntroActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.9, ease: [0.32, 0.72, 0, 1] }}
+                transition={{ duration: 0.6, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="flex items-baseline leading-none font-sans text-[1.22rem] tracking-tight"
               >
                 <span className="font-bold text-[var(--text-primary)]">
@@ -543,7 +543,12 @@ export default function Navbar() {
         )}
 
         {/* Navigation list & Actions on the right side */}
-        <div className="flex items-center gap-2 shrink-0">
+        <motion.div
+          initial={isIntroActive ? { opacity: 0, y: -4 } : { opacity: 1, y: 0 }}
+          animate={!isIntroActive ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.6, ease: [0.32, 0.72, 0, 1] }}
+          className="flex items-center gap-2 shrink-0"
+        >
           {/* Main scrollable nav list */}
           <nav className="flex items-center gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(isGuest || isLoading) && !searchExpanded && (
@@ -688,7 +693,7 @@ export default function Navbar() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </header>
     </>

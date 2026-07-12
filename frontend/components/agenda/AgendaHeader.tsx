@@ -44,7 +44,7 @@ export default function AgendaHeader({
             <button
               type="button"
               onClick={onPrevious}
-               className="inline-flex min-h-9 items-center gap-1 rounded-xl px-3 text-[13px] font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] dark:hover:bg-[var(--surface-2)]"
+              className="inline-flex min-h-9 items-center gap-1 rounded-xl px-3 text-[13px] font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] dark:hover:bg-[var(--surface-2)]"
               aria-label="Periodo anterior"
             >
               <AppIcon icon={ChevronLeft} />
@@ -60,7 +60,7 @@ export default function AgendaHeader({
             <button
               type="button"
               onClick={onNext}
-               className="inline-flex min-h-9 items-center gap-1 rounded-xl px-3 text-[13px] font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] dark:hover:bg-[var(--surface-2)]"
+              className="inline-flex min-h-9 items-center gap-1 rounded-xl px-3 text-[13px] font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] dark:hover:bg-[var(--surface-2)]"
               aria-label="Periodo siguiente"
             >
               Siguiente
@@ -80,11 +80,10 @@ export default function AgendaHeader({
                   aria-disabled={option.disabled}
                   disabled={option.disabled}
                   onClick={() => onViewChange(option.value)}
-                  className={`min-h-9 rounded-xl px-4 text-[13px] font-semibold transition-all ${
-                    active
+                  className={`min-h-9 rounded-xl px-4 text-[13px] font-semibold transition-all ${active
                       ? "bg-[linear-gradient(90deg,var(--app-primary),var(--app-primary-strong))] text-[var(--surface-3)] shadow-[var(--shadow-md)] border border-[var(--border-soft)]"
                       : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:shadow-[var(--shadow-sm)] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[var(--surface-2)] dark:hover:text-[var(--text-primary)]"
-                  }`}
+                    }`}
                 >
                   {option.label}
                 </button>

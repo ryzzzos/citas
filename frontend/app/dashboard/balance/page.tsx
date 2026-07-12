@@ -10,31 +10,8 @@ import type { Business } from "@/types";
 import { useBranchContext } from "@/contexts/BranchContext";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import AppIcon from "@/components/ui/AppIcon";
-
-function TrendBadge({ delta, invert = false }: { delta: number; invert?: boolean }) {
-  const isPositive = delta >= 0;
-  const isGood = invert ? !isPositive : isPositive;
-  const label = `${isPositive ? "+" : ""}${delta}%`;
-  const icon = isPositive ? "↑" : "↓";
-  
-  if (delta === 0) {
-    return (
-      <span className="inline-flex items-center gap-0.5 rounded px-2 py-0.5 text-xs font-semibold bg-[var(--surface-2)] text-[var(--text-muted)]">
-        0%
-      </span>
-    );
-  }
-
-  return (
-    <span className={`inline-flex items-center gap-0.5 rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-bold ${
-      isGood 
-        ? "bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/15" 
-        : "bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]/15"
-    }`}>
-      {icon} {label}
-    </span>
-  );
-}
+import { ChartBarMultiple } from "@/components/charts/ChartBarMultiple";
+import { KpiCard } from "@/components/ui/KpiCard";
 
 export default function BalancePage() {
   const { activeBranch } = useBranchContext();
@@ -155,170 +132,150 @@ export default function BalancePage() {
 
       {/* KPI Cards Grid */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 shrink-0">
-        {/* KPI 1: Ingresos Brutos */}
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--app-primary)] text-[var(--surface-3)]">
-                <AppIcon icon={Wallet} size="md" />
-              </div>
-              <p className="text-[14px] font-bold text-[var(--text-secondary)]">Ingresos Brutos</p>
-            </div>
-            <TrendBadge delta={balance.gross_income.delta} />
-          </div>
-          <div className="mt-4">
-            <p className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-              {formatCurrency(balance.gross_income.value)}
-            </p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-1 font-medium">
-              Ventas y reservas pagadas
-            </p>
-          </div>
-        </article>
+        <KpiCard
+          title="Ingresos Brutos"
+          value={formatCurrency(balance.gross_income.value)}
+          icon={Wallet}
+          iconBgClass="bg-[var(--app-primary)] text-[var(--surface-3)]"
+          trendDelta={balance.gross_income.delta}
+          tooltipText="Ventas y reservas pagadas"
+          tooltipTarget="title"
+          showProgressBar={true}
+          barColorClass="bg-[var(--app-primary)]"
+          period={period}
+        />
 
-        {/* KPI 2: Gastos Totales */}
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-error)] text-[var(--surface-3)]">
-                <AppIcon icon={TrendingDown} size="md" />
-              </div>
-              <p className="text-[14px] font-bold text-[var(--text-secondary)]">Gastos Totales</p>
-            </div>
-            {/* Invert delta badge color: spending increase is alert, decrease is success */}
-            <TrendBadge delta={balance.expenses.delta} invert={true} />
-          </div>
-          <div className="mt-4">
-            <p className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-              {formatCurrency(balance.expenses.value)}
-            </p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-1 font-medium">
-              Comisiones estimadas de staff (30%)
-            </p>
-          </div>
-        </article>
+        <KpiCard
+          title="Gastos Totales"
+          value={formatCurrency(balance.expenses.value)}
+          icon={TrendingDown}
+          iconBgClass="bg-[var(--color-error)] text-[var(--surface-3)]"
+          trendDelta={balance.expenses.delta}
+          trendInvert={true}
+          tooltipText="Comisiones estimadas de staff (30%)"
+          tooltipTarget="title"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-error)]"
+          period={period}
+        />
 
-        {/* KPI 3: Ganancia Neta */}
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)]">
-                <AppIcon icon={DollarSign} size="md" />
-              </div>
-              <p className="text-[14px] font-bold text-[var(--text-secondary)]">Ganancia Neta</p>
-            </div>
-            <TrendBadge delta={balance.net_profit.delta} />
-          </div>
-          <div className="mt-4">
-            <p className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-              {formatCurrency(balance.net_profit.value)}
-            </p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-1 font-medium">
-              Ingresos menos gastos estimados
-            </p>
-          </div>
-        </article>
+        <KpiCard
+          title="Ganancia Neta"
+          value={formatCurrency(balance.net_profit.value)}
+          icon={DollarSign}
+          iconBgClass="bg-[var(--color-success)] text-[var(--surface-3)]"
+          trendDelta={balance.net_profit.delta}
+          tooltipText="Ingresos menos gastos estimados"
+          tooltipTarget="title"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-success)]"
+          period={period}
+        />
 
-        {/* KPI 4: Nuevos Clientes */}
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)]">
-                <AppIcon icon={Users} size="md" />
-              </div>
-              <p className="text-[14px] font-bold text-[var(--text-secondary)]">Nuevos Clientes</p>
-            </div>
-            <TrendBadge delta={balance.new_customers.delta} />
-          </div>
-          <div className="mt-4">
-            <p className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-              {balance.new_customers.value}
-            </p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-1 font-medium">
-              Clientes que agendaron por primera vez
-            </p>
-          </div>
-        </article>
+        <KpiCard
+          title="Nuevos Clientes"
+          value={balance.new_customers.value}
+          icon={Users}
+          iconBgClass="bg-[var(--color-info)] text-[var(--surface-3)]"
+          trendDelta={balance.new_customers.delta}
+          tooltipText="Clientes que agendaron por primera vez"
+          tooltipTarget="title"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-info)]"
+          period={period}
+        />
       </section>
 
       {/* Charts & Breakdown Details */}
-      <section className="grid gap-6 md:grid-cols-2 shrink-0">
-        {/* Left Column: Payments Breakdown */}
-        <div className="rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)]">
-          <div className="mb-4">
-            <h3 className="text-[16px] font-bold text-[var(--text-primary)]">Métodos de Pago</h3>
-            <p className="text-[11.5px] text-[var(--text-muted)] mt-0.5 font-medium">
-              Desglose de facturación por canal de pago
-            </p>
-          </div>
+      <section className="grid gap-6 grid-cols-1 lg:grid-cols-4 shrink-0">
+        {/* Left Column: Multiple Bar Chart (takes 2/4 columns on desktop) */}
+        <div className="lg:col-span-2">
+          <ChartBarMultiple
+            period={period}
+            grossIncome={balance.gross_income.value}
+          />
+        </div>
 
-          <div className="space-y-4.5 mt-5">
-            {paymentMethods.map(item => {
-              const pctOfTotal = Math.round((item.val / totalPayments) * 100);
-              const barWidthPct = Math.round((item.val / maxPaymentVal) * 100);
-              const ItemIcon = item.icon;
+        {/* Middle Column: Most profitable services (takes 1/4 columns on desktop) */}
+        <div className="rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 sm:p-5 shadow-[var(--shadow-sm)] flex flex-col justify-between">
+          <div>
+            <div className="mb-4">
+              <h3 className="text-sm sm:text-[15px] font-bold text-[var(--text-primary)]">Servicios Más Populares</h3>
+              <p className="text-[10.5px] text-[var(--text-muted)] mt-0.5 font-medium">
+                Top servicios ordenados por ingresos
+              </p>
+            </div>
 
-              return (
-                <div key={item.id} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="inline-flex items-center gap-2 text-[var(--text-secondary)]">
-                      <AppIcon icon={ItemIcon} className="text-[var(--text-muted)] h-4 w-4 shrink-0" />
-                      {item.label}
-                    </span>
-                    <span className="text-[var(--text-primary)] font-bold">
-                      {formatCurrency(item.val)} <span className="text-[var(--text-muted)] font-medium">({pctOfTotal}%)</span>
-                    </span>
-                  </div>
-
-                  <div className="h-2 w-full bg-[var(--surface-2)] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-[var(--app-primary)] rounded-full transition-all duration-500 ease-out" 
-                      style={{ width: `${barWidthPct}%` }}
-                    />
-                  </div>
+            <div className="space-y-2.5">
+              {balance.profitable_services.length === 0 ? (
+                <div className="text-center py-8 text-xs font-medium text-[var(--text-muted)]">
+                  No hay servicios registrados en este período.
                 </div>
-              );
-            })}
+              ) : (
+                balance.profitable_services.slice(0, 4).map((item, idx) => (
+                  <div 
+                    key={item.name} 
+                    className="flex items-center gap-2.5 p-2 rounded-[var(--radius-lg)] border border-[var(--border-soft)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
+                  >
+                    <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[var(--app-primary)] text-[10px] font-bold">
+                      {idx + 1}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-bold text-[var(--text-primary)] truncate">
+                        {item.name}
+                      </p>
+                      <p className="text-[9px] text-[var(--text-muted)] mt-0.5">
+                        {item.bookings_count} citas
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right font-bold text-[11px] text-[var(--text-primary)]">
+                      {formatCurrency(item.income)}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Most profitable services */}
-        <div className="rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)]">
-          <div className="mb-4">
-            <h3 className="text-[16px] font-bold text-[var(--text-primary)]">Servicios Más Populares</h3>
-            <p className="text-[11.5px] text-[var(--text-muted)] mt-0.5 font-medium">
-              Top servicios ordenados por ingresos generados
-            </p>
-          </div>
+        {/* Right Column: Compact Payment Methods (takes 1/4 columns on desktop) */}
+        <div className="rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 sm:p-5 shadow-[var(--shadow-sm)] flex flex-col justify-between">
+          <div>
+            <div className="mb-4">
+              <h3 className="text-sm sm:text-[15px] font-bold text-[var(--text-primary)]">Métodos de Pago</h3>
+              <p className="text-[10.5px] text-[var(--text-muted)] mt-0.5 font-medium">
+                Desglose por canal de facturación
+              </p>
+            </div>
 
-          <div className="space-y-3.5 mt-5">
-            {balance.profitable_services.length === 0 ? (
-              <div className="text-center py-8 text-xs font-medium text-[var(--text-muted)]">
-                No hay servicios registrados en este período.
-              </div>
-            ) : (
-              balance.profitable_services.map((item, idx) => (
-                <div 
-                  key={item.name} 
-                  className="flex items-center gap-3.5 p-2.5 rounded-[var(--radius-lg)] border border-[var(--border-soft)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
-                >
-                  <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-full bg-[var(--app-primary)]/10 text-[var(--app-primary)] text-xs font-bold">
-                    {idx + 1}
+            <div className="space-y-3">
+              {paymentMethods.map(item => {
+                const pctOfTotal = Math.round((item.val / totalPayments) * 100);
+                const barWidthPct = Math.round((item.val / maxPaymentVal) * 100);
+                const ItemIcon = item.icon;
+
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold">
+                      <span className="inline-flex items-center gap-1.5 text-[var(--text-secondary)]">
+                        <AppIcon icon={ItemIcon} className="text-[var(--text-muted)] h-3.5 w-3.5 shrink-0" />
+                        {item.label}
+                      </span>
+                      <span className="text-[var(--text-primary)] font-bold">
+                        {pctOfTotal}%
+                      </span>
+                    </div>
+
+                    <div className="h-1.5 w-full bg-[var(--surface-2)] rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-[var(--app-primary)] rounded-full transition-all duration-500 ease-out" 
+                        style={{ width: `${barWidthPct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">
-                      {item.name}
-                    </p>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                      {item.bookings_count} citas completadas
-                    </p>
-                  </div>
-                  <div className="shrink-0 text-right font-bold text-xs text-[var(--text-primary)]">
-                    {formatCurrency(item.income)}
-                  </div>
-                </div>
-              ))
-            )}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>

@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.14] - 2026-07-12
+
+### Added
+- **Componentes de Gráficos Financieros Interactivos y KpiCard**:
+  - Incorporación de los componentes de gráficos premium `ChartBarMultiple`, `ChartPieDonut`, `ChartAreaInteractive` y `ChartRadialHalf` (`frontend/components/charts/`).
+  - Creación de los componentes base de UI `card.tsx`, `chart.tsx` (con soporte para Tooltips e indicaciones tipadas de forma segura y sin `any`), y `KpiCard.tsx` (`frontend/components/ui/`).
+  - Actualización del dashboard general (`frontend/app/dashboard/page.tsx`) y del panel de balances (`frontend/app/dashboard/balance/page.tsx`) integrando los nuevos componentes KPI, desgloses financieros y diagramas interactivos.
+  - Reemplazo y limpieza de mockups estáticos de dashboard (`dashboard_ligth.webp` y `dashboard_dark.webp`) en `frontend/public/`.
+
 ## [0.4.13] - 2026-07-11
 
 ### Added

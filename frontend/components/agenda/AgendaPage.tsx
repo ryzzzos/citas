@@ -145,13 +145,13 @@ export default function AgendaPage() {
 
     sileo.promise(promise, {
       loading: { title: "Actualizando estado de la cita..." },
-      success: { 
+      success: {
         title: statusLabel,
         description: `El estado de la cita fue cambiado a "${status === "pending" ? "pendiente" : status === "confirmed" ? "confirmada" : status === "cancelled" ? "cancelada" : "completada"}".`
       },
-      error: (err) => ({ 
-        title: "Error al actualizar estado", 
-        description: err instanceof Error ? err.message : "Inténtalo de nuevo." 
+      error: (err) => ({
+        title: "Error al actualizar estado",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo."
       }),
     });
 

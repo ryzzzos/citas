@@ -9,6 +9,7 @@ import {
 import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
 import AppIcon from "@/components/ui/AppIcon";
 import { NumberTicker } from "@/components/ui/NumberTicker";
+import { KpiCard } from "@/components/ui/KpiCard";
 import type { Booking, User as UserType } from "@/types";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 import { es } from "date-fns/locale";
@@ -202,150 +203,75 @@ export default function DashboardPage() {
       </section>
 
       <section className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--surface-3)]">
-                <AppIcon icon={ClipboardList} size="md" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--text-primary)]">Reservas</p>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-bold text-[var(--text-primary)]">
-              <AppIcon icon={TrendingUp} size="md" className="h-4 w-4" />
-              <span><NumberTicker value={totalPct} />%</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-              <NumberTicker value={thisWeekTotal} />
-            </p>
-            <div className="group relative">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
-                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--text-primary)]" style={{ width: `${totalBar}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
-                Volumen total de citas esta semana vs. la semana anterior (Meta: {lastWeekTotal} citas).
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
-              </div>
-            </div>
-          </div>
-        </article>
+        <KpiCard
+          title="Reservas"
+          value={thisWeekTotal}
+          previousValue={lastWeekTotal}
+          animateNumber={true}
+          icon={ClipboardList}
+          iconBgClass="bg-[var(--text-primary)] text-[var(--surface-3)]"
+          trendPct={totalPct}
+          trendColorClass="text-[var(--text-primary)]"
+          showProgressBar={true}
+          barColorClass="bg-[var(--text-primary)]"
+          period="week"
+        />
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-pending)] text-[var(--surface-3)]">
-                <AppIcon icon={Hourglass} size="md" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--text-primary)]">Pendientes</p>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-pending)]">
-              <AppIcon icon={thisWeekPending > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span><NumberTicker value={pendingPct} />%</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-              <NumberTicker value={thisWeekPending} />
-            </p>
-            <div className="group relative">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
-                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-pending)]" style={{ width: `${pendingBar}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
-                Citas pendientes esta semana vs. la semana anterior ({thisWeekPending} vs. {lastWeekPending}).
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
-              </div>
-            </div>
-          </div>
-        </article>
+        <KpiCard
+          title="Pendientes"
+          value={thisWeekPending}
+          previousValue={lastWeekPending}
+          animateNumber={true}
+          icon={Hourglass}
+          iconBgClass="bg-[var(--color-pending)] text-[var(--surface-3)]"
+          trendPct={pendingPct}
+          trendColorClass="text-[var(--color-pending)]"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-pending)]"
+          period="week"
+        />
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)]">
-                <AppIcon icon={TrendingUp} size="md" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--text-primary)]">Confirmadas</p>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-info)]">
-              <AppIcon icon={thisWeekConfirmed > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span><NumberTicker value={confirmedPct} />%</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-              <NumberTicker value={thisWeekConfirmed} />
-            </p>
-            <div className="group relative">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
-                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-info)]" style={{ width: `${confirmedBar}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
-                Citas confirmadas esta semana vs. la semana anterior ({thisWeekConfirmed} vs. {lastWeekConfirmed}).
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
-              </div>
-            </div>
-          </div>
-        </article>
+        <KpiCard
+          title="Confirmadas"
+          value={thisWeekConfirmed}
+          previousValue={lastWeekConfirmed}
+          animateNumber={true}
+          icon={TrendingUp}
+          iconBgClass="bg-[var(--color-info)] text-[var(--surface-3)]"
+          trendPct={confirmedPct}
+          trendColorClass="text-[var(--color-info)]"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-info)]"
+          period="week"
+        />
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)]">
-                <AppIcon icon={CheckCircle2} size="md" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--text-primary)]">Completadas</p>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-success)]">
-              <AppIcon icon={thisWeekCompleted > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span><NumberTicker value={completedPct} />%</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-              <NumberTicker value={thisWeekCompleted} />
-            </p>
-            <div className="group relative">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
-                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-success)]" style={{ width: `${completedBar}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
-                Citas completadas esta semana vs. la semana anterior ({thisWeekCompleted} vs. {lastWeekCompleted}).
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
-              </div>
-            </div>
-          </div>
-        </article>
+        <KpiCard
+          title="Completadas"
+          value={thisWeekCompleted}
+          previousValue={lastWeekCompleted}
+          animateNumber={true}
+          icon={CheckCircle2}
+          iconBgClass="bg-[var(--color-success)] text-[var(--surface-3)]"
+          trendPct={completedPct}
+          trendColorClass="text-[var(--color-success)]"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-success)]"
+          period="week"
+        />
 
-        <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-error)] text-[var(--surface-3)]">
-                <AppIcon icon={XCircle} size="md" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--text-primary)]">Canceladas</p>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-bold text-[var(--color-error)]">
-              <AppIcon icon={thisWeekCancelled > 0 ? TrendingUp : Minus} size="md" className="h-4 w-4" />
-              <span><NumberTicker value={cancelledPct} />%</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="my-3 text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-              <NumberTicker value={thisWeekCancelled} />
-            </p>
-            <div className="group relative">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-1)] cursor-help">
-                <div className="absolute left-0 top-0 h-full rounded-full bg-[var(--color-error)]" style={{ width: `${cancelledBar}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[11px] leading-snug font-medium text-[var(--text-secondary)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-200 pointer-events-none group-hover:opacity-100 z-50">
-                Citas canceladas esta semana vs. la semana anterior ({thisWeekCancelled} vs. {lastWeekCancelled}).
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-[var(--surface-3)]" />
-              </div>
-            </div>
-          </div>
-        </article>
+        <KpiCard
+          title="Canceladas"
+          value={thisWeekCancelled}
+          previousValue={lastWeekCancelled}
+          animateNumber={true}
+          icon={XCircle}
+          iconBgClass="bg-[var(--color-error)] text-[var(--surface-3)]"
+          trendPct={cancelledPct}
+          trendColorClass="text-[var(--color-error)]"
+          showProgressBar={true}
+          barColorClass="bg-[var(--color-error)]"
+          period="week"
+        />
       </section>
       </div>
 

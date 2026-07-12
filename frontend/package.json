@@ -1,6 +1,6 @@
 {
   "name": "agenda-web",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "private": true,
   "packageManager": "pnpm@10.6.5",
   "pnpm": {
@@ -28,6 +28,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-leaflet": "^5.0.0",
+    "recharts": "^3.9.2",
     "shadcn": "^4.1.2",
     "sileo": "^0.1.5",
     "supercluster": "^8.0.1",
