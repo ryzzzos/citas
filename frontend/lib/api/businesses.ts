@@ -134,6 +134,8 @@ export interface PaymentMethodBreakdown {
 export interface StaffCommissionItem {
   staff_id: string;
   staff_name: string;
+  staff_email?: string;
+  staff_phone?: string;
   bookings_count: number;
   income: number;
   commission: number;

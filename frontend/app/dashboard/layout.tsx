@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <div className="bg-[var(--surface-2)]  border border-[var(--border-strong)] shadow-[var(--shadow-md)] rounded-[var(--radius-xl)] relative flex h-full min-h-0 flex-col overflow-hidden">
             <header className="sticky top-0 z-[49] border-b border-[var(--border-soft)] bg-[var(--surface-3)] backdrop-blur-2xl">
-              <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto flex h-14 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
@@ -62,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
 
                 <div className="min-w-0 flex-1">
-                  <h1 className="truncate text-base font-bold tracking-tight text-[var(--text-primary)]  sm:text-lg">{pageTitle}</h1>
+                  <h1 className="truncate text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">{pageTitle}</h1>
                 </div>
 
                 <label className="hidden min-w-52 items-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm shadow-[var(--shadow-sm)] backdrop-blur-sm transition-all focus-within:border-[var(--app-primary)] focus-within:bg-[var(--surface-3)] focus-within:ring-4 focus-within:ring-[var(--app-primary)] md:flex dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] dark:focus-within:border-[var(--app-primary)] dark:focus-within:bg-[var(--surface-1)] dark:focus-within:ring-[var(--app-primary)]">
@@ -93,7 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <main
               id="dashboard-main"
-              className="mx-auto min-h-0 w-full max-w-[1500px] flex-1 overflow-hidden px-4 py-5 sm:px-6 lg:px-8 lg:py-7"
+              className="mx-auto min-h-0 w-full max-w-[1500px] flex-1 overflow-y-auto px-3 py-4 sm:px-5 lg:px-6 lg:py-5 scrollbar-thin"
             >
               {children}
             </main>

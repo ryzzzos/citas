@@ -28,8 +28,8 @@ export default function AgendaHeader({
   onNext,
 }: AgendaHeaderProps) {
   return (
-    <header className="rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <header className="rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--app-primary)]">Agenda operativa</p>
           <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl ">{title}</h2>

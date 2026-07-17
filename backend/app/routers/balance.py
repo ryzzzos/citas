@@ -37,6 +37,8 @@ class ExpensesBreakdown(BaseModel):
 class StaffCommissionItem(BaseModel):
     staff_id: str
     staff_name: str
+    staff_email: str | None = None
+    staff_phone: str | None = None
     bookings_count: int
     income: float
     commission: float
@@ -199,7 +201,7 @@ def get_business_balance(
 
     # 8. Payment methods breakdown (current period)
     pay_breakdown_q = apply_filters(
-        db.query(Payment.payment_method, func.sum(Payment.amount)),
+        db.query(Payment.payment_method, func.sum(Payment.amount)).join(Booking),
         start_date,
         end_date
     ).filter(Payment.status == "paid").group_by(Payment.payment_method).all()
@@ -216,6 +218,8 @@ def get_business_balance(
         db.query(
             Staff.id,
             Staff.name,
+            Staff.email,
+            Staff.phone,
             func.count(Booking.id).label("citas_count"),
             func.sum(Service.price).label("ingresos_generados")
         )
@@ -223,15 +227,17 @@ def get_business_balance(
         .join(Service, Booking.service_id == Service.id),
         start_date,
         end_date
-    ).filter(Booking.status == "completed").group_by(Staff.id, Staff.name).all()
+    ).filter(Booking.status == "completed").group_by(Staff.id, Staff.name, Staff.email, Staff.phone).all()
 
     staff_commissions = []
-    for s_id, s_name, count, total_income in staff_breakdown_q:
+    for s_id, s_name, s_email, s_phone, count, total_income in staff_breakdown_q:
         inc = float(total_income or 0)
         staff_commissions.append(
             StaffCommissionItem(
                 staff_id=str(s_id),
                 staff_name=s_name,
+                staff_email=s_email,
+                staff_phone=s_phone,
                 bookings_count=count,
                 income=inc,
                 commission=round(inc * 0.30, 2),
@@ -239,7 +245,7 @@ def get_business_balance(
             )
         )
 
-    # 10. Most profitable services
+    # 10. Most popular/profitable services
     services_breakdown_q = apply_filters(
         db.query(
             Service.name,
@@ -249,8 +255,8 @@ def get_business_balance(
         .join(Booking, Booking.service_id == Service.id),
         start_date,
         end_date
-    ).filter(Booking.status == "completed").group_by(Service.id, Service.name).order_by(
-        func.sum(Service.price).desc()
+    ).filter(Booking.status != "cancelled").group_by(Service.id, Service.name).order_by(
+        func.count(Booking.id).desc()
     ).limit(5).all()
 
     profitable_services = []

@@ -22,7 +22,7 @@
 
 
   /* glass */
-  --surface-glass: rgba(255, 255, 255, 0.45);
+  --surface-glass: rgba(255, 255, 255, 0.3);
 
   /* borders */
   --border-soft: rgba(255, 255, 255, 0.5);
@@ -47,12 +47,13 @@
   --radius-xs: 0.5rem;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-xl: 1.75rem;
-  --radius-2xl: 2rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 1.75rem;
 
   /* colors */
   --color-pending: #f59e0b;
+  --color-warnm: #ff6b35;
   --color-info: #007aff;
   --color-error: #ff3b30;
   --color-success: #10b981;
@@ -89,6 +90,8 @@
   --text-primary: #fafafa;
   --text-secondary: #d4d4d8;
   --text-muted: #a1a1aa;
+  --warm-start: #ffb703;
+  --warm-end: #fb8500;
 }
 
 

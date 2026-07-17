@@ -22,6 +22,7 @@ import AppIcon from "@/components/ui/AppIcon";
 import { KineticText } from "@/components/ui/KineticText";
 import BrandLogo from "@/components/ui/BrandLogo";
 import Safari from "@/components/ui/Safari";
+import SaaSVirtuesSection from "@/components/landing/SaaSVirtuesSection";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -281,6 +282,9 @@ export default function HomePage() {
           imageSrcDark="/dashboard_dark.webp"
         />
       </motion.div>
+
+      {/* ── SAAS VIRTUES SECTION ───────────────────────────────── */}
+      <SaaSVirtuesSection />
 
       {/* ── INTERACTIVE MOCKUP SECTION ──────────────────────── */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-12">

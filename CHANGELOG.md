@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.15] - 2026-07-17
+
+### Added
+- **Mejoras en el Módulo de Balances y Componentes de UI**:
+  - Ampliación del endpoint `/businesses/{business_id}/balance` en el backend (`backend/app/routers/balance.py`) para incluir email y teléfono del personal (`staff_email`, `staff_phone`) en la liquidación de comisiones, así como ajuste del desglose de métodos de pago.
+  - Rediseño completo de la página de balances (`frontend/app/dashboard/balance/page.tsx`) integrando tablas interactivas con `Table.tsx`, desglose de comisiones con modal/drawer de contacto directo (WhatsApp/llamada) y gráficos de donut interactivos (`ChartPieDonutActive.tsx`, `ChartPieLegend.tsx`).
+  - Creación del componente `Table.tsx` reutilizable (`frontend/components/ui/Table.tsx`) para renderizar tablas estilizadas de alto diseño con soporte para ordenamiento y acciones.
+  - Reorganización de tarjetas de KPI y gráficos (`ChartBarMultiple.tsx`, `ChartPieLegend.tsx`) para consistencia del sistema de diseño.
+
 ## [0.4.14] - 2026-07-12
 
 ### Added

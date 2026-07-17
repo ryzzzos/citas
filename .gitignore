@@ -69,3 +69,5 @@ skills-lock.json
 backup_editor.txt
 start.bat
 start.ps1
+clear_bookings.py
+create_test_bookings.py

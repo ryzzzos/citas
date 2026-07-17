@@ -9,7 +9,7 @@ import {
 import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
 import AppIcon from "@/components/ui/AppIcon";
 import { NumberTicker } from "@/components/ui/NumberTicker";
-import { KpiCard } from "@/components/ui/KpiCard";
+import { KpiCard } from "@/components/charts/KpiCard";
 import type { Booking, User as UserType } from "@/types";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 import { es } from "date-fns/locale";
@@ -146,10 +146,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-full space-y-6 lg:space-y-8">
-      <div className="shrink-0 space-y-6 lg:space-y-8">
+    <div className="flex flex-col min-h-full space-y-5 lg:space-y-6">
+      <div className="shrink-0 space-y-5 lg:space-y-6">
         {/* Hero / Welcome */}
-      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] p-6">
+      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] p-5">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
           <div className="space-y-1.5">
             <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
@@ -202,7 +202,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
+      <section className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
         <KpiCard
           title="Reservas"
           value={thisWeekTotal}
@@ -275,7 +275,7 @@ export default function DashboardPage() {
       </section>
       </div>
 
-      <section className={`flex-1 min-h-0 flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)] ${loading ? 'opacity-50' : ''} transition-opacity`}>
+      <section className={`flex-1 min-h-0 flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] ${loading ? 'opacity-50' : ''} transition-opacity`}>
         <h3 className="shrink-0 text-[17px] font-bold tracking-tight text-[var(--text-primary)]">
           {user?.role === "business_owner" ? "Últimas reservas" : "Mis reservas"}
         </h3>

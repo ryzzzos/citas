@@ -123,10 +123,9 @@ export default function BranchesPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3 lg:space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">Mis Sedes</h2>
           <p className="text-sm text-[var(--text-muted)]">
             Administra las ubicaciones físicas de tu negocio.
           </p>
@@ -143,7 +142,7 @@ export default function BranchesPage() {
       )}
 
       {branches.length === 0 ? (
-        <section className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-12 text-center shadow-[var(--shadow-sm)]">
+        <section className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-10 text-center shadow-[var(--shadow-sm)]">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--text-muted)]">
             <AppIcon icon={Store} size="lg" />
           </div>
@@ -156,7 +155,7 @@ export default function BranchesPage() {
           </Button>
         </section>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {branches.map((branch) => (
             <article
               key={branch.id}

@@ -169,8 +169,8 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden space-y-4 lg:space-y-5">
-      <div className="shrink-0 space-y-4 lg:space-y-5">
+    <div className="flex flex-col min-h-full overflow-hidden space-y-3 lg:space-y-4">
+      <div className="shrink-0 space-y-3 lg:space-y-4">
         <ServicesHeader 
         services={services} 
         onCreate={openCreateModal} 
@@ -194,7 +194,7 @@ export default function ServicesPage() {
       ) : null}
 
       {filteredServices.length === 0 ? (
-        <section className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-12 text-center shadow-[var(--shadow-sm)]">
+        <section className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)] p-10 text-center shadow-[var(--shadow-sm)]">
           <p className="text-[16px] font-semibold tracking-tight text-[var(--text-primary)]">No hay servicios para este filtro</p>
           <p className="mt-1 text-[14px] text-[var(--text-muted)]">
             Ajusta la búsqueda o crea un nuevo servicio para comenzar.

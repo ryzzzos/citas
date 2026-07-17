@@ -2,14 +2,14 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { TrendingUp, ChevronDown } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import AppIcon from "@/components/ui/AppIcon"
+import CustomSelect from "@/components/ui/CustomSelect"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -23,16 +23,13 @@ import {
 export interface ChartBarMultipleProps {
   period: string
   grossIncome: number
+  trendDelta?: number
 }
 
 const chartConfig = {
-  desktop: {
-    label: "Plataforma Web",
+  sales: {
+    label: "Ventas",
     color: "var(--app-primary)",
-  },
-  mobile: {
-    label: "Plataforma Móvil",
-    color: "var(--color-pending)",
   },
 } satisfies ChartConfig
 
@@ -57,6 +54,7 @@ const RANGE_LABELS: Record<string, Record<string, string>> = {
 export function ChartBarMultiple({
   period,
   grossIncome,
+  trendDelta = 0,
 }: ChartBarMultipleProps) {
   const [range, setRange] = useState<"current" | "last2" | "last3">("current")
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -67,6 +65,20 @@ export function ChartBarMultiple({
     setPrevPeriod(period)
     setRange("current")
   }
+
+  const trendValue = trendDelta
+  const isPositive = trendValue > 0
+  const isNegative = trendValue < 0
+
+  const TrendIcon = isPositive ? TrendingUp : (isNegative ? TrendingDown : Minus)
+  const trendColorClass = isPositive
+    ? "text-[var(--color-success)]"
+    : (isNegative ? "text-[var(--color-error)]" : "text-[var(--text-muted)]")
+  const trendSign = isPositive ? "+" : ""
+  const trendFormatted = `${trendSign}${trendValue}%`
+
+  const periodLabel = period === "week" ? "la semana anterior" : (period === "year" ? "el año anterior" : "el mes anterior")
+  const tooltipText = `Ventas un ${Math.abs(trendValue)}% ${isPositive ? "superiores" : (isNegative ? "inferiores" : "iguales")} a ${periodLabel}.`
 
   // Cerrar el dropdown al hacer clic afuera
   useEffect(() => {
@@ -108,8 +120,7 @@ export function ChartBarMultiple({
           const label = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`
           data.push({
             label,
-            desktop: Math.round(val * 0.75),
-            mobile: Math.round(val * 0.25),
+            sales: Math.round(val),
           })
         }
         return data
@@ -130,8 +141,7 @@ export function ChartBarMultiple({
           const label = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`
           data.push({
             label,
-            desktop: Math.round(val * 0.75),
-            mobile: Math.round(val * 0.25),
+            sales: Math.round(val),
           })
         }
         return data
@@ -141,8 +151,7 @@ export function ChartBarMultiple({
           const val = activeGross * distribution[i]
           return {
             label: day,
-            desktop: Math.round(val * 0.75),
-            mobile: Math.round(val * 0.25),
+            sales: Math.round(val),
           }
         })
       }
@@ -162,8 +171,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 2) * distribution[m]
           data.push({
             label: `${monthNames[m]} '${prevYearSuffix}`,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           })
         }
         // Year 2 (Current)
@@ -171,8 +179,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 2) * distribution[m]
           data.push({
             label: `${monthNames[m]} '${currentYearSuffix}`,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           })
         }
         return data
@@ -183,8 +190,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[m]
           data.push({
             label: `${monthNames[m]} '${prev2YearSuffix}`,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           })
         }
         // Year 2 (Prev 1)
@@ -192,8 +198,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[m]
           data.push({
             label: `${monthNames[m]} '${prevYearSuffix}`,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           })
         }
         // Year 3 (Current)
@@ -201,8 +206,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[m]
           data.push({
             label: `${monthNames[m]} '${currentYearSuffix}`,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           })
         }
         return data
@@ -211,8 +215,7 @@ export function ChartBarMultiple({
           const val = activeGross * distribution[i]
           return {
             label: month,
-            desktop: Math.round(val * 0.70),
-            mobile: Math.round(val * 0.30),
+            sales: Math.round(val),
           }
         })
       }
@@ -242,8 +245,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 2) * distribution[w]
           data.push({
             label: `${prevMonthName} S${w+1}`,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           })
         }
         // Month 2 (Current)
@@ -251,8 +253,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 2) * distribution[w]
           data.push({
             label: `${currentMonthName} S${w+1}`,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           })
         }
         return data
@@ -263,8 +264,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[w]
           data.push({
             label: `${prev2MonthName} S${w+1}`,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           })
         }
         // Month 2 (Prev 1)
@@ -272,8 +272,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[w]
           data.push({
             label: `${prevMonthName} S${w+1}`,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           })
         }
         // Month 3 (Current)
@@ -281,8 +280,7 @@ export function ChartBarMultiple({
           const val = (activeGross / 3) * distribution[w]
           data.push({
             label: `${currentMonthName} S${w+1}`,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           })
         }
         return data
@@ -291,8 +289,7 @@ export function ChartBarMultiple({
           const val = activeGross * distribution[i]
           return {
             label: week,
-            desktop: Math.round(val * 0.72),
-            mobile: Math.round(val * 0.28),
+            sales: Math.round(val),
           }
         })
       }
@@ -312,9 +309,9 @@ export function ChartBarMultiple({
 
   // Dynamic barSize calculations based on active dataset density
   const calculatedBarSize = (() => {
-    if (range === "last3") return 4
-    if (range === "last2") return 6
-    return 14
+    if (range === "last3") return 8
+    if (range === "last2") return 12
+    return 24
   })()
 
   // Format tick labels for the Left YAxis scale
@@ -336,65 +333,34 @@ export function ChartBarMultiple({
           <CardTitle className="text-sm sm:text-[15px] font-bold text-[var(--text-primary)]">
             Rendimiento de Ventas
           </CardTitle>
-          <CardDescription className="text-[10.5px] text-[var(--text-muted)] mt-0.5 font-medium">
-            Facturación estimada por tipo de dispositivo
-          </CardDescription>
         </div>
 
         {/* Top-Right Header Elements: inline Trend + Dropdown selector */}
         <div className="flex items-center gap-3.5">
           {/* Custom Tooltip Trend Percentage (Text-only layout at text-sm) */}
-          <div className="group relative inline-flex items-center gap-1 text-sm font-bold text-[var(--color-success)] cursor-help pb-0.5">
-            <AppIcon icon={TrendingUp} className="h-4 w-4" />
-            <span>+5.2%</span>
+          <div className={`group relative inline-flex items-center gap-1 text-sm font-bold ${trendColorClass} cursor-help pb-0.5`}>
+            <AppIcon icon={TrendIcon} className="h-4 w-4" />
+            <span>{trendFormatted}</span>
             
             {/* Hover Tooltip Box */}
             <div className="pointer-events-none absolute bottom-full right-0 mb-2.5 w-48 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 text-center text-[10px] leading-relaxed font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-md)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
-              {period === "week"
-                ? "Ventas un 5.2% superiores a la semana anterior."
-                : period === "year"
-                ? "Ventas un 5.2% superiores al año anterior."
-                : "Ventas un 5.2% superiores al mes anterior."}
+              {tooltipText}
             </div>
           </div>
 
-          {/* Premium CSS-Only Range Select Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              type="button"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[11px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)] transition-colors focus:outline-none cursor-pointer"
-            >
-              <span>{periodRanges[range] || "Periodo"}</span>
-              <ChevronDown
-                className="h-3 w-3 text-[var(--text-muted)] transition-transform duration-200"
-                style={{ transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-              />
-            </button>
-
-            <AnimatePresence>
-              {dropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                  transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
-                  className="absolute right-0 mt-1 w-32 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-3)] py-1 shadow-[var(--shadow-md)] z-50 overflow-hidden"
-                >
-                  {Object.entries(periodRanges).map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => handleRangeSelect(value as "current" | "last2" | "last3")}
-                      className="w-full text-left px-3 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          {/* Premium CustomSelect Range Dropdown */}
+          <CustomSelect
+            value={range}
+            options={[
+              { value: "current", label: periodRanges.current },
+              { value: "last2", label: periodRanges.last2 },
+              { value: "last3", label: periodRanges.last3 },
+            ]}
+            onChange={(val) => handleRangeSelect(val as "current" | "last2" | "last3")}
+            variant="glass"
+            size="sm"
+            align="right"
+          />
         </div>
       </CardHeader>
 
@@ -425,8 +391,7 @@ export function ChartBarMultiple({
               content={<ChartTooltipContent indicator="dashed" />}
             />
             {/* Pill Capsule Bars: radius=[10, 10, 10, 10], barSize dynamically scaled to calculatedBarSize */}
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={[10, 10, 10, 10]} barSize={calculatedBarSize} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={[10, 10, 10, 10]} barSize={calculatedBarSize} />
+            <Bar dataKey="sales" fill="var(--color-sales)" radius={[10, 10, 10, 10]} barSize={calculatedBarSize} />
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -35,7 +35,6 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
     <header className="flex flex-col gap-6">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">Mis servicios</h2>
           <p className="mt-1.5 max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
             Gestiona tu catálogo de servicios, precios y disponibilidad.
           </p>

@@ -141,6 +141,7 @@ agenda-web/
 - **Error handling**: use HTTPException with clear status codes and messages
 - **Clean code**: descriptive names, single-responsibility functions
 - **Dashboard composition**: keep dashboard navigation reusable and isolated in `frontend/components/layout/`.
+- **No Hardcoded/Fake Metrics (CRITICAL)**: It is strictly forbidden to hardcode, simulate, mock, or hallucinate metrics, transaction details, financial balances, platform division statistics (such as web vs mobile splits when mobile development has not started), or mock user activities anywhere in production dashboards or client-facing views. All data must map 1:1 to real database tables or actual backend calculations. Empty/null values must fallback gracefully to blank states or localized error prompts rather than faked placeholders.
 
 ## Key Paths
 
