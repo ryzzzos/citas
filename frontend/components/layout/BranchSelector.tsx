@@ -54,7 +54,7 @@ export default function BranchSelector() {
               {business.name}
             </p>
             <p className="truncate text-sm font-bold tracking-tight text-[var(--text-primary)]">
-              {activeBranch?.name || "Sin sucursales"}
+              {activeBranch ? activeBranch.name : branches.length > 0 ? "Todas las sedes" : "Sin sucursales"}
             </p>
           </div>
         </div>
@@ -75,6 +75,20 @@ export default function BranchSelector() {
             transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
             className="absolute top-[calc(100%+4px)] left-1 right-1 z-[100] max-h-48 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] py-1.5 shadow-[var(--shadow-lg)] scrollbar-thin"
           >
+            {branches.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveBranch("all");
+                  setOpen(false);
+                }}
+                className={`w-full px-4 py-2 text-left text-xs transition-colors hover:bg-[var(--surface-2)] focus:outline-none cursor-pointer border-b border-[var(--border-strong)]/45 ${
+                  activeBranch === null ? "bg-[var(--app-primary)]/10 font-bold text-[var(--app-primary)]" : "text-[var(--text-primary)] font-medium"
+                }`}
+              >
+                Todas las sedes
+              </button>
+            )}
             {branches.map((branch) => {
               const isSelected = branch.id === activeBranch?.id;
               return (

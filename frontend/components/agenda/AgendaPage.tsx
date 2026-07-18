@@ -44,13 +44,14 @@ function mapBookingsByDay(bookings: AgendaBooking[]): Record<string, AgendaBooki
 }
 
 export default function AgendaPage() {
-  const { business } = useBranchContext();
+  const { business, setActiveBranch } = useBranchContext();
   const timezone = useMemo(() => {
     return business?.timezone || getCanonicalTimezone();
   }, [business?.timezone]);
 
   const searchParams = useSearchParams();
   const dateParam = searchParams.get("date");
+  const branchParam = searchParams.get("branchId");
   const initialBookingId = searchParams.get("bookingId");
 
   const [view, setView] = useState<AgendaView>("day");
@@ -66,6 +67,13 @@ export default function AgendaPage() {
     }
     return getNowInTimezone(timezone);
   });
+
+  // Sync state during render if branchParam changes
+  const [prevBranchParam, setPrevBranchParam] = useState<string | null>(null);
+  if (branchParam && branchParam !== prevBranchParam) {
+    setPrevBranchParam(branchParam);
+    setActiveBranch(branchParam);
+  }
 
   // Sync state during render if dateParam changes
   const [prevDateParam, setPrevDateParam] = useState<string | null>(null);

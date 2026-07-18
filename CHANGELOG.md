@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.16] - 2026-07-18
+
+### Added
+- **Soporte Multisede Consolidado ("Todas las sedes")**:
+  - Incorporación de la opción "Todas las sedes" en el selector de sucursales (`BranchSelector.tsx`) y contexto de sede (`BranchContext.tsx`), permitiendo a los dueños de negocio visualizar métricas y citas globales.
+  - Ajuste en los endpoints de agenda y balances (`backend/app/routers/balance.py` y `useAgendaData.ts`) para soportar consulta global sin restringir a una única `branch_id`.
+  - Sincronización automática de sedes al presionar notificaciones (`NavbarNotifications.tsx` y `AgendaPage.tsx`) con paso dinámico del parámetro `branchId` en la URL.
+  - Inclusión de citas confirmadas y completadas en el cálculo de ingresos brutos y comisiones en el backend.
+
 ## [0.4.15] - 2026-07-17
 
 ### Added

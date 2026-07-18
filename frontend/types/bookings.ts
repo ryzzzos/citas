@@ -4,6 +4,7 @@ export interface Booking {
   id: string;
   user_id: string;
   business_id: string;
+  branch_id?: string | null;
   service_id: string;
   staff_id: string;
   booking_date: string;

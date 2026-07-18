@@ -10,6 +10,7 @@ import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
 import AppIcon from "@/components/ui/AppIcon";
 import { NumberTicker } from "@/components/ui/NumberTicker";
 import { KpiCard } from "@/components/charts/KpiCard";
+import { useBranchContext } from "@/contexts/BranchContext";
 import type { Booking, User as UserType } from "@/types";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameMonth, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 import { es } from "date-fns/locale";
@@ -23,6 +24,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { activeBranch } = useBranchContext();
   const [user, setUser] = useState<UserType | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [weeklyBookings, setWeeklyBookings] = useState<Booking[]>([]);
@@ -52,6 +54,7 @@ export default function DashboardPage() {
           if (myBiz) {
             weekBks = await businessAgenda(myBiz.id, {
               timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              branch_id: activeBranch?.id || undefined,
               from_at: new Date(startStr + "T00:00:00").toISOString(),
               to_at: new Date(endStr + "T23:59:59").toISOString(),
             });
@@ -77,7 +80,7 @@ export default function DashboardPage() {
     }
     load();
     return () => { mounted = false; };
-  }, [router, currentDate]);
+  }, [router, currentDate, activeBranch]);
 
   if (loading && !user) {
     return (

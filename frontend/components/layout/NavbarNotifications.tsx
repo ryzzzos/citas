@@ -47,7 +47,7 @@ const getAlertStatusText = (alert: BookingAlert) => {
 
 export default function NavbarNotifications() {
   const router = useRouter();
-  const { business } = useBranchContext();
+  const { business, setActiveBranch } = useBranchContext();
   const [alerts, setAlerts] = useState<BookingAlert[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -102,9 +102,13 @@ export default function NavbarNotifications() {
 
   const handleAlertClick = (alert: BookingAlert) => {
     setIsOpen(false);
+    if (alert.booking.branch_id) {
+      setActiveBranch(alert.booking.branch_id);
+    }
     // Redirect to the agenda, loading the booking date and auto-opening the drawer
+    const targetBranch = alert.booking.branch_id ? `&branchId=${alert.booking.branch_id}` : "";
     router.push(
-      `/dashboard/agenda?bookingId=${alert.booking.id}&date=${alert.booking.booking_date}`
+      `/dashboard/agenda?bookingId=${alert.booking.id}&date=${alert.booking.booking_date}${targetBranch}`
     );
   };
 

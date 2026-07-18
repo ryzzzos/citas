@@ -9,7 +9,7 @@ except ImportError:
     from backports.zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, String
+from sqlalchemy import func, String, or_
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -143,20 +143,24 @@ def get_business_balance(
             q = q.filter(Booking.branch_id == branch_id)
         return q
 
-    # 4. Gross Income (Paid Payments)
-    current_gross_q = apply_filters(db.query(func.sum(Payment.amount)).join(Booking), start_date, end_date).filter(Payment.status == "paid")
+    # 4. Gross Income (Paid Payments or Confirmed/Completed Bookings)
+    current_gross_q = apply_filters(db.query(func.sum(Payment.amount)).join(Booking), start_date, end_date).filter(
+        or_(Payment.status == "paid", Booking.status.in_(["confirmed", "completed"]))
+    )
     current_gross = current_gross_q.scalar() or Decimal("0.00")
 
-    prev_gross_q = apply_filters(db.query(func.sum(Payment.amount)).join(Booking), prev_start_date, prev_end_date).filter(Payment.status == "paid")
+    prev_gross_q = apply_filters(db.query(func.sum(Payment.amount)).join(Booking), prev_start_date, prev_end_date).filter(
+        or_(Payment.status == "paid", Booking.status.in_(["confirmed", "completed"]))
+    )
     prev_gross = prev_gross_q.scalar() or Decimal("0.00")
 
-    # 5. Expenses (30% completed bookings commissions)
-    current_completed_q = apply_filters(db.query(func.sum(Service.price)).join(Booking, Booking.service_id == Service.id), start_date, end_date).filter(Booking.status == "completed")
+    # 5. Expenses (30% confirmed/completed bookings commissions)
+    current_completed_q = apply_filters(db.query(func.sum(Service.price)).join(Booking, Booking.service_id == Service.id), start_date, end_date).filter(Booking.status.in_(["confirmed", "completed"]))
     current_completed_sum = current_completed_q.scalar() or Decimal("0.00")
     current_commissions = current_completed_sum * Decimal("0.30")
     current_expenses = current_commissions
 
-    prev_completed_q = apply_filters(db.query(func.sum(Service.price)).join(Booking, Booking.service_id == Service.id), prev_start_date, prev_end_date).filter(Booking.status == "completed")
+    prev_completed_q = apply_filters(db.query(func.sum(Service.price)).join(Booking, Booking.service_id == Service.id), prev_start_date, prev_end_date).filter(Booking.status.in_(["confirmed", "completed"]))
     prev_completed_sum = prev_completed_q.scalar() or Decimal("0.00")
     prev_commissions = prev_completed_sum * Decimal("0.30")
     prev_expenses = prev_commissions
@@ -227,7 +231,7 @@ def get_business_balance(
         .join(Service, Booking.service_id == Service.id),
         start_date,
         end_date
-    ).filter(Booking.status == "completed").group_by(Staff.id, Staff.name, Staff.email, Staff.phone).all()
+    ).filter(Booking.status.in_(["confirmed", "completed"])).group_by(Staff.id, Staff.name, Staff.email, Staff.phone).all()
 
     staff_commissions = []
     for s_id, s_name, s_email, s_phone, count, total_income in staff_breakdown_q:

@@ -82,7 +82,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
   ]);
 
   const loadAgendaData = useCallback(async () => {
-    if (!businessId || !branchId) {
+    if (!businessId) {
       return;
     }
 
@@ -92,7 +92,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     try {
       const [bookingsResult, staffResult, servicesResult] = await Promise.all([
         businessAgenda(businessId, bookingQuery),
-        listStaff(businessId, branchId),
+        listStaff(businessId, branchId || undefined),
         listServices(businessId),
       ]);
 

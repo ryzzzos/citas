@@ -68,7 +68,7 @@ export default function BalancePage() {
         setLoading(true);
         const data = await getBusinessBalance(business.id, {
           period,
-          branch_id: activeBranch?.id || null,
+          branch_id: activeBranch?.id || undefined,
         });
         setBalance(data);
         setError(null);

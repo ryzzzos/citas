@@ -40,6 +40,10 @@ export function BranchProvider({ children }: { children: React.ReactNode }) {
       if (fetchedBranches.length > 0) {
         // Try to restore from local storage
         const savedBranchId = localStorage.getItem("active_branch_id");
+        if (savedBranchId === "all") {
+          setActiveBranchState(null);
+          return;
+        }
         if (savedBranchId) {
           const found = fetchedBranches.find(b => b.id === savedBranchId);
           if (found) {
@@ -66,6 +70,11 @@ export function BranchProvider({ children }: { children: React.ReactNode }) {
   }, [fetchBranches]);
 
   const setActiveBranch = useCallback((branchId: string) => {
+    if (branchId === "all") {
+      setActiveBranchState(null);
+      localStorage.setItem("active_branch_id", "all");
+      return;
+    }
     const branch = branches.find(b => b.id === branchId);
     if (branch) {
       setActiveBranchState(branch);
