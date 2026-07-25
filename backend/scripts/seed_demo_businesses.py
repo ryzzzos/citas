@@ -56,7 +56,7 @@ SEED_BUSINESSES: list[SeedBusiness] = [
         address="Carrera 70 #45E-10, Laureles",
         city="Medellin",
         cover_image_url="https://placehold.co/1280x720/png?text=Barberia+Centro+Norte",
-        logo_image_url="https://placehold.co/300x300/png?text=BCN",
+        logo_image_url='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%230f172a"/><path d="M35 35L65 65M65 35L35 65" stroke="%2338bdf8" stroke-width="4"/><circle cx="35" cy="35" r="6" fill="none" stroke="%2338bdf8" stroke-width="3"/><circle cx="65" cy="35" r="6" fill="none" stroke="%2338bdf8" stroke-width="3"/><path d="M38 75Q50 85 62 75" fill="none" stroke="%23fbbf24" stroke-width="4"/></svg>',
     ),
     SeedBusiness(
         owner=SeedOwner("Javier Mena", "owner.estetica.aura@agenda-demo.co", "+57 302 622 2202"),
@@ -71,7 +71,7 @@ SEED_BUSINESSES: list[SeedBusiness] = [
         address="Circular 3 #70-45, Laureles",
         city="Medellin",
         cover_image_url="https://placehold.co/1280x720/png?text=Estetica+Aura+Laureles",
-        logo_image_url="https://placehold.co/300x300/png?text=AURA",
+        logo_image_url='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23022c22"/><path d="M50 20C36 38 28 52 28 64A22 22 0 0 0 72 64C72 52 64 38 50 20Z" fill="%2310b981"/><path d="M50 35C42 46 38 55 38 62A12 12 0 0 0 62 62C62 55 58 46 50 35Z" fill="%23a7f3d0"/></svg>',
     ),
     SeedBusiness(
         owner=SeedOwner("Camila Soto", "owner.spa.bosque@agenda-demo.co", "+57 303 633 3303"),
@@ -86,7 +86,7 @@ SEED_BUSINESSES: list[SeedBusiness] = [
         address="Calle 30 Sur #43A-57, Zona Centro",
         city="Envigado",
         cover_image_url="https://placehold.co/1280x720/png?text=Spa+Bosque+Envigado",
-        logo_image_url="https://placehold.co/300x300/png?text=SPA",
+        logo_image_url='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23064e3b"/><path d="M50 18C30 40 26 66 50 82C74 66 70 40 50 18Z" fill="none" stroke="%2334d399" stroke-width="4"/><path d="M50 30C40 46 38 60 50 72C62 60 60 46 50 30Z" fill="%23059669"/><path d="M50 30V72" stroke="%23ecfdf5" stroke-width="3"/></svg>',
     ),
     SeedBusiness(
         owner=SeedOwner("Matias Perez", "owner.clinica.sonrisa@agenda-demo.co", "+57 304 644 4404"),
@@ -101,7 +101,7 @@ SEED_BUSINESSES: list[SeedBusiness] = [
         address="Carrera 50 #52-18, Centro",
         city="Bello",
         cover_image_url="https://placehold.co/1280x720/png?text=Clinica+Sonrisa+Bello",
-        logo_image_url="https://placehold.co/300x300/png?text=SONRISA",
+        logo_image_url='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%230c4a6e"/><path d="M32 38C32 26 44 24 50 34C56 24 68 26 68 38C68 56 56 74 50 78C44 74 32 56 32 38Z" fill="%230284c7" stroke="%23e0f2fe" stroke-width="3"/><path d="M42 48Q50 60 58 48" fill="none" stroke="%23ffffff" stroke-width="4" stroke-linecap="round"/></svg>',
     ),
     SeedBusiness(
         owner=SeedOwner("Renata Alarcon", "owner.kine.andina@agenda-demo.co", "+57 305 655 5505"),
@@ -116,7 +116,7 @@ SEED_BUSINESSES: list[SeedBusiness] = [
         address="Calle 68 Sur #43A-120, Parque Sabaneta",
         city="Sabaneta",
         cover_image_url="https://placehold.co/1280x720/png?text=Kine+Andina+Sabaneta",
-        logo_image_url="https://placehold.co/300x300/png?text=KINE",
+        logo_image_url='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23311b92"/><path d="M50 20L78 35V65L50 80L22 65V35Z" fill="none" stroke="%23818cf8" stroke-width="4"/><path d="M36 50L46 60L64 40" fill="none" stroke="%23c7d2fe" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     ),
 ]
 

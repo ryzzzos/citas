@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useSearchParams } from "next/navigation";
 import { useDiscoverySearchRegistration } from "@/components/sucursales/DiscoverySearchContext";
 import SucursalesDetailSheet from "@/components/sucursales/SucursalesDetailSheet";
 import SucursalesFiltersPanel from "@/components/sucursales/SucursalesFiltersPanel";
@@ -71,6 +72,9 @@ function viewportFromLocation(location: UserLocation): ViewportState {
 }
 
 export default function SucursalesDiscoveryPage() {
+  const searchParams = useSearchParams();
+  const urlBusinessId = searchParams?.get("businessId") ?? searchParams?.get("select");
+
   const [viewport, setViewport] = useState<ViewportState>(DEFAULT_VIEWPORT);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const [items, setItems] = useState<BusinessMapPoint[]>([]);
@@ -78,8 +82,15 @@ export default function SucursalesDiscoveryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(urlBusinessId);
   const [detailDismissed, setDetailDismissed] = useState(false);
+
+  useEffect(() => {
+    if (urlBusinessId) {
+      setSelectedBusinessId(urlBusinessId);
+      setDetailDismissed(false);
+    }
+  }, [urlBusinessId]);
   const [filtersOpenMobile, setFiltersOpenMobile] = useState(false);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [requestingLocation, setRequestingLocation] = useState(false);

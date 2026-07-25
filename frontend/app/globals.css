@@ -11,8 +11,8 @@
 
 
 :root {
-  --app-primary: #2563eb;
-  --app-primary-strong: #0939bf;
+  --app-primary: #f59e0b;
+  --app-primary-strong: #ff6b35;
 
   /* surfaces */
   --surface-0: #dddddd;
@@ -62,8 +62,8 @@
 
 
 .dark {
-  --app-primary: #60a5fa;
-  --app-primary-strong: #2563eb;
+  --app-primary: #fb923c;
+  --app-primary-strong: #ff6b35;
 
   /* surfaces */
   --surface-0: #09090b;
@@ -181,4 +181,23 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
 [data-sileo-toast],
 [data-sileo-viewport] * {
   z-index: 2147483647 !important;
+}
+
+/* Seamless Hardware-Accelerated Marquee Animation */
+@keyframes infinite-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-marquee {
+  animation: infinite-marquee 45s linear infinite;
+}
+
+/* Pause marquee animation smoothly on hover */
+.marquee-container:hover .animate-infinite-marquee {
+  animation-play-state: paused !important;
 }

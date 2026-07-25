@@ -6,6 +6,17 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.17] - 2026-07-25
+
+### Added
+- **Rediseño Completo y Experiencia Visual de la Landing Page**:
+  - Incorporación del componente `FeatureSlideshow` (`frontend/components/landing/FeatureSlideshow.tsx`) para la presentación interactiva por pestañas y demostraciones en video/imagen del dashboard.
+  - Implementación de `InfiniteMarquee` (`frontend/components/ui/InfiniteMarquee.tsx`) para la tira sin fin de marcas/negocios aliados.
+  - Creación del efecto de iluminación ambiental `LightRays` (`frontend/components/ui/LightRays.tsx`).
+  - Actualización estética integral de `frontend/app/page.tsx` con soporte para videos adaptativos según tema claro/oscuro (`recorte black.mp4`, `recorte white.mp4`).
+  - Inclusión de utilidad `cn` en `frontend/lib/utils.ts` y refinamiento de tokens de estilo CSS en `frontend/app/globals.css`.
+  - Mejoras en la página de descubrimiento de sucursales (`SucursalesDiscoveryPage.tsx`) y actualización de datos demo (`seed_demo_businesses.py`).
+
 ## [0.4.16] - 2026-07-18
 
 ### Added

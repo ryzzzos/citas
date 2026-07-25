@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -23,36 +23,12 @@ import { KineticText } from "@/components/ui/KineticText";
 import BrandLogo from "@/components/ui/BrandLogo";
 import Safari from "@/components/ui/Safari";
 import SaaSVirtuesSection from "@/components/landing/SaaSVirtuesSection";
-
-function cn(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-/* ── Interactive Demo Steps ────────────────────────────────── */
-
-const DEMO_STEPS = [
-  {
-    id: "step-1",
-    title: "1. Busca un local",
-    description: "Explora salones, barberías, spas o centros médicos cercanos en el mapa interactivo.",
-    badge: "B2C Marketplace",
-    icon: MapPin,
-  },
-  {
-    id: "step-2",
-    title: "2. Elige el servicio",
-    description: "Selecciona el servicio que deseas, revisa el precio, duración y el especialista de tu preferencia.",
-    badge: "Transparencia Total",
-    icon: Calendar,
-  },
-  {
-    id: "step-3",
-    title: "3. Reserva al instante",
-    description: "Escoge una hora disponible y confirma. Sin llamadas telefónicas ni tiempos de espera.",
-    badge: "Confirmación 24/7",
-    icon: Clock,
-  },
-];
+import FeatureSlideshow from "@/components/landing/FeatureSlideshow";
+import { LightRays } from "@/components/ui/LightRays";
+import { InfiniteMarquee } from "@/components/ui/InfiniteMarquee";
+import { listBusinesses } from "@/lib/api/businesses";
+import type { Business } from "@/types";
+import { cn } from "@/lib/utils";
 
 /* ── FAQ Accordion Items ────────────────────────────────────── */
 
@@ -195,75 +171,114 @@ function FAQAccordionItem({ question, answer }: { question: string; answer: stri
 /* ── HomePage Component ─────────────────────────────────────── */
 
 export default function HomePage() {
-  const [activeStep, setActiveStep] = useState(0);
+  const [dbBusinesses, setDbBusinesses] = useState<Business[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    listBusinesses()
+      .then((data) => {
+        if (active && Array.isArray(data) && data.length > 0) {
+          setDbBusinesses(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const marqueeDisplayItems = dbBusinesses.map((biz) => (
+    <Link
+      key={biz.id}
+      href={`/sucursales?businessId=${biz.id}`}
+      className="flex items-center gap-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-300 group cursor-pointer select-none shrink-0"
+    >
+      {biz.logo_image_url ? (
+        <img
+          src={biz.logo_image_url}
+          alt={biz.name}
+          className="h-6 w-6 rounded-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all shrink-0"
+        />
+      ) : (
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)]/60 group-hover:bg-[var(--app-primary)] transition-colors shrink-0" />
+      )}
+      <span className="text-sm sm:text-base font-bold tracking-wider uppercase opacity-85 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+        {biz.name}
+      </span>
+    </Link>
+  ));
 
   return (
     <main className="min-h-screen bg-[var(--surface-1)] text-[var(--text-primary)] overflow-x-hidden">
-      {/* ── BACKGROUND GLOWS ─────────────────────────────────── */}
-      <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[color-mix(in_oklab,var(--app-primary)_8%,transparent)] to-transparent pointer-events-none z-0" />
-
+      <LightRays className="z-0" />
       {/* ── HERO SECTION ─────────────────────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-16 text-center flex flex-col items-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8, ease: [0.32, 0.72, 0, 1] }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3.5 py-1 text-[0.7rem] font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)]"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)] animate-pulse" />
-          Plataforma B2C e Inteligencia de Agendamiento
-        </motion.div>
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-16 text-center flex flex-col items-center overflow-hidden">
+        {/* Light Rays ambient background */}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9, ease: [0.32, 0.72, 0, 1] }}
-          className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
-        >
-          <KineticText
-            text="Gestiona tu agenda,"
-            as="span"
-            className="justify-center"
-          />
-          <KineticText
-            text="haz crecer tu negocio"
-            as="span"
-            className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary-strong)] bg-clip-text text-transparent justify-center"
-          />
-        </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0, ease: [0.32, 0.72, 0, 1] }}
-          className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
-        >
-          Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
-          Controla tu agenda y sucursales en un solo lugar con diseño Apple-First.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.1, ease: [0.32, 0.72, 0, 1] }}
-          className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
-        >
-          <Link
-            href="/auth/register"
-            className="inline-flex h-12 items-center justify-center rounded-full bg-primary-gradient px-7 text-sm font-semibold text-white shadow-[var(--shadow-md)] hover:brightness-110 active:scale-98 transition-all duration-200"
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8, ease: [0.32, 0.72, 0, 1] }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3.5 py-1 text-[0.7rem] font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)]"
           >
-            Registra tu negocio
-          </Link>
-          <Link
-            href="/sucursales"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-7 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] active:scale-98 transition-all duration-200"
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)] animate-pulse" />
+            Plataforma B2C e Inteligencia de Agendamiento
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9, ease: [0.32, 0.72, 0, 1] }}
+            className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
           >
-            Explorar sucursales
-          </Link>
-        </motion.div>
+            <KineticText
+              text="Gestiona tu agenda,"
+              as="span"
+              className="justify-center"
+            />
+            <KineticText
+              text="haz crecer tu negocio"
+              as="span"
+              className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary-strong)] bg-clip-text text-transparent justify-center"
+            />
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.0, ease: [0.32, 0.72, 0, 1] }}
+            className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
+          >
+            Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
+            Controla tu agenda y sucursales en un solo lugar con diseño Apple-First.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.1, ease: [0.32, 0.72, 0, 1] }}
+            className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
+          >
+            <Link
+              href="/auth/register"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-primary-gradient px-7 text-sm font-semibold text-white shadow-[var(--shadow-md)] hover:brightness-110 active:scale-98 transition-all duration-200"
+            >
+              Registra tu negocio
+            </Link>
+            <Link
+              href="/sucursales"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-7 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] active:scale-98 transition-all duration-200"
+            >
+              Explorar sucursales
+            </Link>
+          </motion.div>
+        </div>
       </section>
 
       {/* Safari Browser Mockup */}
@@ -278,158 +293,28 @@ export default function HomePage() {
 
         <Safari
           url="agendaweb.com"
-          imageSrc="/dashboard_ligth.webp"
-          imageSrcDark="/dashboard_dark.webp"
+          imageSrc="/1 white.webp"
+          imageSrcDark="/1 black.webp"
         />
       </motion.div>
 
+      {/* ── INFINITE MARQUEE SECTION ────────────────────────────── */}
+      {marqueeDisplayItems.length > 0 && (
+        <section className="relative z-10 max-w-6xl mx-auto px-6 py-2 my-4">
+          <InfiniteMarquee
+            title="NEGOCIOS QUE CONFÍAN EN NOSOTROS"
+            items={marqueeDisplayItems}
+            speed={45}
+            pauseOnHover={true}
+          />
+        </section>
+      )}
+
+      {/* ── FEATURE SLIDESHOW SECTION ───────────────────────── */}
+      <FeatureSlideshow />
+
       {/* ── SAAS VIRTUES SECTION ───────────────────────────────── */}
       <SaaSVirtuesSection />
-
-      {/* ── INTERACTIVE MOCKUP SECTION ──────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-lg)] p-6 sm:p-8 shadow-[var(--shadow-md)]">
-          
-          {/* Steps Left Selector */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-              ¿Cómo funciona?
-            </h2>
-            <p className="text-[0.82rem] text-[var(--text-muted)] leading-relaxed mb-4">
-              Una experiencia simplificada al máximo inspirada en la interacción fluida del ecosistema iOS.
-            </p>
-
-            <div className="space-y-3">
-              {DEMO_STEPS.map((step, idx) => {
-                const isActive = activeStep === idx;
-                return (
-                  <button
-                    key={step.id}
-                    type="button"
-                    onClick={() => setActiveStep(idx)}
-                    className={cn(
-                      "w-full text-left p-3.5 rounded-[var(--radius-sm)] border transition-all duration-300 flex items-start gap-3 cursor-pointer",
-                      isActive
-                        ? "bg-[var(--surface-3)] border-[var(--app-primary)]/30 shadow-[var(--shadow-sm)]"
-                        : "bg-transparent border-transparent hover:bg-[var(--surface-3)]/40"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                        isActive
-                          ? "bg-[var(--app-primary)] text-white"
-                          : "bg-[var(--surface-3)] border border-[var(--border-strong)] text-[var(--text-muted)]"
-                      )}
-                    >
-                      <AppIcon icon={step.icon} className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <span className="rounded-full bg-[var(--surface-2)] px-2 py-0.5 text-[0.6rem] font-bold text-[var(--text-muted)] border border-[var(--border-strong)]/60">
-                        {step.badge}
-                      </span>
-                      <h4 className="text-[0.85rem] font-bold text-[var(--text-primary)] mt-1">{step.title}</h4>
-                      <p className="text-[0.75rem] text-[var(--text-muted)] mt-0.5 leading-relaxed">{step.description}</p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Interactive Device Screen Preview */}
-          <div className="lg:col-span-3 h-[320px] rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] overflow-hidden relative p-6 flex flex-col justify-center items-center">
-            {/* Soft grid background */}
-            <div className="absolute inset-0 bg-[radial-gradient(var(--border-strong)_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
-
-            <AnimatePresence mode="wait">
-              {activeStep === 0 && (
-                <motion.div
-                  key="step-0"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full max-w-sm flex flex-col gap-3 z-10"
-                >
-                  <span className="text-[0.65rem] font-bold text-[var(--app-primary)] uppercase tracking-wider">Paso 1: Localización</span>
-                  <h3 className="text-base font-bold text-[var(--text-primary)]">Mapa y Filtros en Vivo</h3>
-                  
-                  {/* Map mockup widget */}
-                  <div className="rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-[color-mix(in_oklab,var(--app-primary)_12%,transparent)] flex items-center justify-center text-[var(--app-primary)] border border-[var(--app-primary)]/10">
-                      <MapPin className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[0.78rem] font-bold text-[var(--text-primary)] truncate">Clinicas y Salones Cercanos</p>
-                      <p className="text-[0.68rem] text-[var(--text-muted)] truncate">Resultados ordenados por distancia en tu ciudad.</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeStep === 1 && (
-                <motion.div
-                  key="step-1"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full max-w-sm flex flex-col gap-3 z-10"
-                >
-                  <span className="text-[0.65rem] font-bold text-[var(--color-success)] uppercase tracking-wider">Paso 2: Selección</span>
-                  <h3 className="text-base font-bold text-[var(--text-primary)]">Servicios Personalizados</h3>
-                  
-                  {/* Service list mockup */}
-                  <div className="space-y-2">
-                    <div className="rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-2.5 flex justify-between items-center">
-                      <div>
-                        <p className="text-[0.75rem] font-bold text-[var(--text-primary)]">Masaje Relajante</p>
-                        <p className="text-[0.65rem] text-[var(--text-muted)]">60 minutos</p>
-                      </div>
-                      <span className="text-[0.78rem] font-semibold text-[var(--text-primary)]">$45.000</span>
-                    </div>
-                    <div className="rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-2.5 flex justify-between items-center opacity-60">
-                      <div>
-                        <p className="text-[0.75rem] font-bold text-[var(--text-primary)]">Limpieza Facial</p>
-                        <p className="text-[0.65rem] text-[var(--text-muted)]">45 minutos</p>
-                      </div>
-                      <span className="text-[0.78rem] font-semibold text-[var(--text-primary)]">$35.000</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeStep === 2 && (
-                <motion.div
-                  key="step-2"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full max-w-sm flex flex-col gap-3 z-10"
-                >
-                  <span className="text-[0.65rem] font-bold text-[var(--color-pending)] uppercase tracking-wider">Paso 3: Reserva</span>
-                  <h3 className="text-base font-bold text-[var(--text-primary)]">Cita Confirmada</h3>
-                  
-                  {/* Ticket/Confirm mockup */}
-                  <div className="rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3.5 space-y-2">
-                    <div className="flex items-center gap-2 text-[var(--color-success)] text-[0.75rem] font-bold">
-                      <CheckCircle className="h-4 w-4" />
-                      <span>¡Reserva Registrada Exitosamente!</span>
-                    </div>
-                    <div className="border-t border-[var(--border-strong)]/40 pt-2 text-[0.68rem] space-y-1">
-                      <div className="flex justify-between"><span className="text-[var(--text-muted)]">Fecha:</span> <span className="font-semibold text-[var(--text-primary)]">Sábado, 5 de Julio</span></div>
-                      <div className="flex justify-between"><span className="text-[var(--text-muted)]">Hora:</span> <span className="font-semibold text-[var(--text-primary)]">11:00 AM - 12:00 PM</span></div>
-                      <div className="flex justify-between"><span className="text-[var(--text-muted)]">Servicio:</span> <span className="font-semibold text-[var(--text-primary)]">Corte + Barba premium</span></div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
 
       {/* ── BENTO GRID FEATURES ──────────────────────────────── */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-16">
