@@ -3,26 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Compass,
-  MapPin,
-  Shield,
-  Smartphone,
-  Star,
-  Users,
-  Store,
-  Plus,
-  Minus,
-} from "lucide-react";
-
-import AppIcon from "@/components/ui/AppIcon";
+import { Plus, Minus } from "lucide-react";
+import FinalCTASection from "@/components/landing/FinalCTASection";
 import { KineticText } from "@/components/ui/KineticText";
 import BrandLogo from "@/components/ui/BrandLogo";
 import Safari from "@/components/ui/Safari";
-import SaaSVirtuesSection from "@/components/landing/SaaSVirtuesSection";
 import FeatureSlideshow from "@/components/landing/FeatureSlideshow";
 import { LightRays } from "@/components/ui/LightRays";
 import { InfiniteMarquee } from "@/components/ui/InfiniteMarquee";
@@ -47,85 +32,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "¿Es amigable con dispositivos móviles?",
-    answer: "Totalmente. Toda la plataforma está diseñada con enfoque 'Mobile-First', inspirada en la sencillez de los sistemas iOS y Android, ideal tanto para tus clientes como para tus colaboradores.",
-  },
-];
-
-/* ── Bento Grid Features ────────────────────────────────────── */
-
-const BENTO_FEATURES = [
-  {
-    title: "Agenda en tiempo real",
-    desc: "Un calendario intuitivo diario, semanal o mensual diseñado para operar rápidamente en tabletas y móviles sin fricción.",
-    icon: Calendar,
-    className: "col-span-1 md:col-span-2",
-    decor: (
-      <div className="mt-4 flex flex-col gap-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3.5 shadow-[var(--shadow-sm)]">
-        <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-2">
-          <span className="text-[0.7rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">Hoy, 10:30 AM</span>
-          <span className="rounded-full bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)] px-2 py-0.5 text-[0.6rem] font-bold text-[var(--color-success)] border border-[var(--color-success)]/10">Confirmado</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-[var(--app-primary)]" />
-          <span className="text-[0.8rem] font-semibold text-[var(--text-primary)]">Corte de Cabello Premium</span>
-        </div>
-        <span className="text-[0.7rem] text-[var(--text-muted)]">Especialista: Adrian M. · 45 min</span>
-      </div>
-    ),
-  },
-  {
-    title: "Cero Doble Reserva",
-    desc: "Validación de slots segundo a segundo en base a la agenda real de tus estilistas y profesionales.",
-    icon: Shield,
-    className: "col-span-1",
-    decor: (
-      <div className="mt-4 flex items-center justify-center py-4">
-        <div className="relative flex items-center justify-center h-14 w-14 rounded-full bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)] text-[var(--color-success)] border border-[var(--color-success)]/20 shadow-[var(--shadow-sm)]">
-          <CheckCircle className="h-7 w-7" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-[var(--color-success)] animate-ping" />
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "Marketplace Abierto",
-    desc: "Tus clientes te encuentran y reservan directamente. Aumenta tu alcance local.",
-    icon: Compass,
-    className: "col-span-1",
-    decor: (
-      <div className="mt-4 flex flex-col gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 shadow-[var(--shadow-sm)]">
-        <div className="flex items-center gap-2">
-          <Store className="h-4 w-4 text-[var(--app-primary)]" />
-          <span className="text-[0.75rem] font-bold text-[var(--text-primary)]">Estetica Aura Laureles</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-          <span className="text-[0.7rem] font-semibold text-[var(--text-secondary)]">4.9 (124 valoraciones)</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "Mobile First",
-    desc: "Perfecto para tablets, celulares y computadores. Tus clientes reservan desde el sillón de su casa en segundos.",
-    icon: Smartphone,
-    className: "col-span-1 md:col-span-2",
-    decor: (
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-[var(--radius-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] p-2 text-center shadow-[var(--shadow-sm)]">
-          <Clock className="h-4 w-4 mx-auto text-[var(--color-info)] mb-1" />
-          <span className="text-[0.6rem] font-medium text-[var(--text-muted)]">Rápido</span>
-        </div>
-        <div className="rounded-[var(--radius-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] p-2 text-center shadow-[var(--shadow-sm)]">
-          <Users className="h-4 w-4 mx-auto text-[var(--color-pending)] mb-1" />
-          <span className="text-[0.6rem] font-medium text-[var(--text-muted)]">Colaborativo</span>
-        </div>
-        <div className="rounded-[var(--radius-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] p-2 text-center shadow-[var(--shadow-sm)]">
-          <Star className="h-4 w-4 mx-auto text-amber-500 mb-1" />
-          <span className="text-[0.6rem] font-medium text-[var(--text-muted)]">Premium</span>
-        </div>
-      </div>
-    ),
+    answer: "Totalmente. Toda la plataforma está diseñada con enfoque 'Mobile-First' y respuesta ultrarrápida, garantizando una navegación intuitiva y sin fricción en cualquier celular, tablet o computador.",
   },
 ];
 
@@ -255,7 +162,7 @@ export default function HomePage() {
             className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
           >
             Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
-            Controla tu agenda y sucursales en un solo lugar con diseño Apple-First.
+            Controla tu agenda, sucursales y equipo en un solo lugar con una interfaz intuitiva y profesional.
           </motion.p>
 
           {/* CTAs */}
@@ -313,41 +220,7 @@ export default function HomePage() {
       {/* ── FEATURE SLIDESHOW SECTION ───────────────────────── */}
       <FeatureSlideshow />
 
-      {/* ── SAAS VIRTUES SECTION ───────────────────────────────── */}
-      <SaaSVirtuesSection />
-
-      {/* ── BENTO GRID FEATURES ──────────────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 py-16">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            Todo lo necesario en una interfaz fluida
-          </h2>
-          <p className="text-[0.82rem] text-[var(--text-muted)] mt-2">
-            Centralizamos los módulos de tu negocio y la reserva de tus clientes sin enredos.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {BENTO_FEATURES.map((feature, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                "rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-6 shadow-[var(--shadow-sm)] flex flex-col justify-between overflow-hidden",
-                feature.className
-              )}
-            >
-              <div>
-                <div className="h-9 w-9 rounded-full bg-[color-mix(in_oklab,var(--app-primary)_8%,transparent)] text-[var(--app-primary)] flex items-center justify-center border border-[var(--app-primary)]/10 mb-4">
-                  <AppIcon icon={feature.icon} className="h-4.5 w-4.5" />
-                </div>
-                <h3 className="font-bold text-[0.92rem] text-[var(--text-primary)]">{feature.title}</h3>
-                <p className="text-[0.78rem] text-[var(--text-muted)] mt-1.5 leading-relaxed">{feature.desc}</p>
-              </div>
-              {feature.decor}
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* ── FAQ SECTION ──────────────────────────────────────── */}
 
       {/* ── FAQ SECTION ──────────────────────────────────────── */}
       <section className="relative z-10 max-w-3xl mx-auto px-6 py-16">
@@ -367,35 +240,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FINAL CTA SECTION ────────────────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 py-16">
-        <div className="rounded-[var(--radius-xl)] bg-gradient-to-r from-[var(--surface-3)] to-[var(--surface-2)] border border-[var(--border-strong)] p-8 sm:p-12 text-center shadow-[var(--shadow-md)] overflow-hidden relative">
-          {/* Subtle glow behind */}
-          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[color-mix(in_oklab,var(--app-primary)_10%,transparent)] blur-3xl pointer-events-none" />
-
-          <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            ¿Listo para simplificar tu agenda?
-          </h2>
-          <p className="text-[0.85rem] text-[var(--text-muted)] mt-3 max-w-md mx-auto leading-relaxed">
-            Únete a cientos de salones, consultorios y centros de bienestar que ya automatizan su reserva de citas en línea.
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/auth/register"
-              className="inline-flex h-11 items-center justify-center rounded-full bg-primary-gradient px-8 text-sm font-semibold text-white shadow-[var(--shadow-sm)] hover:brightness-110 transition-all cursor-pointer"
-            >
-              Comienza gratis hoy
-            </Link>
-            <Link
-              href="/sucursales"
-              className="inline-flex h-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-8 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
-            >
-              Explorar el mapa
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ── FINAL HIGH-IMPACT CTA SECTION ────────────────────── */}
+      <FinalCTASection />
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 px-6 text-center text-[0.72rem] text-[var(--text-muted)] flex flex-col items-center justify-center gap-3">

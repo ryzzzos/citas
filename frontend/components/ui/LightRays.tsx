@@ -59,27 +59,53 @@ const Ray = ({
   intensity,
 }: LightRay) => {
   return (
-    <motion.div
-      className="pointer-events-none absolute -top-[12%] left-[var(--ray-left)] h-[var(--light-rays-length)] w-[var(--ray-width)] origin-top -translate-x-1/2 rounded-full bg-linear-to-b from-[color-mix(in_srgb,var(--light-rays-color)_70%,transparent)] to-transparent opacity-0 mix-blend-screen blur-[var(--light-rays-blur)]"
-      style={
-        {
-          "--ray-left": `${left}%`,
-          "--ray-width": `${width}px`,
-        } as CSSProperties
-      }
-      initial={{ rotate: rotate }}
-      animate={{
-        opacity: [0, intensity, 0],
-        rotate: [rotate - swing, rotate + swing, rotate - swing],
-      }}
-      transition={{
-        duration: duration,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: delay,
-        repeatDelay: duration * 0.1,
-      }}
-    />
+    <>
+      {/* DARK MODE RAY: 100% EXACT ORIGINAL UNTOUCHED COMPONENT & STYLES */}
+      <motion.div
+        className="hidden dark:block pointer-events-none absolute -top-[12%] left-[var(--ray-left)] h-[var(--light-rays-length)] w-[var(--ray-width)] origin-top -translate-x-1/2 rounded-full bg-linear-to-b from-[color-mix(in_srgb,var(--light-rays-color)_70%,transparent)] to-transparent opacity-0 mix-blend-screen blur-[var(--light-rays-blur)]"
+        style={
+          {
+            "--ray-left": `${left}%`,
+            "--ray-width": `${width}px`,
+          } as CSSProperties
+        }
+        initial={{ rotate: rotate }}
+        animate={{
+          opacity: [0, intensity, 0],
+          rotate: [rotate - swing, rotate + swing, rotate - swing],
+        }}
+        transition={{
+          duration: duration,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay,
+          repeatDelay: duration * 0.1,
+        }}
+      />
+
+      {/* LIGHT MODE RAY: SOFT ETHEREAL LIGHT HALO ON WHITE SURFACES */}
+      <motion.div
+        className="dark:hidden pointer-events-none absolute -top-[12%] left-[var(--ray-left)] h-[var(--light-rays-length)] w-[var(--ray-width)] origin-top -translate-x-1/2 rounded-full bg-gradient-to-b from-[#3b82f6]/22 via-[#60a5fa]/10 to-transparent opacity-0 mix-blend-multiply blur-[calc(var(--light-rays-blur)+8px)] transition-opacity duration-300"
+        style={
+          {
+            "--ray-left": `${left}%`,
+            "--ray-width": `${width}px`,
+          } as CSSProperties
+        }
+        initial={{ rotate: rotate }}
+        animate={{
+          opacity: [0, intensity * 0.75, 0],
+          rotate: [rotate - swing, rotate + swing, rotate - swing],
+        }}
+        transition={{
+          duration: duration,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay,
+          repeatDelay: duration * 0.1,
+        }}
+      />
+    </>
   )
 }
 
@@ -119,9 +145,10 @@ export function LightRays({
       {...props}
     >
       <div className="absolute inset-0 overflow-hidden">
+        {/* DARK MODE AMBIENT GLOW: 100% EXACT ORIGINAL UNTOUCHED */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-60"
+          className="hidden dark:block absolute inset-0 opacity-60"
           style={
             {
               background:
@@ -131,7 +158,7 @@ export function LightRays({
         />
         <div
           aria-hidden
-          className="absolute inset-0 opacity-60"
+          className="hidden dark:block absolute inset-0 opacity-60"
           style={
             {
               background:
@@ -139,6 +166,19 @@ export function LightRays({
             } as CSSProperties
           }
         />
+
+        {/* LIGHT MODE AMBIENT GLOW: SOFT LIGHT HALO */}
+        <div
+          aria-hidden
+          className="dark:hidden absolute inset-0 opacity-100 transition-opacity"
+          style={
+            {
+              background:
+                "radial-gradient(circle at 20% 15%, rgba(59, 130, 246, 0.12), transparent 70%), radial-gradient(circle at 80% 10%, rgba(96, 165, 250, 0.08), transparent 75%)",
+            } as CSSProperties
+          }
+        />
+
         {rays.map((ray) => (
           <Ray key={ray.id} {...ray} />
         ))}

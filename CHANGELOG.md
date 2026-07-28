@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.18] - 2026-07-28
+
+### Added
+- **Componente FinalCTASection y Refactorización de la Landing Page**:
+  - Incorporación del componente dedicado `FinalCTASection` (`frontend/components/landing/FinalCTASection.tsx`) para un cierre visual de alta conversión y llamada a la acción en la Landing Page.
+  - Modularización de `frontend/app/page.tsx` delegando la sección de llamado a la acción final a su componente reutilizable.
+  - Refactorización y mejoras visuales en `FeatureSlideshow` (`frontend/components/landing/FeatureSlideshow.tsx`), optimizando pestañas interactivas, controles de vista previa y renderizado responsivo.
+  - Actualización de `LightRays` (`frontend/components/ui/LightRays.tsx`) con parámetros de animación de rayos de luz más pulidos y adaptables.
+
 ## [0.4.17] - 2026-07-25
 
 ### Added

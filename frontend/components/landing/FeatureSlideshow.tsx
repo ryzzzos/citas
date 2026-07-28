@@ -25,6 +25,7 @@ export interface FeatureSlideshowProps {
   title?: string;
   subtitle?: string;
   steps?: FeatureStep[];
+  autoPlayInterval?: number;
   className?: string;
 }
 
@@ -32,46 +33,58 @@ const DEFAULT_STEPS: FeatureStep[] = [
   {
     id: "step-1",
     stepNumber: "1",
-    title: "1. Busca un local",
-    description: "Explora salones, barberías, spas o centros médicos cercanos en el mapa interactivo.",
-    badge: "B2C Marketplace",
+    title: "1. Digitaliza tu catálogo y equipo",
+    description: "Configura tus sucursales, servicios, tarifas y asigna horarios de atención a tus colaboradores en menos de 2 minutos.",
+    badge: "Setup en 2 Minutos",
     icon: MapPin,
-    previewBadge: "Paso 1: Localización",
-    previewTitle: "Mapa y Filtros en Vivo",
-    previewDescription: "Resultados ordenados por distancia en tu ciudad.",
+    previewBadge: "Paso 1: Setup Simple",
+    previewTitle: "Catálogo y Personal Centralizado",
+    previewDescription: "Precios, duraciones y especialistas listos para recibir reservas.",
   },
   {
     id: "step-2",
     stepNumber: "2",
-    title: "2. Elige el servicio",
-    description: "Selecciona el servicio que deseas, revisa el precio, duración y el especialista de tu preferencia.",
-    badge: "Transparencia Total",
-    icon: Calendar,
-    previewBadge: "Paso 2: Selección",
-    previewTitle: "Servicios Personalizados",
-    previewDescription: "Revisa tarifas y duraciones en tiempo real.",
+    title: "2. Reservas en piloto automático 24/7",
+    description: "Tus clientes eligen servicio, hora y especialista solos desde su celular, sin interrumpirte con llamadas ni chats de WhatsApp.",
+    badge: "Cero Interrupciones",
+    icon: Clock,
+    previewBadge: "Paso 2: Automatización",
+    previewTitle: "Portal de Reservas Autónomo",
+    previewDescription: "Tus clientes agendan solos a cualquier hora del día.",
   },
   {
     id: "step-3",
     stepNumber: "3",
-    title: "3. Reserva al instante",
-    description: "Escoge una hora disponible y confirma. Sin llamadas telefónicas ni tiempos de espera.",
-    badge: "Confirmación 24/7",
-    icon: Clock,
-    previewBadge: "Paso 3: Confirmación",
-    previewTitle: "Ticket de Reserva Generado",
-    previewDescription: "Confirmación automática inmediata 24/7.",
+    title: "3. Blindaje anti doble-reserva y cero plantones",
+    description: "El motor inteligente valida la disponibilidad de tu equipo segundo a segundo, evitando cruces de horarios y maximizando tus ingresos.",
+    badge: "Ingresos Protegidos",
+    icon: Calendar,
+    previewBadge: "Paso 3: Máxima Rentabilidad",
+    previewTitle: "Protección Operativa en Tiempo Real",
+    previewDescription: "Sincronización instantánea de equipo y prevención de huecos muertos.",
   },
 ];
 
 export function FeatureSlideshow({
-  eyebrow = "CÓMO FUNCIONA",
-  title = "Solo 3 pasos para empezar",
-  subtitle = "Una experiencia simplificada al máximo inspirada en la interacción fluida del ecosistema iOS.",
+  eyebrow = "BENEFICIOS CLAVE",
+  title = "Diseñado para escalar tu negocio",
+  subtitle = "Elimina el caos de la agenda manual, automatiza la captura de clientes y enfócate en facturar más.",
   steps = DEFAULT_STEPS,
+  autoPlayInterval = 5000,
   className,
 }: FeatureSlideshowProps) {
   const [activeStep, setActiveStep] = useState(0);
+  const [timerKey, setTimerKey] = useState(0);
+
+  const handleSelectStep = React.useCallback((idx: number) => {
+    setActiveStep(idx);
+    setTimerKey((prev) => prev + 1);
+  }, []);
+
+  const handleAutoNext = React.useCallback(() => {
+    setActiveStep((prev) => (prev + 1) % (steps.length || 1));
+    setTimerKey((prev) => prev + 1);
+  }, [steps.length]);
 
   const currentStep = steps[activeStep] || steps[0];
 
@@ -100,37 +113,53 @@ export function FeatureSlideshow({
 
       {/* Main Grid: Steps list on the left, Preview on the right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        {/* Left Column - Steps selector */}
-        <div className="lg:col-span-5 space-y-3 relative">
+        {/* Left Column - Steps selector (Non-card sleek layout with vertical progress fill) */}
+        <div className="lg:col-span-5 space-y-2 relative">
           {steps.map((step, idx) => {
             const isActive = activeStep === idx;
             return (
               <button
                 key={step.id}
                 type="button"
-                onClick={() => setActiveStep(idx)}
+                onClick={() => handleSelectStep(idx)}
                 className={cn(
-                  "w-full text-left p-4 rounded-[var(--radius-md)] border transition-all duration-300 relative flex items-start gap-3.5 cursor-pointer",
+                  "w-full text-left pl-6 pr-4 py-3.5 rounded-[var(--radius-md)] transition-all duration-300 relative flex items-start gap-3.5 cursor-pointer group select-none",
                   isActive
-                    ? "bg-[var(--surface-3)] border-[var(--border-strong)] shadow-[var(--shadow-sm)]"
-                    : "bg-transparent border-transparent hover:bg-[var(--surface-2)]/60"
+                    ? "bg-[var(--surface-2)]/80 backdrop-blur-xs"
+                    : "bg-transparent hover:bg-[var(--surface-2)]/40"
                 )}
               >
-                {/* Accent line on left when active */}
-                <span
-                  className={cn(
-                    "absolute left-0 top-3 bottom-3 w-1 rounded-full transition-all duration-300",
-                    isActive ? "bg-[var(--app-primary)] opacity-100" : "bg-transparent opacity-0"
+                {/* Left Progress Bar Track */}
+                <div className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[var(--border-strong)]/30 overflow-hidden">
+                  {idx < activeStep ? (
+                    // Previous steps: completed 100% bar
+                    <div className="w-full h-full bg-[var(--app-primary)] rounded-full" />
+                  ) : idx > activeStep ? (
+                    // Future steps: empty 0% bar
+                    <div className="w-full h-0 bg-transparent" />
+                  ) : (
+                    // Active step: animates fill top-to-bottom from 0% to 100%
+                    <motion.div
+                      key={`${activeStep}-${timerKey}`}
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      transition={{
+                        duration: autoPlayInterval / 1000,
+                        ease: "linear",
+                      }}
+                      onAnimationComplete={handleAutoNext}
+                      className="w-full h-full bg-gradient-to-b from-[var(--app-primary)] to-[var(--app-primary-strong)] rounded-full origin-top shadow-[0_0_8px_var(--app-primary)]"
+                    />
                   )}
-                />
+                </div>
 
                 {step.icon && (
                   <div
                     className={cn(
-                      "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-colors mt-0.5",
+                      "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 mt-0.5",
                       isActive
-                        ? "bg-[color-mix(in_oklab,var(--app-primary)_15%,transparent)] text-[var(--app-primary)] border border-[var(--app-primary)]/20 shadow-[var(--shadow-sm)]"
-                        : "bg-[var(--surface-3)] border border-[var(--border-strong)] text-[var(--text-muted)]"
+                        ? "bg-[color-mix(in_oklab,var(--app-primary)_15%,transparent)] text-[var(--app-primary)] border border-[var(--app-primary)]/30 shadow-[var(--shadow-sm)] scale-105"
+                        : "bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
                     )}
                   >
                     <AppIcon icon={step.icon} className="h-4.5 w-4.5" />
@@ -139,14 +168,31 @@ export function FeatureSlideshow({
 
                 <div className="flex-1 min-w-0">
                   {step.badge && (
-                    <span className="inline-block rounded-full bg-[var(--surface-2)] px-2 py-0.5 text-[0.62rem] font-bold text-[var(--text-muted)] border border-[var(--border-strong)]/60 mb-1">
+                    <span
+                      className={cn(
+                        "inline-block rounded-full px-2 py-0.5 text-[0.62rem] font-bold border mb-1 transition-colors duration-300",
+                        isActive
+                          ? "bg-[color-mix(in_oklab,var(--app-primary)_10%,transparent)] text-[var(--app-primary)] border-[var(--app-primary)]/20"
+                          : "bg-[var(--surface-2)] text-[var(--text-muted)] border-[var(--border-strong)]/60"
+                      )}
+                    >
                       {step.badge}
                     </span>
                   )}
-                  <h3 className="text-[0.92rem] font-bold text-[var(--text-primary)] tracking-tight">
+                  <h3
+                    className={cn(
+                      "text-[0.92rem] font-bold tracking-tight transition-colors duration-300",
+                      isActive ? "text-[var(--text-primary)]" : "text-[var(--text-muted)] group-hover:text-[var(--text-primary)]"
+                    )}
+                  >
                     {step.title}
                   </h3>
-                  <p className="text-[0.78rem] text-[var(--text-muted)] mt-1 leading-relaxed">
+                  <p
+                    className={cn(
+                      "text-[0.78rem] mt-1 leading-relaxed transition-colors duration-300",
+                      isActive ? "text-[var(--text-secondary)]" : "text-[var(--text-muted)]/80"
+                    )}
+                  >
                     {step.description}
                   </p>
                 </div>
@@ -155,7 +201,7 @@ export function FeatureSlideshow({
           })}
         </div>
 
-        {/* Right Column - Interactive Device / Screen Preview */}
+        {/* Right Column - Interactive Device / Screen Preview (Entrepreneur Perspective) */}
         <div className="lg:col-span-7 h-[340px] sm:h-[380px] rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)] overflow-hidden relative p-6 sm:p-8 flex flex-col justify-center items-center">
           {/* Soft grid ambient background */}
           <div className="absolute inset-0 bg-[radial-gradient(var(--border-strong)_1px,transparent_1px)] [background-size:16px_16px] opacity-35 pointer-events-none" />
@@ -180,7 +226,7 @@ export function FeatureSlideshow({
                   />
                 </div>
               ) : (
-                /* Built-in default mockup visuals if no custom preview image/content passed */
+                /* Built-in default mockup visuals tailored for Business Owners */
                 <>
                   {currentStep.previewBadge && (
                     <span className="text-[0.65rem] font-bold text-[var(--app-primary)] uppercase tracking-wider">
@@ -193,57 +239,72 @@ export function FeatureSlideshow({
                     </h3>
                   )}
 
+                  {/* Step 1 Preview: Business Services & Staff Setup */}
                   {activeStep === 0 && (
-                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 flex items-center gap-3.5 shadow-[var(--shadow-sm)]">
-                      <div className="h-11 w-11 rounded-full bg-[color-mix(in_oklab,var(--app-primary)_12%,transparent)] flex items-center justify-center text-[var(--app-primary)] border border-[var(--app-primary)]/10 shrink-0">
-                        <MapPin className="h-5.5 w-5.5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[0.82rem] font-bold text-[var(--text-primary)] truncate">
-                          Clínicas y Salones Cercanos
-                        </p>
-                        <p className="text-[0.72rem] text-[var(--text-muted)] truncate mt-0.5">
-                          {currentStep.previewDescription || "Resultados ordenados por distancia."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeStep === 1 && (
                     <div className="space-y-2.5">
-                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 flex justify-between items-center shadow-[var(--shadow-sm)]">
+                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3.5 flex justify-between items-center shadow-[var(--shadow-sm)]">
                         <div>
-                          <p className="text-[0.78rem] font-bold text-[var(--text-primary)]">
-                            Masaje Relajante
+                          <p className="text-[0.8rem] font-bold text-[var(--text-primary)]">
+                            Corte & Barba Executive
                           </p>
-                          <p className="text-[0.68rem] text-[var(--text-muted)]">60 minutos</p>
+                          <p className="text-[0.7rem] text-[var(--text-muted)] mt-0.5">
+                            45 min · 3 Especialistas asignados
+                          </p>
                         </div>
                         <span className="text-[0.82rem] font-bold text-[var(--app-primary)]">
                           $45.000
                         </span>
                       </div>
-                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 flex justify-between items-center opacity-60">
+                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 flex justify-between items-center opacity-70">
                         <div>
-                          <p className="text-[0.78rem] font-bold text-[var(--text-primary)]">
-                            Limpieza Facial
+                          <p className="text-[0.78rem] font-semibold text-[var(--text-primary)]">
+                            Facial Hidratante
                           </p>
-                          <p className="text-[0.68rem] text-[var(--text-muted)]">45 minutos</p>
+                          <p className="text-[0.68rem] text-[var(--text-muted)]">60 min · 2 Especialistas</p>
                         </div>
                         <span className="text-[0.82rem] font-semibold text-[var(--text-primary)]">
-                          $35.000
+                          $65.000
                         </span>
                       </div>
                     </div>
                   )}
 
+                  {/* Step 2 Preview: Autonomous Client Booking Link */}
+                  {activeStep === 1 && (
+                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 space-y-3 shadow-[var(--shadow-sm)]">
+                      <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-2">
+                        <span className="text-[0.7rem] font-bold text-[var(--app-primary)] uppercase tracking-wider">
+                          Reserva Recibida 24/7
+                        </span>
+                        <span className="rounded-full bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)] px-2 py-0.5 text-[0.62rem] font-bold text-[var(--color-success)] border border-[var(--color-success)]/10">
+                          Sin llamadas
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[0.82rem] font-bold text-[var(--text-primary)]">
+                          Cliente: Camilo R.
+                        </p>
+                        <p className="text-[0.74rem] text-[var(--text-muted)]">
+                          Mañana a las 10:30 AM · Especialista Adrian M.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 Preview: Anti-Double Booking & Revenue Protection */}
                   {activeStep === 2 && (
-                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 space-y-2.5 shadow-[var(--shadow-sm)]">
-                      <div className="flex items-center gap-2 text-[var(--color-success)]">
-                        <CheckCircle className="h-4.5 w-4.5" />
-                        <span className="text-[0.8rem] font-bold">Cita Confirmada</span>
+                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 space-y-3 shadow-[var(--shadow-sm)]">
+                      <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-2">
+                        <div className="flex items-center gap-2 text-[var(--color-success)]">
+                          <CheckCircle className="h-4.5 w-4.5 shrink-0" />
+                          <span className="text-[0.8rem] font-bold">Motor Anti-Solapamiento Activo</span>
+                        </div>
+                        <span className="rounded-full bg-[color-mix(in_oklab,var(--app-primary)_10%,transparent)] px-2.5 py-0.5 text-[0.62rem] font-bold text-[var(--app-primary)] border border-[var(--app-primary)]/20">
+                          100% Ocupación
+                        </span>
                       </div>
                       <p className="text-[0.75rem] text-[var(--text-muted)] leading-relaxed">
-                        Mañana a las 03:30 PM · Barba & Corte en Estética Aura
+                        Protección contra doble-reserva en tiempo real · Validación de horarios segundo a segundo para todo el personal.
                       </p>
                     </div>
                   )}
