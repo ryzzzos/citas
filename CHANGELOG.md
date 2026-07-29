@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.19] - 2026-07-29
+
+### Added
+- **Actualización de Marca y Capturas de Pantalla de Alta Fidelidad**:
+  - Incorporación de la vista previa de marca (`frontend/app/logo-preview/page.tsx`) y componentes de identidad de marca (`frontend/components/brand/`).
+  - Refactorización de `BrandLogo` (`frontend/components/ui/BrandLogo.tsx`) con SVG vectorial pulido, gradientes refinados y tipografía unificada.
+  - Actualización de `FeatureSlideshow` (`frontend/components/landing/FeatureSlideshow.tsx`) reemplazando videos por capturas de pantalla de alta fidelidad para mayor rendimiento y fidelidad visual (`dashboard black.webp`, `dashboard white.webp`, `benefit-anti-overlap.png`, `benefit-autopilot-booking.png`, `benefit-catalog-setup.png`).
+  - Limpieza de activos multimedia obsoletos en `frontend/public/`.
+
 ## [0.4.18] - 2026-07-28
 
 ### Added

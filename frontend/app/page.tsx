@@ -200,8 +200,8 @@ export default function HomePage() {
 
         <Safari
           url="agendaweb.com"
-          imageSrc="/1 white.webp"
-          imageSrcDark="/1 black.webp"
+          imageSrc="/dashboard white.webp"
+          imageSrcDark="/dashboard black.webp"
         />
       </motion.div>
 

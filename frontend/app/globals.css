@@ -11,8 +11,8 @@
 
 
 :root {
-  --app-primary: #f59e0b;
-  --app-primary-strong: #ff6b35;
+  --app-primary: #ff7300;
+  --app-primary-strong: #e03000;
 
   /* surfaces */
   --surface-0: #dddddd;
@@ -62,8 +62,8 @@
 
 
 .dark {
-  --app-primary: #fb923c;
-  --app-primary-strong: #ff6b35;
+  --app-primary: #ff7300;
+  --app-primary-strong: #e03000;
 
   /* surfaces */
   --surface-0: #09090b;
@@ -188,6 +188,7 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }

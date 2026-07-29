@@ -69,8 +69,8 @@ export default function SaaSVirtuesSection() {
               <div className="mt-6 pt-2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-sm)] group-hover:scale-[1.02] transition-transform duration-500">
                 <Safari
                   url="agendaweb.com/agenda"
-                  imageSrc="/dashboard_ligth.webp"
-                  imageSrcDark="/dashboard_dark.webp"
+                  imageSrc="/dashboard white.webp"
+                  imageSrcDark="/dashboard black.webp"
                   className="w-full"
                 />
               </div>
@@ -97,8 +97,8 @@ export default function SaaSVirtuesSection() {
               <div className="mt-6 pt-2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-sm)] group-hover:scale-[1.02] transition-transform duration-500">
                 <Safari
                   url="agendaweb.com/seguridad"
-                  imageSrc="/dashboard_ligth.webp"
-                  imageSrcDark="/dashboard_dark.webp"
+                  imageSrc="/dashboard white.webp"
+                  imageSrcDark="/dashboard black.webp"
                   className="w-full"
                 />
               </div>
@@ -127,8 +127,8 @@ export default function SaaSVirtuesSection() {
             <div className="mt-6 pt-2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-sm)] group-hover:scale-[1.01] transition-transform duration-500">
               <Safari
                 url="agendaweb.com/dashboard"
-                imageSrc="/dashboard_ligth.webp"
-                imageSrcDark="/dashboard_dark.webp"
+                imageSrc="/dashboard white.webp"
+                imageSrcDark="/dashboard black.webp"
                 className="w-full"
               />
             </div>
@@ -160,8 +160,8 @@ export default function SaaSVirtuesSection() {
           <div className="relative z-10 mt-8 pt-2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-1)] shadow-[var(--shadow-md)] group-hover:scale-[1.02] transition-transform duration-500 flex-1 flex flex-col justify-start">
             <Safari
               url="agendaweb.com/reservas"
-              imageSrc="/dashboard_ligth.webp"
-              imageSrcDark="/dashboard_dark.webp"
+              imageSrc="/dashboard white.webp"
+              imageSrcDark="/dashboard black.webp"
               className="w-full h-full object-cover"
             />
           </div>

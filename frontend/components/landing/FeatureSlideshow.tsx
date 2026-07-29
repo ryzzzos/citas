@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock, MapPin, CheckCircle, type LucideIcon } from "lucide-react";
+import { Calendar, Clock, MapPin, type LucideIcon } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +38,10 @@ const DEFAULT_STEPS: FeatureStep[] = [
     description: "Configura tus sucursales, servicios, tarifas y asigna horarios de atención a tus colaboradores en menos de 2 minutos.",
     badge: "Setup en 2 Minutos",
     icon: MapPin,
-    previewBadge: "Paso 1: Setup Simple",
-    previewTitle: "Catálogo y Personal Centralizado",
-    previewDescription: "Precios, duraciones y especialistas listos para recibir reservas.",
+    previewBadge: "Setup Simple",
+    previewTitle: "Tu catálogo listo al instante",
+    previewDescription: "Servicios, precios y equipo organizados en un solo lugar.",
+    previewImage: "/benefit-catalog-setup.png",
   },
   {
     id: "step-2",
@@ -48,9 +50,10 @@ const DEFAULT_STEPS: FeatureStep[] = [
     description: "Tus clientes eligen servicio, hora y especialista solos desde su celular, sin interrumpirte con llamadas ni chats de WhatsApp.",
     badge: "Cero Interrupciones",
     icon: Clock,
-    previewBadge: "Paso 2: Automatización",
-    previewTitle: "Portal de Reservas Autónomo",
-    previewDescription: "Tus clientes agendan solos a cualquier hora del día.",
+    previewBadge: "Automatización",
+    previewTitle: "Reservas mientras duermes",
+    previewDescription: "Tus clientes agendan solos, a cualquier hora.",
+    previewImage: "/benefit-autopilot-booking.png",
   },
   {
     id: "step-3",
@@ -59,9 +62,10 @@ const DEFAULT_STEPS: FeatureStep[] = [
     description: "El motor inteligente valida la disponibilidad de tu equipo segundo a segundo, evitando cruces de horarios y maximizando tus ingresos.",
     badge: "Ingresos Protegidos",
     icon: Calendar,
-    previewBadge: "Paso 3: Máxima Rentabilidad",
-    previewTitle: "Protección Operativa en Tiempo Real",
-    previewDescription: "Sincronización instantánea de equipo y prevención de huecos muertos.",
+    previewBadge: "Máxima Rentabilidad",
+    previewTitle: "Agenda blindada, cero cruces",
+    previewDescription: "Validación en tiempo real que protege cada minuto de tu equipo.",
+    previewImage: "/benefit-anti-overlap.png",
   },
 ];
 
@@ -132,13 +136,10 @@ export function FeatureSlideshow({
                 {/* Left Progress Bar Track */}
                 <div className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[var(--border-strong)]/30 overflow-hidden">
                   {idx < activeStep ? (
-                    // Previous steps: completed 100% bar
                     <div className="w-full h-full bg-[var(--app-primary)] rounded-full" />
                   ) : idx > activeStep ? (
-                    // Future steps: empty 0% bar
                     <div className="w-full h-0 bg-transparent" />
                   ) : (
-                    // Active step: animates fill top-to-bottom from 0% to 100%
                     <motion.div
                       key={`${activeStep}-${timerKey}`}
                       initial={{ scaleY: 0 }}
@@ -201,113 +202,118 @@ export function FeatureSlideshow({
           })}
         </div>
 
-        {/* Right Column - Interactive Device / Screen Preview (Entrepreneur Perspective) */}
-        <div className="lg:col-span-7 h-[340px] sm:h-[380px] rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-md)] overflow-hidden relative p-6 sm:p-8 flex flex-col justify-center items-center">
-          {/* Soft grid ambient background */}
-          <div className="absolute inset-0 bg-[radial-gradient(var(--border-strong)_1px,transparent_1px)] [background-size:16px_16px] opacity-35 pointer-events-none" />
+        {/* Right Column — Expressive Illustration Preview */}
+        <div className="lg:col-span-7 h-[360px] sm:h-[420px] rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-lg)] overflow-hidden relative">
+          {/* Ambient glow that shifts with each step */}
+          <motion.div
+            key={`glow-${activeStep}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              background:
+                activeStep === 0
+                  ? "radial-gradient(ellipse at 70% 30%, color-mix(in oklab, var(--app-primary) 8%, transparent) 0%, transparent 70%)"
+                  : activeStep === 1
+                    ? "radial-gradient(ellipse at 50% 60%, color-mix(in oklab, var(--color-info) 8%, transparent) 0%, transparent 70%)"
+                    : "radial-gradient(ellipse at 30% 70%, color-mix(in oklab, var(--color-success) 8%, transparent) 0%, transparent 70%)",
+            }}
+          />
+
+          {/* Soft dot grid overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(var(--border-strong)_0.5px,transparent_0.5px)] [background-size:20px_20px] opacity-20 pointer-events-none z-[1]" />
 
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep.id}
-              initial={{ opacity: 0, y: 12, scale: 0.97 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -12, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-              className="w-full max-w-md flex flex-col gap-3.5 z-10"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              className="relative w-full h-full flex flex-col z-[2]"
             >
               {currentStep.previewContent ? (
-                currentStep.previewContent
-              ) : currentStep.previewImage ? (
-                <div className="rounded-[var(--radius-md)] overflow-hidden border border-[var(--border-strong)] shadow-[var(--shadow-sm)] bg-[var(--surface-2)]">
-                  <img
-                    src={currentStep.previewImage}
-                    alt={currentStep.title}
-                    className="w-full h-auto object-cover"
-                  />
+                <div className="flex-1 flex items-center justify-center p-6">
+                  {currentStep.previewContent}
                 </div>
               ) : (
-                /* Built-in default mockup visuals tailored for Business Owners */
                 <>
-                  {currentStep.previewBadge && (
-                    <span className="text-[0.65rem] font-bold text-[var(--app-primary)] uppercase tracking-wider">
-                      {currentStep.previewBadge}
-                    </span>
-                  )}
-                  {currentStep.previewTitle && (
-                    <h3 className="text-base font-bold text-[var(--text-primary)]">
-                      {currentStep.previewTitle}
-                    </h3>
-                  )}
-
-                  {/* Step 1 Preview: Business Services & Staff Setup */}
-                  {activeStep === 0 && (
-                    <div className="space-y-2.5">
-                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3.5 flex justify-between items-center shadow-[var(--shadow-sm)]">
-                        <div>
-                          <p className="text-[0.8rem] font-bold text-[var(--text-primary)]">
-                            Corte & Barba Executive
-                          </p>
-                          <p className="text-[0.7rem] text-[var(--text-muted)] mt-0.5">
-                            45 min · 3 Especialistas asignados
-                          </p>
-                        </div>
-                        <span className="text-[0.82rem] font-bold text-[var(--app-primary)]">
-                          $45.000
-                        </span>
+                  {/* Hero Illustration Area */}
+                  <div className="flex-1 relative flex items-center justify-center p-4 sm:p-6">
+                    {currentStep.previewImage ? (
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1], delay: 0.1 }}
+                        className="relative w-full h-full max-w-[340px] max-h-[260px] sm:max-h-[300px]"
+                      >
+                        <Image
+                          src={currentStep.previewImage}
+                          alt={currentStep.previewTitle || currentStep.title}
+                          fill
+                          className="object-contain drop-shadow-lg"
+                          sizes="(max-width: 768px) 90vw, 400px"
+                          priority={activeStep === 0}
+                        />
+                      </motion.div>
+                    ) : (
+                      /* Fallback: decorative icon if no image */
+                      <div className="w-28 h-28 rounded-full bg-[color-mix(in_oklab,var(--app-primary)_10%,transparent)] border border-[var(--app-primary)]/20 flex items-center justify-center">
+                        {currentStep.icon && (
+                          <AppIcon icon={currentStep.icon} className="h-12 w-12 text-[var(--app-primary)]" />
+                        )}
                       </div>
-                      <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 flex justify-between items-center opacity-70">
-                        <div>
-                          <p className="text-[0.78rem] font-semibold text-[var(--text-primary)]">
-                            Facial Hidratante
+                    )}
+                  </div>
+
+                  {/* Floating Glassmorphic Info Bar — overlays the bottom */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1], delay: 0.15 }}
+                    className="mx-3 sm:mx-4 mb-3 sm:mb-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)]/80 backdrop-blur-xl shadow-[var(--shadow-md)] px-4 sm:px-5 py-3 sm:py-3.5"
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Step accent dot */}
+                      <div
+                        className={cn(
+                          "mt-1 h-2 w-2 rounded-full shrink-0 ring-4",
+                          activeStep === 0
+                            ? "bg-[var(--app-primary)] ring-[var(--app-primary)]/15"
+                            : activeStep === 1
+                              ? "bg-[var(--color-info)] ring-[var(--color-info)]/15"
+                              : "bg-[var(--color-success)] ring-[var(--color-success)]/15"
+                        )}
+                      />
+                      <div className="flex-1 min-w-0">
+                        {currentStep.previewBadge && (
+                          <span
+                            className={cn(
+                              "text-[0.6rem] font-bold uppercase tracking-widest",
+                              activeStep === 0
+                                ? "text-[var(--app-primary)]"
+                                : activeStep === 1
+                                  ? "text-[var(--color-info)]"
+                                  : "text-[var(--color-success)]"
+                            )}
+                          >
+                            {currentStep.previewBadge}
+                          </span>
+                        )}
+                        {currentStep.previewTitle && (
+                          <h3 className="text-[0.88rem] sm:text-[0.95rem] font-bold text-[var(--text-primary)] tracking-tight leading-snug">
+                            {currentStep.previewTitle}
+                          </h3>
+                        )}
+                        {currentStep.previewDescription && (
+                          <p className="text-[0.72rem] sm:text-[0.76rem] text-[var(--text-muted)] leading-relaxed mt-0.5">
+                            {currentStep.previewDescription}
                           </p>
-                          <p className="text-[0.68rem] text-[var(--text-muted)]">60 min · 2 Especialistas</p>
-                        </div>
-                        <span className="text-[0.82rem] font-semibold text-[var(--text-primary)]">
-                          $65.000
-                        </span>
+                        )}
                       </div>
                     </div>
-                  )}
-
-                  {/* Step 2 Preview: Autonomous Client Booking Link */}
-                  {activeStep === 1 && (
-                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 space-y-3 shadow-[var(--shadow-sm)]">
-                      <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-2">
-                        <span className="text-[0.7rem] font-bold text-[var(--app-primary)] uppercase tracking-wider">
-                          Reserva Recibida 24/7
-                        </span>
-                        <span className="rounded-full bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)] px-2 py-0.5 text-[0.62rem] font-bold text-[var(--color-success)] border border-[var(--color-success)]/10">
-                          Sin llamadas
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[0.82rem] font-bold text-[var(--text-primary)]">
-                          Cliente: Camilo R.
-                        </p>
-                        <p className="text-[0.74rem] text-[var(--text-muted)]">
-                          Mañana a las 10:30 AM · Especialista Adrian M.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 3 Preview: Anti-Double Booking & Revenue Protection */}
-                  {activeStep === 2 && (
-                    <div className="rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 space-y-3 shadow-[var(--shadow-sm)]">
-                      <div className="flex items-center justify-between border-b border-[var(--border-strong)]/40 pb-2">
-                        <div className="flex items-center gap-2 text-[var(--color-success)]">
-                          <CheckCircle className="h-4.5 w-4.5 shrink-0" />
-                          <span className="text-[0.8rem] font-bold">Motor Anti-Solapamiento Activo</span>
-                        </div>
-                        <span className="rounded-full bg-[color-mix(in_oklab,var(--app-primary)_10%,transparent)] px-2.5 py-0.5 text-[0.62rem] font-bold text-[var(--app-primary)] border border-[var(--app-primary)]/20">
-                          100% Ocupación
-                        </span>
-                      </div>
-                      <p className="text-[0.75rem] text-[var(--text-muted)] leading-relaxed">
-                        Protección contra doble-reserva en tiempo real · Validación de horarios segundo a segundo para todo el personal.
-                      </p>
-                    </div>
-                  )}
+                  </motion.div>
                 </>
               )}
             </motion.div>
@@ -319,4 +325,3 @@ export function FeatureSlideshow({
 }
 
 export default FeatureSlideshow;
-
