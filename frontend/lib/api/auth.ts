@@ -30,3 +30,12 @@ export async function register(data: RegisterInput): Promise<User> {
 export function logout(): void {
   clearAccessToken();
 }
+
+export async function loginDemoUser(): Promise<AuthToken> {
+  const token = await request<AuthToken>("/auth/demo-login", {
+    method: "POST",
+  });
+
+  setAccessToken(token.access_token);
+  return token;
+}

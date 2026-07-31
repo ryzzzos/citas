@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.20] - 2026-07-31
+
+### Added
+- **Sección de Precios Transparentes y Acceso Demo en 1-Clic**:
+  - Incorporación del componente `PricingSection` (`frontend/components/landing/PricingSection.tsx`) con planes en COP (Emprendedor, Pro, Multi-Sucursal) y selector de facturación mensual/anual.
+  - Implementación del botón de acceso rápido demo `DemoLoginButton` (`frontend/components/auth/DemoLoginButton.tsx`) integrado en la barra inferior y footer de la Landing Page.
+  - Creación del servicio de cuenta demo (`backend/app/services/demo_service.py`) y del endpoint `/auth/demo-login` (`backend/app/routers/auth.py`) para ingresar a cuentas de prueba sin registro.
+  - Creación y aplicación de migración de base de datos Alembic (`20260730_1648_34da078891ad_add_is_demo_seed_to_bookings.py`) para identificar reservas generadas por el script demo.
+  - Actualización del script `seed_demo_businesses.py` (`backend/scripts/seed_demo_businesses.py`) para generar agencias con citas realistas y métricas financieras.
+
 ## [0.4.19] - 2026-07-29
 
 ### Added

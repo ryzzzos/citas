@@ -93,7 +93,7 @@ export function FeatureSlideshow({
   const currentStep = steps[activeStep] || steps[0];
 
   return (
-    <section className={cn("relative z-10 max-w-5xl mx-auto px-6 py-12 sm:py-16", className)}>
+    <section className={cn("relative z-10 max-w-5xl mx-auto px-6 py-16 sm:py-24", className)}>
       {/* Header Section */}
       {(eyebrow || title || subtitle) && (
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">

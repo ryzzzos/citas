@@ -5,10 +5,12 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import FinalCTASection from "@/components/landing/FinalCTASection";
+import DemoLoginButton from "@/components/auth/DemoLoginButton";
 import { KineticText } from "@/components/ui/KineticText";
 import BrandLogo from "@/components/ui/BrandLogo";
 import Safari from "@/components/ui/Safari";
 import FeatureSlideshow from "@/components/landing/FeatureSlideshow";
+import PricingSection from "@/components/landing/PricingSection";
 import { LightRays } from "@/components/ui/LightRays";
 import { InfiniteMarquee } from "@/components/ui/InfiniteMarquee";
 import { listBusinesses } from "@/lib/api/businesses";
@@ -119,28 +121,14 @@ export default function HomePage() {
     <main className="min-h-screen bg-[var(--surface-1)] text-[var(--text-primary)] overflow-x-hidden">
       <LightRays className="z-0" />
       {/* ── HERO SECTION ─────────────────────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-16 text-center flex flex-col items-center overflow-hidden">
-        {/* Light Rays ambient background */}
-
-
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-20 sm:pt-28 pb-12 sm:pb-16 text-center flex flex-col items-center overflow-hidden">
         {/* Content Overlay */}
         <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8, ease: [0.32, 0.72, 0, 1] }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3.5 py-1 text-[0.7rem] font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)]"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-primary)] animate-pulse" />
-            Plataforma B2C e Inteligencia de Agendamiento
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.9, ease: [0.32, 0.72, 0, 1] }}
-            className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
+            transition={{ duration: 0.6, delay: 0.7, ease: [0.32, 0.72, 0, 1] }}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
           >
             <KineticText
               text="Gestiona tu agenda,"
@@ -158,7 +146,7 @@ export default function HomePage() {
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.6, delay: 0.85, ease: [0.32, 0.72, 0, 1] }}
             className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
           >
             Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
@@ -169,7 +157,7 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.1, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.6, delay: 1.0, ease: [0.32, 0.72, 0, 1] }}
             className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
           >
             <Link
@@ -192,8 +180,8 @@ export default function HomePage() {
       <motion.div
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1.2, ease: [0.32, 0.72, 0, 1] }}
-        className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-12 pb-16 group"
+        transition={{ duration: 0.8, delay: 1.1, ease: [0.32, 0.72, 0, 1] }}
+        className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-12 pb-16 sm:pb-24 group"
       >
         {/* Ambient glow behind Safari */}
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--app-primary)]/10 to-transparent blur-3xl rounded-[var(--radius-xl)] opacity-50 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none -z-10" />
@@ -207,7 +195,7 @@ export default function HomePage() {
 
       {/* ── INFINITE MARQUEE SECTION ────────────────────────────── */}
       {marqueeDisplayItems.length > 0 && (
-        <section className="relative z-10 max-w-6xl mx-auto px-6 py-2 my-4">
+        <section className="relative z-10 max-w-6xl mx-auto px-6 py-8 sm:py-12">
           <InfiniteMarquee
             title="NEGOCIOS QUE CONFÍAN EN NOSOTROS"
             items={marqueeDisplayItems}
@@ -220,10 +208,11 @@ export default function HomePage() {
       {/* ── FEATURE SLIDESHOW SECTION ───────────────────────── */}
       <FeatureSlideshow />
 
-      {/* ── FAQ SECTION ──────────────────────────────────────── */}
+      {/* ── PRICING SECTION ────────────────────────────────── */}
+      <PricingSection />
 
       {/* ── FAQ SECTION ──────────────────────────────────────── */}
-      <section className="relative z-10 max-w-3xl mx-auto px-6 py-16">
+      <section className="relative z-10 max-w-3xl mx-auto px-6 py-16 sm:py-24">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
             Preguntas Frecuentes
@@ -244,9 +233,11 @@ export default function HomePage() {
       <FinalCTASection />
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
-      <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 px-6 text-center text-[0.72rem] text-[var(--text-muted)] flex flex-col items-center justify-center gap-3">
+      <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 sm:py-12 px-6 text-center text-[0.72rem] text-[var(--text-muted)] flex flex-col items-center justify-center gap-4">
         <BrandLogo size={24} />
         <p>© {new Date().getFullYear()} Agenda Web. Todos los derechos reservados. Diseñado para simplificar tu día.</p>
+        <div className="w-12 h-px bg-[var(--border-strong)]/60" />
+        <DemoLoginButton />
       </footer>
     </main>
   );

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Date, Enum, ForeignKey, String, Text, Time, DateTime, func
+from sqlalchemy import Boolean, Date, Enum, ForeignKey, String, Text, Time, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -44,6 +44,7 @@ class Booking(Base):
     customer_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
     customer_whatsapp: Mapped[str | None] = mapped_column(String(30), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_demo_seed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false", index=True)
 
     # Auditing timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

@@ -231,7 +231,7 @@ export default function FinalCTASection() {
                     "0 0 0 1px rgba(245,158,11,0.3), 0 8px 32px -4px rgba(245,158,11,0.45), 0 20px 50px -12px rgba(255,107,53,0.4)",
                 }}
               >
-                <span className="relative z-10">Comienza a automatizar gratis</span>
+                <span className="relative z-10">Comienza a automatizar</span>
                 <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </motion.div>
             </Link>
