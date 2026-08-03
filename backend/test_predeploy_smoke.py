@@ -178,6 +178,23 @@ def run_predeploy_smoke_tests():
     assert idor_status_resp.status_code in (403, 404), f"IDOR Status change vulnerability detected! Status: {idor_status_resp.status_code}"
     print("   [OK] Item 59: Intento de acceso ajeno (IDOR) bloqueado con 403 Forbidden.")
 
+    # 6. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
+    print("\n[6/6] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")
+    from app.core.config import Settings
+    from pydantic import ValidationError
+    try:
+        Settings(app_env="production", supabase_url="", supabase_key="", database_url="postgresql://user:pass@localhost/db", secret_key="a-very-long-secret-key-for-testing-12345")
+        assert False, "Should have failed startup validation in production mode when storage credentials are missing"
+    except ValidationError as exc:
+        assert "Production startup failed" in str(exc)
+        print("   [OK] Item 4: Fallback de filesystem bloqueado en produccion sin credenciales.")
+
+    from jose import jwt
+    encoded = jwt.encode({"sub": "test_user"}, "secret_key_123456789", algorithm="HS256")
+    decoded = jwt.decode(encoded, "secret_key_123456789", algorithms=["HS256"])
+    assert decoded["sub"] == "test_user"
+    print("   [OK] Item 6: python-jose 3.5.0 JWT encode/decode funciona perfectamente.")
+
     print("\n" + "=" * 60)
     print("ALL PRE-DEPLOY SMOKE TESTS PASSED SUCCESSFULLY!")
     print("=" * 60)

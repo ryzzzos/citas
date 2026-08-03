@@ -114,7 +114,14 @@ class StorageService:
                 f"{settings.supabase_storage_bucket}/{object_path}"
             )
 
-        # 4. Local Storage Fallback (Offline Development)
+        # 4. In Production Mode, Local Storage Fallback is Strictly Prohibited
+        if settings.app_env.strip().lower() == "production":
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Production storage misconfiguration: Cloud storage credentials (SUPABASE_URL, SUPABASE_KEY) are missing or disabled. Local filesystem fallback is prohibited in production.",
+            )
+
+        # 5. Local Storage Fallback (Offline Development Only)
         local_file_path = LOCAL_STORAGE_ROOT / object_path
         local_file_path.parent.mkdir(parents=True, exist_ok=True)
         local_file_path.write_bytes(content)

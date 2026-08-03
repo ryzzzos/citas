@@ -1,6 +1,6 @@
 import json
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,7 +17,29 @@ class Settings(BaseSettings):
     geocoding_timeout_seconds: int = 3
     supabase_url: str = ""
     supabase_key: str = ""
+    supabase_service_role_key: str = ""
     supabase_storage_bucket: str = "agenda-images"
+
+    @model_validator(mode="after")
+    def validate_production_storage(self) -> "Settings":
+        if not self.supabase_key and self.supabase_service_role_key:
+            self.supabase_key = self.supabase_service_role_key
+
+        if self.app_env.strip().lower() == "production":
+            missing = []
+            if not self.supabase_url or not self.supabase_url.strip():
+                missing.append("SUPABASE_URL")
+            if not self.supabase_key or not self.supabase_key.strip():
+                missing.append("SUPABASE_KEY / SUPABASE_SERVICE_ROLE_KEY")
+            if not self.supabase_storage_bucket or not self.supabase_storage_bucket.strip():
+                missing.append("SUPABASE_STORAGE_BUCKET")
+
+            if missing:
+                raise ValueError(
+                    f"Production startup failed: Missing required storage credentials ({', '.join(missing)}). "
+                    "Local filesystem fallback is disabled in production to prevent image loss."
+                )
+        return self
 
     @field_validator("database_url")
     @classmethod

@@ -185,7 +185,9 @@ Always maintain a strict separation of concerns between customer-facing views an
    - The dashboard is exclusively for business owners to manage schedules, view statistics, and adjust parameters.
    - It must NOT contain customer-focused navigation or features (e.g. do not show the "Explorar sucursales" or "Explorar" compass button in the dashboard shell). Keep the owner focused on operational metrics.
 
----
+## Technical Debt & Future Migrations
+
+- **Password Hashing Migration (Passlib / bcrypt)**: `passlib==1.7.4` and `bcrypt==3.2.2` are currently pinned to preserve password hashing compatibility. Future migration plan: Transition password hashing mechanism to `Argon2id` / `pwdlib` with transparent re-hash on user authentication.
 
 ## Agent Usage Notes
 

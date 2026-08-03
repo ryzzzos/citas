@@ -135,10 +135,14 @@ export default function SucursalesMapCanvas({
     setMounted(true);
   }, []);
 
-  const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "PvIiQ0nO1t77BEI61zKQ";
-  const tileUrl = `https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${mapTilerKey}`;
-  
-  const attribution = '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "";
+  const tileUrl = mapTilerKey
+    ? `https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${mapTilerKey}`
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+  const attribution = mapTilerKey
+    ? '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   const userLocationIcon = useMemo(() => {
     if (!mounted) return null;

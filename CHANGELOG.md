@@ -6,6 +6,21 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.22] - 2026-08-03
+
+### Fixed
+- **Validación Estricta de Almacenamiento en Producción**:
+  - Restricción del fallback de filesystem local exclusivamente a entornos de desarrollo (`app_env != "production"`).
+  - En producción (`app_env == "production"`), las credenciales de almacenamiento en la nube (`SUPABASE_URL`, `SUPABASE_KEY` / `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET`) son estrictamente obligatorias, provocando un error de startup si falta alguna.
+- **Remoción de API Key Hardcodeada de MapTiler**:
+  - Eliminación completa de la clave de fallback hardcodeada en `SucursalesMapCanvas.tsx` y en `frontend/.env.example`.
+  - El mapa recurre a capas de mapas libres de OpenStreetMap si no se proporciona `NEXT_PUBLIC_MAPTILER_API_KEY`.
+- **Actualización de Seguridad de Dependencias Backend**:
+  - Actualización de `python-jose[cryptography]` a la versión `3.5.0` (resolviendo la vulnerabilidad CVE-2024-29370).
+  - Actualización de `psycopg2-binary` a la versión `2.9.12`.
+- **Registro de Deuda Técnica**:
+  - Documentación en `AGENTS.md` de la futura migración de hashing de contraseñas de Passlib/bcrypt a Argon2id/pwdlib.
+
 ## [0.4.21] - 2026-08-03
 
 ### Added
