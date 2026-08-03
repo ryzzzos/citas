@@ -86,14 +86,14 @@ class StorageService:
         object_path = f"{folder_path}/{safe_filename}".strip("/")
 
         # 3. Supabase Storage (Cloud / Production)
-        if settings.supabase_url and settings.supabase_key:
+        if settings.supabase_url and settings.supabase_service_role_key:
             target_url = (
                 f"{settings.supabase_url.rstrip('/')}/storage/v1/object/"
                 f"{settings.supabase_storage_bucket}/{object_path}"
             )
             headers = {
-                "Authorization": f"Bearer {settings.supabase_key}",
-                "apikey": settings.supabase_key,
+                "Authorization": f"Bearer {settings.supabase_service_role_key}",
+                "apikey": settings.supabase_service_role_key,
                 "Content-Type": real_mime,
                 "x-upsert": "true",
             }
@@ -118,7 +118,7 @@ class StorageService:
         if settings.app_env.strip().lower() == "production":
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Production storage misconfiguration: Cloud storage credentials (SUPABASE_URL, SUPABASE_KEY) are missing or disabled. Local filesystem fallback is prohibited in production.",
+                detail="Production storage misconfiguration: Cloud storage credentials (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) are missing or disabled. Local filesystem fallback is prohibited in production.",
             )
 
         # 5. Local Storage Fallback (Offline Development Only)
@@ -144,15 +144,15 @@ class StorageService:
 
         # 1. Supabase Storage Cleanup
         public_prefix = f"/storage/v1/object/public/{settings.supabase_storage_bucket}/"
-        if settings.supabase_url and settings.supabase_key and public_prefix in image_url:
+        if settings.supabase_url and settings.supabase_service_role_key and public_prefix in image_url:
             object_path = image_url.split(public_prefix)[-1]
             target_url = (
                 f"{settings.supabase_url.rstrip('/')}/storage/v1/object/"
                 f"{settings.supabase_storage_bucket}/{object_path}"
             )
             headers = {
-                "Authorization": f"Bearer {settings.supabase_key}",
-                "apikey": settings.supabase_key,
+                "Authorization": f"Bearer {settings.supabase_service_role_key}",
+                "apikey": settings.supabase_service_role_key,
             }
             async with httpx.AsyncClient(timeout=10.0) as client:
                 try:

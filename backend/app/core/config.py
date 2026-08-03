@@ -16,21 +16,21 @@ class Settings(BaseSettings):
     geocoding_user_agent: str = "AgendaWeb-Platform/1.0 (contacto@agendaweb.app)"
     geocoding_timeout_seconds: int = 3
     supabase_url: str = ""
-    supabase_key: str = ""
     supabase_service_role_key: str = ""
+    supabase_key: str = ""
     supabase_storage_bucket: str = "agenda-images"
 
     @model_validator(mode="after")
     def validate_production_storage(self) -> "Settings":
-        if not self.supabase_key and self.supabase_service_role_key:
-            self.supabase_key = self.supabase_service_role_key
+        if not self.supabase_service_role_key and self.supabase_key:
+            self.supabase_service_role_key = self.supabase_key
 
         if self.app_env.strip().lower() == "production":
             missing = []
             if not self.supabase_url or not self.supabase_url.strip():
                 missing.append("SUPABASE_URL")
-            if not self.supabase_key or not self.supabase_key.strip():
-                missing.append("SUPABASE_KEY / SUPABASE_SERVICE_ROLE_KEY")
+            if not self.supabase_service_role_key or not self.supabase_service_role_key.strip():
+                missing.append("SUPABASE_SERVICE_ROLE_KEY")
             if not self.supabase_storage_bucket or not self.supabase_storage_bucket.strip():
                 missing.append("SUPABASE_STORAGE_BUCKET")
 

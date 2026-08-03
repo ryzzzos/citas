@@ -37,7 +37,8 @@ app.include_router(staff.router, prefix="/api/v1/staff", tags=["staff"])
 app.include_router(schedules.router, prefix="/api/v1/schedules", tags=["schedules"])
 app.include_router(bookings.router, prefix="/api/v1/bookings", tags=["bookings"])
 app.include_router(balance.router, prefix="/api/v1", tags=["balance"])
-app.mount("/storage", StaticFiles(directory=STORAGE_ROOT), name="storage")
+if settings.app_env.strip().lower() != "production":
+    app.mount("/storage", StaticFiles(directory=STORAGE_ROOT), name="storage")
 
 
 import logging

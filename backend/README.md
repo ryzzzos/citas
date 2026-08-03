@@ -39,7 +39,7 @@ Use these commands once to create the app user and DB:
 $env:PGPASSWORD = 'postgres'
 $psql = "C:\Program Files\PostgreSQL\17\bin\psql.exe"
 
-& $psql -U postgres -h 127.0.0.1 -d postgres -c "CREATE ROLE agenda_web_app LOGIN PASSWORD 'agenda_web_dev_2026';" 2>$null
+& $psql -U postgres -h 127.0.0.1 -d postgres -c "CREATE ROLE agenda_web_app LOGIN PASSWORD '<tu_password_local>';" 2>$null
 & $psql -U postgres -h 127.0.0.1 -d postgres -c "CREATE DATABASE agenda_web_db OWNER agenda_web_app;" 2>$null
 & $psql -U postgres -h 127.0.0.1 -d postgres -c "ALTER DATABASE agenda_web_db OWNER TO agenda_web_app;"
 ```
@@ -47,7 +47,7 @@ $psql = "C:\Program Files\PostgreSQL\17\bin\psql.exe"
 Then set in `.env`:
 
 ```env
-DATABASE_URL=postgresql://agenda_web_app:agenda_web_dev_2026@127.0.0.1:5432/agenda_web_db
+DATABASE_URL=postgresql://agenda_web_app:<tu_password_local>@127.0.0.1:5432/agenda_web_db
 ALLOWED_ORIGINS=["http://localhost:3000"]
 ```
 

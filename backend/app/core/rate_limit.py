@@ -29,7 +29,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         is_protected = path in self.protected_paths or "/image" in path
 
         if request.method == "POST" and is_protected:
-            client_ip = request.client.host if request.client else "127.0.0.1"
+            forwarded_for = request.headers.get("x-forwarded-for")
+            if forwarded_for:
+                client_ip = forwarded_for.split(",")[0].strip()
+            else:
+                client_ip = request.client.host if request.client else "127.0.0.1"
+
             now = time.time()
             window_start = now - self.window_seconds
 

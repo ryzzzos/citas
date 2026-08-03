@@ -210,16 +210,17 @@ def run_predeploy_smoke_tests():
     assert idor_status_resp.status_code in (403, 404), f"IDOR Status change vulnerability detected! Status: {idor_status_resp.status_code}"
     print("   [OK] Item 59: Intento de acceso ajeno (IDOR) bloqueado con 403 Forbidden.")
 
-    # 6. Test Item 60: Alembic Migration Status Check
-    print("\n[6/7] Testing Item 60: Estado de Migraciones de Alembic...")
+    # 6. Test Item 60: Alembic Migration Execution & Status Check
+    print("\n[6/7] Testing Item 60: Ejecucion de Migraciones de Alembic (upgrade head)...")
     from alembic.config import Config
     from alembic import command
     alembic_cfg = Config("alembic.ini")
     try:
+        command.upgrade(alembic_cfg, "head")
         command.current(alembic_cfg)
-        print("   [OK] Item 60: Migraciones de Alembic verificadas e idempotentes.")
+        print("   [OK] Item 60: alembic upgrade head ejecuto correctamente y la BD esta en la version head.")
     except Exception as exc:
-        assert False, f"Alembic migration check failed: {exc}"
+        assert False, f"Alembic migration execution failed: {exc}"
 
     # 7. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
     print("\n[7/7] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")

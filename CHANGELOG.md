@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.24] - 2026-08-03
+
+### Fixed
+- **Estandarización de SUPABASE_SERVICE_ROLE_KEY en Configuración y Storage**:
+  - Actualización en `config.py` para utilizar `supabase_service_role_key` como credencial primaria de Supabase Storage en producción (manteniendo soporte retrocompatible si solo se define `SUPABASE_KEY`).
+  - En `storage_service.py`, envío explícito de `SUPABASE_SERVICE_ROLE_KEY` en headers de autorización para operaciones de lectura/escritura/borrado de imágenes en Supabase.
+- **Verificación y Ejecución de Migraciones Alembic**:
+  - En `test_predeploy_smoke.py`, adición de la ejecución de migraciones con `alembic upgrade head` para garantizar la actualización correcta del esquema antes de validar la versión head.
+
 ## [0.4.23] - 2026-08-03
 
 ### Fixed

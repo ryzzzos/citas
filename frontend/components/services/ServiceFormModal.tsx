@@ -350,7 +350,7 @@ export default function ServiceFormModal({
                 </div>
                 <Input
                   id="service-price"
-                  label="Precio (CLP)"
+                  label="Precio (COP)"
                   type="number"
                   min={0}
                   step="0.01"
