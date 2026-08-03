@@ -25,6 +25,7 @@ from app.schemas.business import (
 from app.services.geocoding_service import (
     GEOCODING_STATUS_FAILED,
     GEOCODING_STATUS_MANUAL,
+    GEOCODING_STATUS_PENDING,
     GEOCODING_STATUS_SUCCESS,
     geocode_business_location,
 )
@@ -149,41 +150,25 @@ def _business_image_path(business_id: uuid.UUID, filename: str) -> Path:
     return target_dir / filename
 
 
+from app.services.storage_service import StorageService
+
+
 async def _upload_business_image(
     request: Request,
     business: Business,
     file: UploadFile,
     kind: str,
 ) -> str:
-    if file.content_type not in ALLOWED_BUSINESS_IMAGE_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Only JPEG, PNG and WEBP images are allowed",
-        )
-
-    ext = ALLOWED_BUSINESS_IMAGE_TYPES[file.content_type]
-    final_name = f"{kind}-{uuid.uuid4().hex[:12]}.{ext}"
-    target_path = _business_image_path(business.id, final_name)
-    written = 0
-
-    try:
-        with target_path.open("wb") as destination:
-            while chunk := await file.read(1024 * 256):
-                written += len(chunk)
-                if written > MAX_BUSINESS_IMAGE_BYTES:
-                    raise HTTPException(
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                        detail="Image size must be 4MB or smaller",
-                    )
-                destination.write(chunk)
-    except HTTPException:
-        if target_path.exists():
-            target_path.unlink(missing_ok=True)
-        raise
-    finally:
-        await file.close()
-
-    return str(request.url_for("storage", path=f"business-images/{business.id}/{final_name}"))
+    old_url = business.logo_url if kind == "logo" else business.cover_image_url
+    folder_path = f"businesses/{business.id}"
+    return await StorageService.upload_image(
+        file=file,
+        folder_path=folder_path,
+        filename_prefix=kind,
+        old_image_url=old_url,
+        request=request,
+        max_bytes=MAX_BUSINESS_IMAGE_BYTES,
+    )
 
 
 @router.post("/", response_model=BusinessRead, status_code=201)

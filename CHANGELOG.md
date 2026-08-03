@@ -6,6 +6,18 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.21] - 2026-08-03
+
+### Added
+- **Almacenamiento Cloudflare R2 / S3, Healthcheck y Smoke Tests de Predespliegue**:
+  - Implementación del servicio de almacenamiento abstracto `storage_service.py` (`backend/app/services/storage_service.py`) con soporte para Cloudflare R2 / AWS S3 para carga de imágenes en producción.
+  - Refactorización de endpoints de carga de archivos en negocios, servicios y personal (`backend/app/routers/`) utilizando el servicio de almacenamiento con fallback local.
+  - Parámetros de configuración R2/S3 en `config.py` (`backend/app/core/config.py`).
+  - Robustecimiento de conexión a base de datos PostgreSQL en `database.py` (`backend/app/database.py`).
+  - Incorporación del endpoint de monitoreo de salud `/health` en `main.py` (`backend/main.py`).
+  - Creación de la suite de pruebas de humo `test_predeploy_smoke.py` (`backend/test_predeploy_smoke.py`).
+  - Configuración de patrones de dominios de imágenes remotas en `frontend/next.config.ts`.
+
 ## [0.4.20] - 2026-07-31
 
 ### Added

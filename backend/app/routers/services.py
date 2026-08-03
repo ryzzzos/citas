@@ -58,6 +58,9 @@ def create_service(
     return service
 
 
+from app.services.storage_service import StorageService
+
+
 @router.post("/{business_id}/image", response_model=ServiceImageUploadRead, status_code=201)
 async def upload_service_image(
     request: Request,
@@ -68,38 +71,14 @@ async def upload_service_image(
 ):
     _get_owned_business(business_id, current_user, db)
 
-    if file.content_type not in ALLOWED_SERVICE_IMAGE_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Only JPEG, PNG and WEBP images are allowed",
-        )
-
-    original_name = Path(file.filename or "service-image").stem
-    safe_name = _slugify_filename(original_name)
-    ext = ALLOWED_SERVICE_IMAGE_TYPES[file.content_type]
-    final_name = f"{safe_name}-{uuid.uuid4().hex[:12]}.{ext}"
-
-    target_path = _service_image_path(business_id, final_name)
-    written = 0
-
-    try:
-        with target_path.open("wb") as destination:
-            while chunk := await file.read(1024 * 256):
-                written += len(chunk)
-                if written > MAX_SERVICE_IMAGE_BYTES:
-                    raise HTTPException(
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                        detail="Image size must be 2MB or smaller",
-                    )
-                destination.write(chunk)
-    except HTTPException:
-        if target_path.exists():
-            target_path.unlink(missing_ok=True)
-        raise
-    finally:
-        await file.close()
-
-    image_url = str(request.url_for("storage", path=f"service-images/{business_id}/{final_name}"))
+    folder_path = f"services/{business_id}"
+    image_url = await StorageService.upload_image(
+        file=file,
+        folder_path=folder_path,
+        filename_prefix="service",
+        request=request,
+        max_bytes=MAX_SERVICE_IMAGE_BYTES,
+    )
     return {"image_url": image_url}
 
 
@@ -158,7 +137,7 @@ def update_service(
 
 
 @router.delete("/{business_id}/services/{service_id}", status_code=204)
-def delete_service(
+async def delete_service(
     business_id: uuid.UUID,
     service_id: uuid.UUID,
     current_user: User = Depends(require_business_owner),
@@ -168,5 +147,7 @@ def delete_service(
     service = db.get(Service, service_id)
     if not service or service.business_id != business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    if service.image_url:
+        await StorageService.delete_image(service.image_url)
     db.delete(service)
     db.commit()

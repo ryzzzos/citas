@@ -126,9 +126,9 @@ def update_branch(
 
     update_data = branch_in.model_dump(exclude_unset=True)
     
-    needs_geocoding = False
-    if "address" in update_data or "city" in update_data:
-        needs_geocoding = True
+    new_address = update_data.get("address", branch.address)
+    new_city = update_data.get("city", branch.city)
+    needs_geocoding = (new_address != branch.address) or (new_city != branch.city)
         
     for field, value in update_data.items():
         setattr(branch, field, value)

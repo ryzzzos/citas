@@ -101,6 +101,13 @@ def business_agenda(
     current_user: User = Depends(require_business_owner),
     db: Session = Depends(get_db),
 ):
+    from app.models.business import Business
+    business = db.get(Business, business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Business not found")
+    if business.owner_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not own this business")
+
     local_zone = _resolve_timezone(timezone)
 
     query = db.query(Booking).options(

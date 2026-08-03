@@ -15,7 +15,8 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
 
     from app.models.staff import Staff
-    staff = db.get(Staff, data.staff_id)
+    # Pessimistic row locking on Staff to serialize concurrent booking attempts and prevent race conditions
+    staff = db.query(Staff).filter(Staff.id == data.staff_id).with_for_update().first()
     if not staff or staff.branch_id != data.branch_id or not staff.is_active:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid staff or branch")
 
@@ -90,7 +91,7 @@ def update_booking_status(
     if not booking:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
 
-    # Customer can only cancel their own bookings
+    # Security Check: Verify ownership
     if current_user.role == "customer":
         if booking.user_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
@@ -99,6 +100,11 @@ def update_booking_status(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Customers may only cancel bookings",
             )
+    elif current_user.role != "admin":
+        from app.models.business import Business
+        business = db.get(Business, booking.business_id)
+        if not business or business.owner_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not own this business")
 
     booking.status = data.status
     
@@ -157,6 +163,10 @@ def reschedule_booking(
 
     # Use specified staff_id or fall back to booking's existing staff
     target_staff_id = data.staff_id if data.staff_id is not None else booking.staff_id
+
+    # Lock target staff member row to serialize concurrent booking and rescheduling attempts
+    from app.models.staff import Staff
+    db.query(Staff).filter(Staff.id == target_staff_id).with_for_update().first()
 
     # Conflict check - exclude the booking itself from overlaps
     existing = (

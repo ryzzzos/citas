@@ -37,6 +37,22 @@ app.include_router(balance.router, prefix="/api/v1", tags=["balance"])
 app.mount("/storage", StaticFiles(directory=STORAGE_ROOT), name="storage")
 
 
+import logging
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+
+logger = logging.getLogger("agenda_web")
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("Unhandled Exception on %s %s", request.method, request.url.path, exc_info=exc)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error. Please try again later."},
+    )
+
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}

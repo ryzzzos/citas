@@ -135,7 +135,8 @@ export default function SucursalesMapCanvas({
     setMounted(true);
   }, []);
 
-  const tileUrl = "https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=PvIiQ0nO1t77BEI61zKQ";
+  const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "PvIiQ0nO1t77BEI61zKQ";
+  const tileUrl = `https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${mapTilerKey}`;
   
   const attribution = '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 

@@ -116,7 +116,7 @@ def update_staff(
 
 
 @router.delete("/{business_id}/staff/{staff_id}", status_code=204)
-def remove_staff(
+async def remove_staff(
     business_id: uuid.UUID,
     staff_id: uuid.UUID,
     current_user: User = Depends(require_business_owner),
@@ -126,8 +126,13 @@ def remove_staff(
     member = db.get(Staff, staff_id)
     if not member or member.business_id != business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found")
+    if member.photo_url:
+        await StorageService.delete_image(member.photo_url)
     db.delete(member)
     db.commit()
+
+from app.services.storage_service import StorageService
+
 
 @router.post("/{business_id}/staff/{staff_id}/photo", response_model=StaffRead)
 async def upload_staff_photo(
@@ -143,40 +148,17 @@ async def upload_staff_photo(
     if not member or member.business_id != business_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found")
 
-    if file.content_type not in ALLOWED_IMAGE_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Only JPEG, PNG and WEBP images are allowed",
-        )
+    folder_path = f"staff/{business_id}/{staff_id}"
+    photo_url = await StorageService.upload_image(
+        file=file,
+        folder_path=folder_path,
+        filename_prefix="photo",
+        old_image_url=member.photo_url,
+        request=request,
+        max_bytes=MAX_IMAGE_BYTES,
+    )
 
-    original_name = Path(file.filename or "staff-photo").stem
-    safe_name = _slugify_filename(original_name)
-    ext = ALLOWED_IMAGE_TYPES[file.content_type]
-    final_name = f"{safe_name}-{uuid.uuid4().hex[:12]}.{ext}"
-
-    target_path = _staff_photo_path(business_id, staff_id, final_name)
-    written = 0
-
-    try:
-        with target_path.open("wb") as destination:
-            while chunk := await file.read(1024 * 256):
-                written += len(chunk)
-                if written > MAX_IMAGE_BYTES:
-                    raise HTTPException(
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                        detail="Image size must be 2MB or smaller",
-                    )
-                destination.write(chunk)
-    except HTTPException:
-        if target_path.exists():
-            target_path.unlink(missing_ok=True)
-        raise
-    finally:
-        await file.close()
-
-    # Update DB
-    url = f"{request.base_url}storage/businesses/{business_id}/staff/{staff_id}/{final_name}"
-    member.photo_url = url
+    member.photo_url = photo_url
     db.commit()
     db.refresh(member)
 

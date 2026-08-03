@@ -91,6 +91,15 @@ def _get_geolocator() -> Nominatim:
     )
 
 
+@lru_cache(maxsize=512)
+def _geocode_query_cached(query: str):
+    geolocator = _get_geolocator()
+    location = geolocator.geocode(query, addressdetails=False, language="es")
+    if location is None:
+        return None
+    return (round(float(location.latitude), 6), round(float(location.longitude), 6))
+
+
 def geocode_business_location(*, name: str, address: str, city: str) -> GeocodingResult:
     queries = _build_geocoding_queries(name=name, address=address, city=city)
     if not queries:
@@ -101,11 +110,9 @@ def geocode_business_location(*, name: str, address: str, city: str) -> Geocodin
             error="missing_address_query",
         )
 
-    geolocator = _get_geolocator()
-
     for query in queries:
         try:
-            location = geolocator.geocode(query, addressdetails=False, language="es")
+            coords = _geocode_query_cached(query)
         except (GeocoderTimedOut, GeocoderUnavailable, GeocoderServiceError) as exc:
             fallback_result = _city_fallback(city, reason=f"temporary_geocoding_error:{exc.__class__.__name__}")
             if fallback_result is not None:
@@ -129,12 +136,12 @@ def geocode_business_location(*, name: str, address: str, city: str) -> Geocodin
                 error=f"unexpected_geocoding_error:{exc.__class__.__name__}",
             )
 
-        if location is None:
+        if coords is None:
             continue
 
         return GeocodingResult(
-            latitude=round(float(location.latitude), 6),
-            longitude=round(float(location.longitude), 6),
+            latitude=coords[0],
+            longitude=coords[1],
             status=GEOCODING_STATUS_SUCCESS,
             error=None,
         )
