@@ -16,6 +16,7 @@ import { ChartPieLegend } from "@/components/charts/ChartPieLegend";
 import { KpiCard } from "@/components/charts/KpiCard";
 import { Table, type TableColumn } from "@/components/ui/Table";
 import CustomSelect from "@/components/ui/CustomSelect";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 const GRADIENTS = [
   "from-indigo-500 to-purple-500",
@@ -80,15 +81,6 @@ export default function BalancePage() {
     }
     loadBalance();
   }, [business, period, activeBranch]);
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(val);
-  };
 
   const periodOptions = [
     { value: "week", label: "Semana" },

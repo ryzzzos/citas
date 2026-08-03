@@ -6,6 +6,19 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.23] - 2026-08-03
+
+### Fixed
+- **Resiliencia en Eliminación de Imágenes en Storage**:
+  - Ajuste en `storage_service.py` para eliminar imágenes antiguas únicamente tras confirmar el éxito de la subida de la nueva imagen a Supabase/almacenamiento local.
+- **Integridad de Dominio y Validaciones de Reserva**:
+  - En `booking_service.py`, validaciones estrictas de pertenencia de sede, especialista y servicio al negocio en flujos de reserva y reagendamiento.
+  - Creación explícita del objeto `Payment` con moneda `COP` asociada a la reserva.
+- **Ampliación de Suite de Smoke Tests**:
+  - En `test_predeploy_smoke.py`, pruebas multihilo paralelas realistas con `ThreadPoolExecutor`, validación de pagos COP y verificación de estado de migraciones Alembic.
+- **Restricción de Versiones Node.js**:
+  - Adición del campo `engines` (`>=20.9.0 <25.0.0`) en `frontend/package.json`.
+
 ## [0.4.22] - 2026-08-03
 
 ### Fixed

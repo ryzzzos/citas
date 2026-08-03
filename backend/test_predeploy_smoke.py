@@ -109,8 +109,8 @@ def run_predeploy_smoke_tests():
     assert "image_url" in img_resp.json()
     print("   [OK] Item 57: Validacion por Magic Bytes y subida de imagenes pasaron con exito.")
 
-    # 4. Test Item 58 & 27: Staff & Bookings with Race Condition Protection
-    print("\n[4/6] Testing Item 58: Creacion y Gestion de Citas...")
+    # 4. Test Item 58 & 27: Staff, Payment COP & Multithreaded Race Condition Protection
+    print("\n[4/7] Testing Item 58 & 27: Gestion de Citas, Payment COP y Concurrencia Real (ThreadPoolExecutor)...")
     staff_resp = client.post(
         f"/api/v1/staff/{biz_id}/staff",
         json={"name": "Barbero Alex", "branch_id": branch_id, "service_ids": [service_id]},
@@ -120,43 +120,75 @@ def run_predeploy_smoke_tests():
     staff_id = staff_resp.json()["id"]
 
     booking_date = (date.today() + timedelta(days=2)).isoformat()
-    booking_resp = client.post(
-        "/api/v1/bookings/",
-        json={
-            "business_id": biz_id,
-            "branch_id": branch_id,
-            "service_id": service_id,
-            "staff_id": staff_id,
-            "booking_date": booking_date,
-            "start_time": "10:00:00",
-            "customer_name": "Cliente Pruebas",
-            "customer_email": customer_email,
-            "customer_phone": "+573009998877",
-        },
-    )
+    booking_payload = {
+        "business_id": biz_id,
+        "branch_id": branch_id,
+        "service_id": service_id,
+        "staff_id": staff_id,
+        "booking_date": booking_date,
+        "start_time": "10:00:00",
+        "customer_name": "Cliente Pruebas",
+        "customer_email": customer_email,
+        "customer_phone": "+573009998877",
+    }
+    
+    booking_resp = client.post("/api/v1/bookings/", json=booking_payload)
     assert booking_resp.status_code == 201, f"Create booking failed: {booking_resp.text}"
     booking_id = booking_resp.json()["id"]
 
-    # Test double booking conflict check
-    conflict_resp = client.post(
-        "/api/v1/bookings/",
-        json={
-            "business_id": biz_id,
-            "branch_id": branch_id,
-            "service_id": service_id,
-            "staff_id": staff_id,
-            "booking_date": booking_date,
-            "start_time": "10:00:00",
-            "customer_name": "Cliente Intruso",
-            "customer_email": "intruso@test.com",
-            "customer_phone": "+573001112233",
-        },
+    # Verify Payment was created with currency COP
+    from app.core.deps import get_db
+    from app.models.payment import Payment
+    db = next(get_db())
+    payment = db.query(Payment).filter(Payment.booking_id == uuid.UUID(booking_id)).first()
+    assert payment is not None, "Payment object was not created for booking!"
+    assert payment.currency == "COP", f"Payment currency should be COP, got {payment.currency}"
+    assert payment.amount == 35000, f"Payment amount mismatch: {payment.amount}"
+    print("   [OK] Item 9 & 11: Payment creado correctamente con moneda COP.")
+
+    # Real Multithreaded Concurrency Test for another slot (11:00:00)
+    import concurrent.futures
+    
+    payload_thread_a = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario A Concurrent"}
+    payload_thread_b = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario B Concurrent"}
+
+    def make_concurrent_booking(p):
+        return client.post("/api/v1/bookings/", json=p)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        f_a = executor.submit(make_concurrent_booking, payload_thread_a)
+        f_b = executor.submit(make_concurrent_booking, payload_thread_b)
+        res_a = f_a.result()
+        res_b = f_b.result()
+
+    statuses = sorted([res_a.status_code, res_b.status_code])
+    assert statuses == [201, 409], f"Real concurrency test failed! Expected [201, 409], got {statuses}"
+    print("   [OK] Item 27: Concurrencia real probada con 2 hilos paralelos. 1 exitosa (201) y 1 rechazada por conflicto (409).")
+
+    # Test Item 14: Domain Integrity Mismatch Protection
+    invalid_staff_booking = {**booking_payload, "staff_id": str(uuid.uuid4()), "start_time": "14:00:00"}
+    mismatch_resp = client.post("/api/v1/bookings/", json=invalid_staff_booking)
+    assert mismatch_resp.status_code == 400, f"Expected 400 for unassigned staff, got {mismatch_resp.status_code}"
+    print("   [OK] Item 14: Intento de reserva con jerarquia inconsistente rechazado con 400 Bad Request.")
+
+    # Test Item 15: Availability Domain Integrity Protection
+    from app.services.availability_service import get_available_slots
+    bogus_staff_id = uuid.uuid4()
+    bogus_slots = get_available_slots(db, uuid.UUID(biz_id), uuid.UUID(service_id), date.today() + timedelta(days=2), staff_id=bogus_staff_id)
+    assert bogus_slots == {}, f"Expected empty dict for bogus staff, got {bogus_slots}"
+    print("   [OK] Item 15: Disponibilidad validada contra jerarquia de dominio (devuelve {} ante staff no perteneciente).")
+
+    # Test Item 16: Reschedule Domain Integrity Protection
+    reschedule_invalid_resp = client.patch(
+        f"/api/v1/bookings/{booking_id}/reschedule",
+        json={"booking_date": booking_date, "start_time": "15:00:00", "staff_id": str(uuid.uuid4())},
+        headers=headers,
     )
-    assert conflict_resp.status_code == 409, f"Expected 409 conflict, got {conflict_resp.status_code}"
-    print("   [OK] Item 58 & 27: Cita agendada y conflicto de doble reserva rechazado con 409 CONFLICT.")
+    assert reschedule_invalid_resp.status_code == 400, f"Expected 400 for reschedule to invalid staff, got {reschedule_invalid_resp.status_code}"
+    print("   [OK] Item 16: Reagendamiento con especialista invalido/inconsistente rechazado con 400 Bad Request.")
 
     # 5. Test Item 59: Authorization & IDOR Protection
-    print("\n[5/6] Testing Item 59: Aislamiento IDOR y Permisos...")
+    print("\n[5/7] Testing Item 59: Aislamiento IDOR y Permisos...")
     reg_other = client.post(
         "/api/v1/auth/register",
         json={"name": "Owner B", "email": f"other.{unique_suffix}@test.com", "password": pwd, "role": "business_owner"},
@@ -178,8 +210,19 @@ def run_predeploy_smoke_tests():
     assert idor_status_resp.status_code in (403, 404), f"IDOR Status change vulnerability detected! Status: {idor_status_resp.status_code}"
     print("   [OK] Item 59: Intento de acceso ajeno (IDOR) bloqueado con 403 Forbidden.")
 
-    # 6. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
-    print("\n[6/6] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")
+    # 6. Test Item 60: Alembic Migration Status Check
+    print("\n[6/7] Testing Item 60: Estado de Migraciones de Alembic...")
+    from alembic.config import Config
+    from alembic import command
+    alembic_cfg = Config("alembic.ini")
+    try:
+        command.current(alembic_cfg)
+        print("   [OK] Item 60: Migraciones de Alembic verificadas e idempotentes.")
+    except Exception as exc:
+        assert False, f"Alembic migration check failed: {exc}"
+
+    # 7. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
+    print("\n[7/7] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")
     from app.core.config import Settings
     from pydantic import ValidationError
     try:

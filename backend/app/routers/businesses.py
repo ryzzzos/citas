@@ -18,6 +18,7 @@ from app.schemas.business import (
     BusinessCreate,
     BusinessImageUploadRead,
     BusinessMapResponseRead,
+    BusinessPublicRead,
     BusinessRead,
     BusinessSlugAvailabilityRead,
     BusinessUpdate,
@@ -243,7 +244,7 @@ def check_business_slug_availability(
     return {"slug": normalized, "available": available}
 
 
-@router.get("/slug/{slug}", response_model=BusinessRead)
+@router.get("/slug/{slug}", response_model=BusinessPublicRead)
 def get_business_by_slug(slug: str, db: Session = Depends(get_db)):
     normalized = _validate_slug_rules(slug)
     business = db.query(Business).filter(func.lower(Business.slug) == normalized).first()
@@ -330,7 +331,7 @@ def list_businesses_for_map(
     }
 
 
-@router.get("/", response_model=list[BusinessRead])
+@router.get("/", response_model=list[BusinessPublicRead])
 def list_businesses(
     city: str | None = None,
     category: str | None = None,
@@ -363,7 +364,7 @@ def get_my_business(
     return business
 
 
-@router.get("/{business_id}", response_model=BusinessRead)
+@router.get("/{business_id}", response_model=BusinessPublicRead)
 def get_business(business_id: uuid.UUID, db: Session = Depends(get_db)):
     business = db.get(Business, business_id)
     if not business:

@@ -2,6 +2,7 @@ import Button from "@/components/ui/Button";
 import { BriefcaseBusiness, CheckCircle2, Plus, Tags, CircleDollarSign } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import type { Service } from "@/types";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 interface ServicesHeaderProps {
   services: Service[];
@@ -16,12 +17,8 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
   const validPrices = activeServices.map(s => Number(s.price)).filter(n => !isNaN(n));
   const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
   const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : 0;
-  
-  const formatPrice = (p: number) => new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(p);
+
+  const formatPrice = (p: number) => formatCurrency(p);
 
   const priceRange = validPrices.length === 0 
     ? formatPrice(0)

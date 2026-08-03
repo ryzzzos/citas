@@ -24,6 +24,7 @@ import AppIcon from "@/components/ui/AppIcon";
 import { BentoCard } from "@/components/ui/magic-card";
 import { AccordionGroup, AccordionItem } from "@/components/ui/Accordion";
 import type { Business, Service, ServiceCategory, Branch } from "@/types";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 interface BusinessProfileViewProps {
   business: Business;
@@ -48,16 +49,7 @@ interface MagicFeature {
 }
 
 function formatPrice(value: string): string {
-  const amount = Number(value);
-  if (Number.isNaN(amount)) {
-    return `$${value}`;
-  }
-
-  return new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return formatCurrency(value);
 }
 
 function InfoRow({

@@ -1,4 +1,16 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+const getApiBase = (): string => {
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  if (url && url.trim()) return url.trim();
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CRITICAL: NEXT_PUBLIC_API_URL environment variable is missing in production environment. " +
+      "Please set NEXT_PUBLIC_API_URL in your deployment configuration (e.g. Render / Vercel)."
+    );
+  }
+  return "http://localhost:8000/api/v1";
+};
+
+const API_BASE = getApiBase();
 
 type QueryValue = string | number | boolean | null | undefined;
 

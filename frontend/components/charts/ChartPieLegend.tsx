@@ -38,13 +38,9 @@ const PAYMENT_COLORS: Record<string, string> = {
   online: "var(--color-success)",
 }
 
-const defaultFormatValue = (value: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value)
+import { formatCurrency } from "@/lib/utils/formatCurrency"
+
+const defaultFormatValue = (value: number) => formatCurrency(value)
 
 const buildChartConfig = (data: PaymentMethodItem[]) => {
   const config: ChartConfig = {

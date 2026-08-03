@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { AgendaBooking } from "@/lib/agenda/types";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 interface BookingTimelineProps {
   booking: AgendaBooking;
@@ -33,15 +34,6 @@ export default function BookingTimeline({ booking, statusOverride, statusBeforeC
     if (!isoString) return "";
     const parsed = DateTime.fromISO(isoString);
     return parsed.isValid ? parsed.toFormat("HH:mm") : "";
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount);
   };
 
   const status = statusOverride || booking.status;

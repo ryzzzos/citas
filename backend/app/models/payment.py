@@ -21,7 +21,7 @@ class Payment(Base):
         nullable=False,
     )
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    currency: Mapped[str] = mapped_column(String(3), default="USD", nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), default="COP", nullable=False)
     status: Mapped[str] = mapped_column(
         Enum("pending", "paid", "refunded", "failed", name="payment_status"),
         nullable=False,

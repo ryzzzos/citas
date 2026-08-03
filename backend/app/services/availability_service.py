@@ -94,7 +94,7 @@ def get_available_slots(
     If staff_id is provided, checks only that staff member.
     """
     service = db.get(Service, service_id)
-    if not service or not service.is_active:
+    if not service or not service.is_active or service.business_id != business_id:
         return {}
     
     # Get current date/time in business's timezone
@@ -113,12 +113,15 @@ def get_available_slots(
         return {}
     
     if staff_id:
-        staff_members = [db.get(Staff, staff_id)]
+        st = db.get(Staff, staff_id)
+        if not st or not st.is_active or st.business_id != business_id or service_id not in st.service_ids:
+            return {}
+        staff_members = [st]
     else:
         # Get all active staff for this business that provide this service
         staff_members = (
             db.query(Staff)
-            .filter(Staff.business_id == business_id, Staff.is_active == True)
+            .filter(Staff.business_id == business_id, Staff.is_active.is_(True))
             .all()
         )
         # Filter in memory because of the many-to-many relationship

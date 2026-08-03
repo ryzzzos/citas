@@ -85,10 +85,6 @@ class StorageService:
         safe_filename = StorageService.generate_safe_filename(filename_prefix, real_mime)
         object_path = f"{folder_path}/{safe_filename}".strip("/")
 
-        # If replacing an old image, delete the old file to avoid orphaned files (Item 17)
-        if old_image_url:
-            await StorageService.delete_image(old_image_url)
-
         # 3. Supabase Storage (Cloud / Production)
         if settings.supabase_url and settings.supabase_key:
             target_url = (
@@ -109,6 +105,10 @@ class StorageService:
                         detail=f"Failed to upload image to Supabase Storage: {response.text}",
                     )
 
+            # Delete old image ONLY AFTER new upload succeeds
+            if old_image_url:
+                await StorageService.delete_image(old_image_url)
+
             return (
                 f"{settings.supabase_url.rstrip('/')}/storage/v1/object/public/"
                 f"{settings.supabase_storage_bucket}/{object_path}"
@@ -125,6 +125,10 @@ class StorageService:
         local_file_path = LOCAL_STORAGE_ROOT / object_path
         local_file_path.parent.mkdir(parents=True, exist_ok=True)
         local_file_path.write_bytes(content)
+
+        # Delete old image ONLY AFTER new local save succeeds
+        if old_image_url:
+            await StorageService.delete_image(old_image_url)
 
         if request:
             return str(request.url_for("storage", path=object_path))

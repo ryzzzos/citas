@@ -12,13 +12,24 @@ from app.services.availability_service import _overlaps_any
 def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
     service = db.get(Service, data.service_id)
     if not service or not service.is_active or service.business_id != data.business_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found or inactive for this business")
+
+    from app.models.branch import Branch
+    branch = db.get(Branch, data.branch_id)
+    if not branch or not branch.is_active or branch.business_id != data.business_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Branch not found or does not belong to business")
 
     from app.models.staff import Staff
     # Pessimistic row locking on Staff to serialize concurrent booking attempts and prevent race conditions
     staff = db.query(Staff).filter(Staff.id == data.staff_id).with_for_update().first()
-    if not staff or staff.branch_id != data.branch_id or not staff.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid staff or branch")
+    if not staff or not staff.is_active:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Staff member not found or inactive")
+    if staff.business_id != data.business_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Staff member does not belong to business")
+    if staff.branch_id != data.branch_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Staff member is not assigned to this branch")
+    if data.service_id not in staff.service_ids:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Staff member does not offer the requested service")
 
     end_time = (
         datetime.combine(data.booking_date, data.start_time)
@@ -75,6 +86,7 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
     payment = Payment(
         booking_id=booking.id,
         amount=service.price,
+        currency="COP",
         status="pending",
         payment_method="pending"
     )
@@ -166,7 +178,27 @@ def reschedule_booking(
 
     # Lock target staff member row to serialize concurrent booking and rescheduling attempts
     from app.models.staff import Staff
-    db.query(Staff).filter(Staff.id == target_staff_id).with_for_update().first()
+    target_staff = db.query(Staff).filter(Staff.id == target_staff_id).with_for_update().first()
+    if not target_staff or not target_staff.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El especialista no fue encontrado o está inactivo",
+        )
+    if target_staff.business_id != booking.business_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El especialista no pertenece al negocio de esta cita",
+        )
+    if target_staff.branch_id != booking.branch_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El especialista no está asignado a la sede de esta cita",
+        )
+    if service.id not in target_staff.service_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El especialista no ofrece el servicio de esta cita",
+        )
 
     # Conflict check - exclude the booking itself from overlaps
     existing = (

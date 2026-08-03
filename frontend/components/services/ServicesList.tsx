@@ -14,17 +14,10 @@ interface ServicesListProps {
   categories: ServiceCategory[];
 }
 
-function formatPrice(value: string): string {
-  const amount = Number(value);
-  if (Number.isNaN(amount)) {
-    return `$${value}`;
-  }
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
-  return new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(amount);
+function formatPrice(value: string): string {
+  return formatCurrency(value);
 }
 
 function ServiceThumbnail({ service }: { service: Service }) {

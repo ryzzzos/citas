@@ -3,6 +3,7 @@ import { LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import AppIcon from "@/components/ui/AppIcon"
 import { NumberTicker } from "@/components/ui/NumberTicker"
 import Tooltip from "@/components/ui/Tooltip"
+import { formatCurrency } from "@/lib/utils/formatCurrency"
 
 export interface KpiCardProps {
   title: string
@@ -106,14 +107,7 @@ export function KpiCard({
       if (!isNaN(currentValueNum)) {
         const prevVal = trendDelta === -100 ? 0 : Math.round(currentValueNum / (1 + trendDelta / 100))
         const isQty = title.toLowerCase().includes("clientes")
-        const formatCLP = (val: number) => {
-          return new Intl.NumberFormat("es-CL", {
-            style: "currency",
-            currency: "CLP",
-            maximumFractionDigits: 0,
-          }).format(val)
-        }
-        const prevStr = isQty ? String(prevVal) : formatCLP(prevVal)
+        const prevStr = isQty ? String(prevVal) : formatCurrency(prevVal)
         return `${title} de ${periodLabel} vs. ${prevPeriodLabel} (${value} vs. ${prevStr}).`
       }
     }

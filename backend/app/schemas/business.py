@@ -144,6 +144,28 @@ class BusinessRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class BusinessPublicRead(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: str | None
+    slug: str
+    category: str
+    timezone: str
+    phone: str
+    whatsapp_phone: str | None
+    email: str
+    public_bio: str | None
+    cover_image_url: str | None
+    logo_image_url: str | None
+    address: str
+    city: str
+    latitude: float | None
+    longitude: float | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class BusinessUpdate(BaseModel):
     name: str | None = None
     description: str | None = None

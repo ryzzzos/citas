@@ -116,7 +116,7 @@ def reset_and_seed_demo_bookings(session: Session, business_id: str) -> int:
         elif status == "cancelled":
             ts_fields["cancelled_at"] = now - timedelta(hours=random.randint(1, 6))
 
-        return Booking(
+        booking_obj = Booking(
             business_id=business_id,
             branch_id=branch.id,
             service_id=service.id,
@@ -130,6 +130,23 @@ def reset_and_seed_demo_bookings(session: Session, business_id: str) -> int:
             **customer,
             **ts_fields,
         )
+        session.add(booking_obj)
+        session.flush()
+
+        from app.models.payment import Payment
+        pay_status = "paid" if status == "completed" else "pending"
+        pay_method = random.choice(["cash", "transfer", "credit_card"]) if status == "completed" else "pending"
+
+        payment_obj = Payment(
+            booking_id=booking_obj.id,
+            amount=service.price,
+            currency="COP",
+            status=pay_status,
+            payment_method=pay_method,
+            transaction_id=f"DEMO-TX-{booking_obj.id.hex[:8].upper()}" if status == "completed" else None,
+        )
+        session.add(payment_obj)
+        return booking_obj
 
     # ── 3. Seed bookings per branch ─────────────────────────────
     for branch in branches:
@@ -150,23 +167,20 @@ def reset_and_seed_demo_bookings(session: Session, business_id: str) -> int:
             yesterday = today - timedelta(days=1)
             for i, slot_hour in enumerate([9, 11, 14]):
                 svc = staff_services[i % len(staff_services)]
-                b = make_booking(branch, staff_member, svc, yesterday, time(slot_hour, 0), "completed")
-                session.add(b)
+                make_booking(branch, staff_member, svc, yesterday, time(slot_hour, 0), "completed")
                 created_count += 1
 
             # --- Today: completed in the morning ---
             morning_hours = [h for h in [9, 10, 11] if h < current_hour]
             for i, h in enumerate(morning_hours):
                 svc = staff_services[i % len(staff_services)]
-                b = make_booking(branch, staff_member, svc, today, time(h, 0), "completed")
-                session.add(b)
+                make_booking(branch, staff_member, svc, today, time(h, 0), "completed")
                 created_count += 1
 
             # --- Today: confirmed "in-progress" at current hour ---
             if 8 <= current_hour <= 17:
                 svc = staff_services[0]
-                b = make_booking(branch, staff_member, svc, today, time(current_hour, 0), "confirmed")
-                session.add(b)
+                make_booking(branch, staff_member, svc, today, time(current_hour, 0), "confirmed")
                 created_count += 1
 
             # --- Today: afternoon confirmed + pending ---
@@ -174,35 +188,30 @@ def reset_and_seed_demo_bookings(session: Session, business_id: str) -> int:
             for i, h in enumerate(afternoon_hours[:2]):
                 svc = staff_services[i % len(staff_services)]
                 st = "confirmed" if i == 0 else "pending"
-                b = make_booking(branch, staff_member, svc, today, time(h, 0), st)
-                session.add(b)
+                make_booking(branch, staff_member, svc, today, time(h, 0), st)
                 created_count += 1
 
             # --- Today: 1 cancelled booking (always present) ---
             cancel_hour = min(max(current_hour - 1, 9), 17)
             svc = staff_services[-1]
-            b = make_booking(branch, staff_member, svc, today, time(cancel_hour, 30), "cancelled")
-            session.add(b)
+            make_booking(branch, staff_member, svc, today, time(cancel_hour, 30), "cancelled")
             created_count += 1
 
             # --- Tomorrow: 2 confirmed + 1 pending ---
             tomorrow = today + timedelta(days=1)
             for i, slot_hour in enumerate([10, 14]):
                 svc = staff_services[i % len(staff_services)]
-                b = make_booking(branch, staff_member, svc, tomorrow, time(slot_hour, 0), "confirmed")
-                session.add(b)
+                make_booking(branch, staff_member, svc, tomorrow, time(slot_hour, 0), "confirmed")
                 created_count += 1
 
             svc = staff_services[0]
-            b = make_booking(branch, staff_member, svc, tomorrow, time(16, 0), "pending")
-            session.add(b)
+            make_booking(branch, staff_member, svc, tomorrow, time(16, 0), "pending")
             created_count += 1
 
             # --- Day after tomorrow: 1 pending ---
             day_after = today + timedelta(days=2)
             svc = staff_services[0]
-            b = make_booking(branch, staff_member, svc, day_after, time(11, 0), "pending")
-            session.add(b)
+            make_booking(branch, staff_member, svc, day_after, time(11, 0), "pending")
             created_count += 1
 
     session.flush()
