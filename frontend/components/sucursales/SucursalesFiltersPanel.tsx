@@ -249,7 +249,7 @@ export default function SucursalesFiltersPanel({
 
         <section
           className={cn(
-            "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+5rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-5 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            "absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+4.25rem)] flex min-h-0 flex-col rounded-[var(--radius-xl)] p-4 sm:p-5 transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
             mobileOpen ? "translate-y-0" : "translate-y-12",
             "bg-[var(--surface-glass)] backdrop-blur-3xl backdrop-saturate-150 border border-[var(--glass-border)] shadow-[var(--glass-shadow)]",
           )}

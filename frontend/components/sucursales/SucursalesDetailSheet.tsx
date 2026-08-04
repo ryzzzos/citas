@@ -43,13 +43,13 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
   return (
     <section
       className={cn(
-        "pointer-events-auto fixed bottom-4 left-4 right-4 z-[500] flex flex-col overflow-hidden rounded-[var(--radius-xl)]",
+        "pointer-events-auto fixed bottom-3 left-3 right-3 z-[500] flex flex-col overflow-hidden rounded-[var(--radius-xl)]",
         "bg-[var(--surface-glass)] backdrop-blur-2xl backdrop-saturate-150 shadow-[var(--shadow-lg)] border border-[var(--border-soft)]",
-        "h-[420px] lg:bottom-[max(env(safe-area-inset-bottom),1.5rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[400px] lg:h-[420px]"
+        "h-[360px] sm:h-[420px] lg:bottom-[max(env(safe-area-inset-bottom),1.5rem)] lg:left-auto lg:right-6 lg:top-auto lg:w-[400px] lg:h-[420px]"
       )}
       aria-label={`Detalle de sucursal: ${business.name}`}
     >
-      <div className="relative h-48 w-full bg-[var(--surface-2)] shrink-0">
+      <div className="relative h-36 sm:h-48 w-full bg-[var(--surface-2)] shrink-0">
         {canRenderCover ? (
           <Image
             src={business.cover_image_url as string}
@@ -88,7 +88,7 @@ export default function SucursalesDetailSheet({ business, onClose }: SucursalesD
       </div>
 
       {/* Profile Picture Overlay between Cover and Surface on the right */}
-      <div className="absolute right-5 top-48 -translate-y-1/2 z-10">
+      <div className="absolute right-5 top-36 sm:top-48 -translate-y-1/2 z-10">
         <div
           className={cn(
             "relative grid h-18 w-18 place-items-center overflow-hidden rounded-xl",

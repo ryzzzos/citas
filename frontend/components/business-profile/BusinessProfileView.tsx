@@ -241,7 +241,7 @@ export default function BusinessProfileView({
                       {displayCity}
                     </span>
                   </div>
-                  <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem]">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem] break-words">
                     {business.name}
                   </h1>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">

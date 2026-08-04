@@ -5,7 +5,7 @@ import Safari from "@/components/ui/Safari";
 
 export default function SaaSVirtuesSection() {
   return (
-    <section className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-12 py-16 sm:py-24">
+    <section className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-6 md:px-12 py-12 sm:py-24">
       {/* ── SECTION HEADER ─────────────────────────────────────── */}
       <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
         <motion.span
@@ -40,13 +40,13 @@ export default function SaaSVirtuesSection() {
       </div>
 
       {/* ── BENTO GRID LAYOUT ───────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8 items-stretch">
         
         {/* ── LEFT COLUMN (Spans 2 cols on lg) ──────────────────── */}
-        <div className="lg:col-span-2 flex flex-col gap-6 sm:gap-8">
+        <div className="lg:col-span-2 flex flex-col gap-5 sm:gap-8">
           
           {/* Row 1: 2 Cards Side-by-Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
             
             {/* Card 1: Algoritmos de Citas */}
             <motion.div
@@ -54,7 +54,7 @@ export default function SaaSVirtuesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-6 sm:p-7 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[360px]"
+              className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-5 sm:p-7 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[280px] sm:min-h-[360px]"
             >
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-[var(--color-warnm)]">
@@ -82,7 +82,7 @@ export default function SaaSVirtuesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-6 sm:p-7 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[360px]"
+              className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-5 sm:p-7 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[280px] sm:min-h-[360px]"
             >
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-[var(--color-warnm)]">
@@ -112,7 +112,7 @@ export default function SaaSVirtuesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-6 sm:p-8 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[380px]"
+            className="bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-5 sm:p-8 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden group min-h-[300px] sm:min-h-[380px]"
           >
             <div>
               <h3 className="text-base sm:text-lg font-bold text-[var(--color-warnm)]">
@@ -142,7 +142,7 @@ export default function SaaSVirtuesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="lg:col-span-1 bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-6 sm:p-8 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden relative group min-h-[500px] lg:min-h-full"
+          className="lg:col-span-1 bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--radius-2xl)] p-5 sm:p-8 flex flex-col justify-between shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)]/80 transition-all duration-300 overflow-hidden relative group min-h-[350px] sm:min-h-[500px] lg:min-h-full"
         >
           {/* Soft dot background pattern matching reference design */}
           <div className="absolute inset-0 bg-[radial-gradient(var(--border-strong)_1.5px,transparent_1.5px)] [background-size:20px_20px] opacity-40 pointer-events-none" />

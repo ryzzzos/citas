@@ -25,7 +25,7 @@ export default function StickyBranchSelector({
         animate={
           pulse
             ? {
-                x: [0, -120, 120, -90, 90, -60, 60, -30, 30, 0],
+                x: [0, -10, 10, -8, 8, -4, 4, 0],
               }
             : {}
         }

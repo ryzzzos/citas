@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.27] - 2026-08-04
+
+### Improved
+- **Optimización de Diseño Responsivo y Experiencia Móvil**:
+  - Ajustes de tipografía flexible, alineación táctil e interacción móvil en los botones principales del Hero CTA de la Landing Page (`page.tsx`).
+  - Refinamiento de paddings, espaciados y rejillas adaptativas en componentes clave (`Navbar.tsx`, `FeatureSlideshow.tsx`, `PricingSection.tsx`, `FinalCTASection.tsx`, `SaaSVirtuesSection.tsx`).
+  - Mejoras en la presentación móvil del explorador de sucursales (`SucursalesDetailSheet.tsx`, `SucursalesFiltersPanel.tsx`, `StickyBranchSelector.tsx`) y flujo de onboarding.
+
 ## [0.4.26] - 2026-08-04
 
 ### Added

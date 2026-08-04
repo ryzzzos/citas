@@ -222,7 +222,7 @@ function PlanCard({
         ease: [0.32, 0.72, 0, 1],
       }}
       className={cn(
-        "relative flex flex-col rounded-[var(--radius-2xl)] border p-6 sm:p-7 transition-all duration-300",
+        "relative flex flex-col rounded-[var(--radius-2xl)] border p-5 sm:p-7 transition-all duration-300",
         plan.highlighted
           ? "bg-[var(--surface-3)] border-[var(--app-primary)]/30 shadow-[var(--shadow-lg)] scale-[1.02] lg:scale-105"
           : "bg-[var(--surface-2)] border-[var(--border-strong)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
@@ -312,7 +312,7 @@ export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <section className="relative z-10 max-w-5xl mx-auto px-6 py-16 sm:py-24">
+    <section className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 py-12 sm:py-24">
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
         <motion.span

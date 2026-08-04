@@ -301,14 +301,14 @@ export default function Navbar() {
       </AnimatePresence>
       <header
         className={cn(
-          "z-[760] px-4 pt-[max(env(safe-area-inset-top),0.45rem)] md:px-6",
+          "z-[760] px-2.5 sm:px-4 pt-[max(env(safe-area-inset-top),0.45rem)] md:px-6",
           isMapRoute ? "fixed inset-x-0 top-0 pb-0" : "sticky top-0 pb-1",
         )}
       >
         <div
           ref={navbarRef}
           className={cn(
-            "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-3 rounded-full px-3.5 sm:px-6 w-full transition-all duration-300",
+            "pointer-events-auto mx-auto flex h-14 items-center justify-between gap-2 sm:gap-3 rounded-full px-3 sm:px-6 w-full transition-all duration-300",
             isMapRoute ? "max-w-[78rem]" : "max-w-6xl",
             "bg-[var(--surface-glass)] shadow-[var(--shadow-md)] backdrop-blur-md border border-[var(--border-strong)]",
           )}
@@ -335,7 +335,7 @@ export default function Navbar() {
                 initial={isIntroActive ? { opacity: 0, x: -6 } : { opacity: 1, x: 0 }}
                 animate={!isIntroActive ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                className="flex items-baseline leading-none font-sans text-[1.22rem] tracking-tight"
+                className="hidden sm:flex items-baseline leading-none font-sans text-[1.22rem] tracking-tight"
               >
                 <span className="font-bold text-[var(--text-primary)]">
                   Agenda
@@ -347,9 +347,9 @@ export default function Navbar() {
             </div>
           </Link>
 
-        {/* ── CENTER ELONGATED SEARCH CAPSULE & COMBOBOX ── */}
+        {/* ── CENTER ELONGATED SEARCH CAPSULE & COMBOBOX (hidden on mobile — FAB handles it) ── */}
         {isMapRoute && ctx && (
-          <div className="flex-1 max-w-md mx-2 relative">
+          <div className="hidden md:block flex-1 max-w-md mx-2 relative">
             {/* Input Capsule Box */}
             <div
               className={cn(
@@ -550,7 +550,7 @@ export default function Navbar() {
           className="flex items-center gap-2 shrink-0"
         >
           {/* Main scrollable nav list */}
-          <nav className="flex items-center gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(isGuest || isLoading) && !searchExpanded && (
               <Link
                 href="/sucursales"
@@ -561,8 +561,8 @@ export default function Navbar() {
                     : undefined,
                 )}
               >
-                <AppIcon icon={Store} className="mr-1.5 inline" />
-                Sucursales
+                <AppIcon icon={Store} size="md" className="sm:mr-1.5 inline" />
+                <span className="hidden sm:inline">Sucursales</span>
               </Link>
             )}
           </nav>
@@ -597,7 +597,7 @@ export default function Navbar() {
                 )}
               >
                 <AppIcon icon={LogIn} />
-                Iniciar sesión
+                <span className="hidden sm:inline">Iniciar sesión</span>
               </Link>
             )}
 

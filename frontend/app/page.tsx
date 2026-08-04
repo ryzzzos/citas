@@ -121,14 +121,14 @@ export default function HomePage() {
     <main className="min-h-screen bg-[var(--surface-1)] text-[var(--text-primary)] overflow-x-hidden">
       <LightRays className="z-0" />
       {/* ── HERO SECTION ─────────────────────────────────────── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-20 sm:pt-28 pb-12 sm:pb-16 text-center flex flex-col items-center overflow-hidden">
+      <section className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 pt-16 sm:pt-28 pb-10 sm:pb-16 text-center flex flex-col items-center overflow-hidden">
         {/* Content Overlay */}
         <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7, ease: [0.32, 0.72, 0, 1] }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1.5"
+            className="text-[1.85rem] sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] max-w-3xl leading-[1.1] flex flex-col items-center gap-1 sm:gap-1.5"
           >
             <KineticText
               text="Gestiona tu agenda,"
@@ -147,7 +147,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.85, ease: [0.32, 0.72, 0, 1] }}
-            className="mt-6 text-[0.95rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
+            className="mt-4 sm:mt-6 text-[0.85rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
           >
             Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
             Controla tu agenda, sucursales y equipo en un solo lugar con una interfaz intuitiva y profesional.
@@ -158,17 +158,17 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.0, ease: [0.32, 0.72, 0, 1] }}
-            className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto"
+            className="mt-8 flex flex-row gap-2.5 sm:gap-3 w-full sm:w-auto"
           >
             <Link
               href="/auth/register"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-primary-gradient px-7 text-sm font-semibold text-white shadow-[var(--shadow-md)] hover:brightness-110 active:scale-98 transition-all duration-200"
+              className="inline-flex h-11 sm:h-12 flex-1 sm:flex-initial items-center justify-center rounded-full bg-primary-gradient px-4 sm:px-7 text-[0.8rem] sm:text-sm font-semibold text-white shadow-[var(--shadow-md)] hover:brightness-110 active:scale-98 transition-all duration-200"
             >
               Registra tu negocio
             </Link>
             <Link
               href="/sucursales"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-7 text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] active:scale-98 transition-all duration-200"
+              className="inline-flex h-11 sm:h-12 flex-1 sm:flex-initial items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-4 sm:px-7 text-[0.8rem] sm:text-sm font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] active:scale-98 transition-all duration-200"
             >
               Explorar sucursales
             </Link>
@@ -181,7 +181,7 @@ export default function HomePage() {
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.1, ease: [0.32, 0.72, 0, 1] }}
-        className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-12 pb-16 sm:pb-24 group"
+        className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 pb-12 sm:pb-24 group"
       >
         {/* Ambient glow behind Safari */}
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--app-primary)]/10 to-transparent blur-3xl rounded-[var(--radius-xl)] opacity-50 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none -z-10" />
@@ -212,7 +212,7 @@ export default function HomePage() {
       <PricingSection />
 
       {/* ── FAQ SECTION ──────────────────────────────────────── */}
-      <section className="relative z-10 max-w-3xl mx-auto px-6 py-16 sm:py-24">
+      <section className="relative z-10 max-w-3xl mx-auto px-5 sm:px-6 py-12 sm:py-24">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
             Preguntas Frecuentes
@@ -222,7 +222,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="bg-[var(--surface-3)] border border-[var(--border-strong)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-[var(--shadow-sm)]">
+        <div className="bg-[var(--surface-3)] border border-[var(--border-strong)] rounded-[var(--radius-lg)] p-4 sm:p-6 shadow-[var(--shadow-sm)]">
           {FAQ_ITEMS.map((item, idx) => (
             <FAQAccordionItem key={idx} question={item.question} answer={item.answer} />
           ))}

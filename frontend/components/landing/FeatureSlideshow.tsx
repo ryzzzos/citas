@@ -93,7 +93,7 @@ export function FeatureSlideshow({
   const currentStep = steps[activeStep] || steps[0];
 
   return (
-    <section className={cn("relative z-10 max-w-5xl mx-auto px-6 py-16 sm:py-24", className)}>
+    <section className={cn("relative z-10 max-w-5xl mx-auto px-5 sm:px-6 py-12 sm:py-24", className)}>
       {/* Header Section */}
       {(eyebrow || title || subtitle) && (
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
@@ -116,7 +116,7 @@ export function FeatureSlideshow({
       )}
 
       {/* Main Grid: Steps list on the left, Preview on the right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
         {/* Left Column - Steps selector (Non-card sleek layout with vertical progress fill) */}
         <div className="lg:col-span-5 space-y-2 relative">
           {steps.map((step, idx) => {
@@ -203,7 +203,7 @@ export function FeatureSlideshow({
         </div>
 
         {/* Right Column — Expressive Illustration Preview */}
-        <div className="lg:col-span-7 h-[360px] sm:h-[420px] rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-lg)] overflow-hidden relative">
+        <div className="lg:col-span-7 h-[280px] sm:h-[420px] rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-lg)] overflow-hidden relative">
           {/* Ambient glow that shifts with each step */}
           <motion.div
             key={`glow-${activeStep}`}

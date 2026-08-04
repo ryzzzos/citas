@@ -69,7 +69,7 @@ export default function FinalCTASection() {
   return (
     <section className="relative w-full overflow-hidden">
       {/* ── Theme-Sensitive Full-Bleed Section (Light: Slate-100, Dark: Deep Dark) ── */}
-      <div className="relative w-full bg-slate-100/70 dark:bg-[#0a0a0f] py-28 px-6 transition-colors duration-300">
+      <div className="relative w-full bg-slate-100/70 dark:bg-[#0a0a0f] py-16 sm:py-28 px-5 sm:px-6 transition-colors duration-300">
 
         {/* Dark Mode Overlay Gradient */}
         <div
@@ -163,7 +163,7 @@ export default function FinalCTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
-            className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white"
+            className="text-[1.75rem] sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white"
           >
             Tu negocio merece{" "}
             <span
@@ -183,7 +183,7 @@ export default function FinalCTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.32, 0.72, 0, 1] }}
-            className="mt-5 max-w-2xl text-[1rem] sm:text-[1.12rem] leading-relaxed text-slate-600 dark:text-white/60"
+            className="mt-4 sm:mt-5 max-w-2xl text-[0.88rem] sm:text-[1.12rem] leading-relaxed text-slate-600 dark:text-white/60"
           >
             Deja de perder clientes por llamadas sin respuesta y citas dobles.{" "}
             <strong className="text-slate-900 dark:text-white/85 font-semibold">
@@ -215,7 +215,7 @@ export default function FinalCTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.65, delay: 0.42, ease: [0.32, 0.72, 0, 1] }}
-            className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center w-full sm:w-auto"
+            className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center w-full sm:w-auto"
           >
             {/* Primary CTA */}
             <Link href="/auth/register">
@@ -223,7 +223,7 @@ export default function FinalCTASection() {
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                className="relative inline-flex h-14 items-center justify-center gap-3 rounded-full px-9 text-[1rem] font-extrabold text-white cursor-pointer overflow-hidden group"
+                className="relative inline-flex h-12 sm:h-14 w-full sm:w-auto items-center justify-center gap-3 rounded-full px-8 sm:px-9 text-[0.92rem] sm:text-[1rem] font-extrabold text-white cursor-pointer overflow-hidden group"
                 style={{
                   background:
                     "linear-gradient(90deg, #f59e0b 0%, #ff6b35 55%, #ef4444 100%)",
@@ -242,7 +242,7 @@ export default function FinalCTASection() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                className="inline-flex h-14 items-center justify-center rounded-full border border-slate-200 dark:border-white/15 bg-white dark:bg-white/6 backdrop-blur-sm px-8 text-[0.95rem] font-semibold text-slate-800 dark:text-white/75 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm dark:shadow-none"
+                className="inline-flex h-12 sm:h-14 w-full sm:w-auto items-center justify-center rounded-full border border-slate-200 dark:border-white/15 bg-white dark:bg-white/6 backdrop-blur-sm px-8 text-[0.88rem] sm:text-[0.95rem] font-semibold text-slate-800 dark:text-white/75 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm dark:shadow-none"
               >
                 Ver mapa de negocios
               </motion.div>
