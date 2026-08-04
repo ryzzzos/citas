@@ -1,13 +1,11 @@
-
-import Image from "next/image";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import type { CreateServiceInput, Service, ServiceCategory } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ImagePlus, Loader2 } from "lucide-react";
 import CustomSelect from "@/components/ui/CustomSelect";
+import { ImageFramingField, type ImageFramingFieldRef } from "@/components/ui/ImageFramingField";
 
 interface ServiceFormModalProps {
   open: boolean;
@@ -82,10 +80,8 @@ export default function ServiceFormModal({
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const framerRef = useRef<ImageFramingFieldRef>(null);
 
   useEffect(() => {
     if (!open) {
@@ -101,52 +97,14 @@ export default function ServiceFormModal({
     setForm(state);
     setValidationError(null);
     setUploadingImage(false);
-    setUploadMessage(null);
-    setUploadError(null);
     setSelectedFile(null);
-    setPreviewUrl(service?.image_url ?? null);
+    framerRef.current?.reset();
   }, [open, service, categories]);
-
-  useEffect(() => {
-    if (!selectedFile) {
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreviewUrl(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
 
   const title = useMemo(
     () => (mode === "create" ? "Crear servicio" : "Editar servicio"),
     [mode]
   );
-
-
-
-  function resetSelectedImage() {
-    setSelectedFile(null);
-    setPreviewUrl(form.imageUrl || service?.image_url || null);
-    setUploadMessage(null);
-    setUploadError(null);
-  }
-
-  function validateSelectedFile(file: File): string | null {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      return "Solo se permiten archivos JPEG, PNG o WEBP.";
-    }
-
-    const maxSizeBytes = 2 * 1024 * 1024;
-    if (file.size > maxSizeBytes) {
-      return "El archivo debe pesar 2MB o menos.";
-    }
-
-    return null;
-  }
-
-
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -180,15 +138,24 @@ export default function ServiceFormModal({
 
     let finalImageUrl = imageUrl;
 
-    if (selectedFile) {
-      setUploadingImage(true);
-      try {
-        const result = await onUploadImage(selectedFile);
-        finalImageUrl = result.image_url;
-      } catch (err) {
-        setValidationError(err instanceof Error ? err.message : "Error al subir la imagen");
-        setUploadingImage(false);
-        return;
+    if (selectedFile || framerRef.current?.hasImage()) {
+      let fileToUpload = selectedFile;
+      if (framerRef.current) {
+        const cropped = await framerRef.current.getCroppedFile();
+        if (cropped) {
+          fileToUpload = cropped;
+        }
+      }
+      if (fileToUpload) {
+        setUploadingImage(true);
+        try {
+          const result = await onUploadImage(fileToUpload);
+          finalImageUrl = result.image_url;
+        } catch (err) {
+          setValidationError(err instanceof Error ? err.message : "Error al subir la imagen");
+          setUploadingImage(false);
+          return;
+        }
       }
     }
 
@@ -363,64 +330,16 @@ export default function ServiceFormModal({
 
             {/* Group 3: Media */}
             <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
-              <h4 className="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Imagen del Servicio</h4>
               <div className="flex flex-col gap-4">
-                <label
-                  className={`dashboard-focusable group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.25rem] border border-[var(--border-strong)] bg-[var(--surface-2)] transition-colors hover:bg-[var(--surface-1)] dark:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-1)] aspect-[16/10] ${uploadingImage ? "pointer-events-none opacity-60" : ""}`}
-                >
-                  {previewUrl && (
-                    <Image src={previewUrl} alt="" fill className="object-cover" unoptimized />
-                  )}
-                  <div
-                    className={`relative z-10 flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-full px-4 py-3 text-center transition-all duration-300 ${
-                      previewUrl
-                        ? "border border-[var(--glass-border)] bg-[var(--surface-glass)] text-[var(--text-primary)] backdrop-blur-md backdrop-saturate-150 group-hover:bg-[var(--surface-glass)]"
-                        : "text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    {uploadingImage ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <>
-                        <ImagePlus className="h-5 w-5" strokeWidth={2.5} />
-                        <span className="text-[0.75rem] font-bold uppercase tracking-wider">
-                          {previewUrl ? "Cambiar" : "Elegir"}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    className="sr-only"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0] ?? null;
-                      if (!file) {
-                        resetSelectedImage();
-                        return;
-                      }
-
-                      const validation = validateSelectedFile(file);
-                      if (validation) {
-                        setSelectedFile(null);
-                        setUploadError(validation);
-                        setUploadMessage(null);
-                        return;
-                      }
-
-                      setSelectedFile(file);
-                      setUploadError(null);
-                      setUploadMessage(null);
-                      setForm((prev) => ({ ...prev, imageUrl: "" }));
-                    }}
-                    disabled={uploadingImage}
-                  />
-                </label>
-                <p className="text-[12px] text-[var(--text-muted)] mt-1">
-                  Formatos soportados: JPEG, PNG o WEBP. Peso máximo: 2MB.
-                </p>
-
-                {uploadError ? <p className="text-[13px] font-medium text-[var(--color-error)]">{uploadError}</p> : null}
+                <ImageFramingField
+                  ref={framerRef}
+                  frameShape="landscape"
+                  label="Imagen del Servicio"
+                  initialImageUrl={service?.image_url ?? null}
+                  selectLabel="Elegir archivo"
+                  changeLabel="Cambiar imagen"
+                  emptyText="Sin imagen seleccionada"
+                />
 
                 <div className="pt-2">
                   <Input
@@ -431,9 +350,6 @@ export default function ServiceFormModal({
                     onChange={(event) => {
                       const value = event.target.value;
                       setForm((previous) => ({ ...previous, imageUrl: value }));
-                      if (!selectedFile) {
-                        setPreviewUrl(value || null);
-                      }
                     }}
                     placeholder="https://ejemplo.com/imagen.jpg"
                   />

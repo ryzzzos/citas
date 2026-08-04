@@ -1,17 +1,40 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import BrandLogo from "@/components/ui/BrandLogo";
 import { login } from "@/lib/api";
+import { sileo } from "sileo";
+import { CheckCircle2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const searchParams = useSearchParams();
+
+  const registered = searchParams.get("registered") === "true";
+  const registeredEmail = searchParams.get("email") || "";
+  const registeredName = searchParams.get("name") || "";
+
+  const [form, setForm] = useState({ email: registeredEmail, password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (registeredEmail && !form.email) {
+      setForm((prev) => ({ ...prev, email: registeredEmail }));
+    }
+  }, [registeredEmail, form.email]);
+
+  useEffect(() => {
+    if (registered) {
+      sileo.success({
+        title: "¡Cuenta registrada!",
+        description: "Ingresa tu contraseña para continuar.",
+      });
+    }
+  }, [registered]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,6 +59,25 @@ export default function LoginPage() {
         <h1 className="mb-6 text-2xl font-bold text-[var(--text-primary)] text-center">
           Iniciar sesión
         </h1>
+
+        {registered && (
+          <div className="mb-6 rounded-[var(--radius-lg)] border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 p-4 text-[var(--text-primary)] shadow-[var(--shadow-sm)] animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-success)]/20 text-[var(--color-success)] mt-0.5">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                  ¡Cuenta creada con éxito!
+                </h3>
+                <p className="mt-1 text-xs text-[var(--text-secondary)] leading-relaxed">
+                  {registeredName ? `¡Hola ${registeredName}! ` : ""}Tu usuario ha sido registrado correctamente. Hemos preparado tu correo para que solo ingreses tu contraseña e inicies sesión.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Input
             id="email"
@@ -53,6 +95,7 @@ export default function LoginPage() {
             placeholder="••••••••"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
+            autoFocus={registered}
             required
           />
           {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
@@ -70,3 +113,18 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)]" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  );
+}
+

@@ -227,7 +227,7 @@ def run_predeploy_smoke_tests():
     from app.core.config import Settings
     from pydantic import ValidationError
     try:
-        Settings(app_env="production", supabase_url="", supabase_key="", database_url="postgresql://user:pass@localhost/db", secret_key="a-very-long-secret-key-for-testing-12345")
+        Settings(app_env="production", supabase_url="", supabase_service_role_key="", database_url="postgresql://user:pass@localhost/db", secret_key="a-very-long-secret-key-for-testing-12345")
         assert False, "Should have failed startup validation in production mode when storage credentials are missing"
     except ValidationError as exc:
         assert "Production startup failed" in str(exc)

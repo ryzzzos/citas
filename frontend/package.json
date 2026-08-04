@@ -1,6 +1,6 @@
 {
   "name": "agenda-web",
-  "version": "0.4.24",
+  "version": "0.4.25",
   "private": true,
   "packageManager": "pnpm@10.6.5",
   "engines": {

@@ -1,11 +1,17 @@
 import json
+import os
+from typing import Any
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     database_url: str
     secret_key: str
@@ -13,18 +19,27 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
     app_env: str = "development"
     allowed_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: str | list[str] | None = None
     geocoding_user_agent: str = "AgendaWeb-Platform/1.0 (contacto@agendaweb.app)"
     geocoding_timeout_seconds: int = 3
     supabase_url: str = ""
     supabase_service_role_key: str = ""
-    supabase_key: str = ""
     supabase_storage_bucket: str = "agenda-images"
 
     @model_validator(mode="after")
-    def validate_production_storage(self) -> "Settings":
-        if not self.supabase_service_role_key and self.supabase_key:
-            self.supabase_service_role_key = self.supabase_key
+    def validate_and_merge_config(self) -> "Settings":
+        # Merge CORS_ORIGINS if provided
+        if self.cors_origins:
+            parsed_extra = self._parse_origins_raw(self.cors_origins)
+            if parsed_extra:
+                # Merge without duplicating while preserving order
+                existing = set(self.allowed_origins)
+                for origin in parsed_extra:
+                    if origin not in existing:
+                        self.allowed_origins.append(origin)
+                        existing.add(origin)
 
+        # Check production storage requirements
         if self.app_env.strip().lower() == "production":
             missing = []
             if not self.supabase_url or not self.supabase_url.strip():
@@ -62,9 +77,8 @@ class Settings(BaseSettings):
             )
         return value.strip()
 
-    @field_validator("allowed_origins", mode="before")
-    @classmethod
-    def parse_allowed_origins(cls, value: object) -> list[str]:
+    @staticmethod
+    def _parse_origins_raw(value: Any) -> list[str]:
         if isinstance(value, list):
             return [str(origin).strip() for origin in value if str(origin).strip()]
 
@@ -77,7 +91,7 @@ class Settings(BaseSettings):
                 try:
                     parsed = json.loads(raw)
                 except json.JSONDecodeError as exc:
-                    raise ValueError("ALLOWED_ORIGINS has invalid JSON format") from exc
+                    raise ValueError("Origins configuration has invalid JSON format") from exc
 
                 if isinstance(parsed, list):
                     return [
@@ -86,7 +100,13 @@ class Settings(BaseSettings):
 
             return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
-        raise ValueError("ALLOWED_ORIGINS must be a list or comma-separated string")
+        raise ValueError("Origins configuration must be a list or comma-separated string")
+
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_allowed_origins(cls, value: object) -> list[str]:
+        return cls._parse_origins_raw(value)
 
 
 settings = Settings()
+

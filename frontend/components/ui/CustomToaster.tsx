@@ -25,5 +25,13 @@ export function CustomToaster() {
     return () => observer.disconnect();
   }, []);
 
-  return <Toaster position="top-center" theme={theme} />;
+  return (
+    <Toaster
+      position="top-center"
+      theme={theme}
+      options={{
+        position: "top-center",
+      }}
+    />
+  );
 }

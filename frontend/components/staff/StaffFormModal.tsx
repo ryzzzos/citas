@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { sileo } from "sileo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, X } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import type { Staff, Service } from "@/types";
+import type { Staff } from "@/types";
 import { useServices } from "@/lib/services/useServices";
 import { useStaff } from "@/lib/staff/useStaff";
-import Image from "next/image";
-import { ImagePlus } from "lucide-react";
+import { ImageFramingField, type ImageFramingFieldRef } from "@/components/ui/ImageFramingField";
 
 interface StaffFormModalProps {
   open: boolean;
@@ -57,9 +56,8 @@ export default function StaffFormModal({
 }: StaffFormModalProps) {
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  
+  const framerRef = useRef<ImageFramingFieldRef>(null);
+
   const { services, loading: loadingServices } = useServices();
   const { create, update, uploadPhoto } = useStaff();
 
@@ -71,11 +69,15 @@ export default function StaffFormModal({
     setPrevStaff(staff);
     if (open) {
       setForm(toFormState(staff));
-      setPhotoFile(null);
-      setPhotoPreview(staff?.photo_url || null);
       setValidationError(null);
     }
   }
+
+  useEffect(() => {
+    if (open) {
+      framerRef.current?.reset();
+    }
+  }, [open, staff]);
 
   const title = useMemo(
     () => (mode === "create" ? "Agregar empleado" : "Editar empleado"),
@@ -123,8 +125,11 @@ export default function StaffFormModal({
         savedStaff = await update(staff.id, data);
       }
 
-      if (savedStaff && photoFile) {
-        await uploadPhoto(savedStaff.id, photoFile);
+      if (savedStaff && framerRef.current?.hasImage()) {
+        const croppedFile = await framerRef.current.getCroppedFile();
+        if (croppedFile) {
+          await uploadPhoto(savedStaff.id, croppedFile);
+        }
       }
       return savedStaff;
     })();
@@ -228,44 +233,16 @@ export default function StaffFormModal({
                       />
                     </div>
                     
-                    <div className="space-y-1.5 pt-2">
-                      <label className="text-[13px] font-semibold text-[var(--text-primary)]">Foto del empleado (Opcional)</label>
-                      <div className="flex items-center gap-4">
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)]">
-                          {photoPreview ? (
-                            <Image src={photoPreview} alt="Preview" fill className="object-cover" unoptimized />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
-                              <ImagePlus className="h-6 w-6" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <label className="inline-flex cursor-pointer items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-1)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] focus-within:ring-2 focus-within:ring-[var(--app-primary)]">
-                            <span>Subir imagen</span>
-                            <input
-                              type="file"
-                              accept="image/jpeg, image/png, image/webp"
-                              className="sr-only"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  if (file.size > 2 * 1024 * 1024) {
-                                    setValidationError("La imagen no debe superar los 2MB.");
-                                    return;
-                                  }
-                                  setPhotoFile(file);
-                                  setPhotoPreview(URL.createObjectURL(file));
-                                  setValidationError(null);
-                                }
-                              }}
-                            />
-                          </label>
-                          <p className="mt-1.5 text-[11px] text-[var(--text-muted)]">
-                            JPEG, PNG o WEBP. Máx 2MB.
-                          </p>
-                        </div>
-                      </div>
+                    <div className="pt-2">
+                      <ImageFramingField
+                        ref={framerRef}
+                        frameShape="circle"
+                        label="Foto del empleado (Opcional)"
+                        initialImageUrl={staff?.photo_url ?? null}
+                        selectLabel="Subir imagen"
+                        changeLabel="Cambiar foto"
+                        emptyText="Sin foto seleccionada"
+                      />
                     </div>
                   </div>
                 </div>

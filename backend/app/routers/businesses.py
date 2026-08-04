@@ -160,7 +160,7 @@ async def _upload_business_image(
     file: UploadFile,
     kind: str,
 ) -> str:
-    old_url = business.logo_url if kind == "logo" else business.cover_image_url
+    old_url = business.logo_image_url if kind == "logo" else business.cover_image_url
     folder_path = f"businesses/{business.id}"
     return await StorageService.upload_image(
         file=file,

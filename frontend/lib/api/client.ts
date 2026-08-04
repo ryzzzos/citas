@@ -38,15 +38,21 @@ export function toQueryString(params: object): string {
 }
 
 async function parseErrorDetail(response: Response): Promise<string> {
-  const fallback = response.statusText || "Request failed";
-  const payload = await response.json().catch(() => null);
+  const fallback = "Ocurrió un inconveniente al procesar la solicitud. Por favor intenta de nuevo.";
 
-  if (!payload || typeof payload !== "object") return fallback;
+  if (response.status >= 500) {
+    return "Ocurrió un error en el servidor. Por favor intenta de nuevo en unos momentos.";
+  }
+
+  const payload = await response.json().catch(() => null);
+  if (!payload || typeof payload !== "object") return response.statusText || fallback;
 
   const detail = (payload as { detail?: unknown }).detail;
-  if (typeof detail === "string") return detail;
 
-  if (Array.isArray(detail) && detail.length > 0) {
+  let rawMessage = "";
+  if (typeof detail === "string") {
+    rawMessage = detail;
+  } else if (Array.isArray(detail) && detail.length > 0) {
     const first = detail[0] as { msg?: unknown; loc?: unknown };
     const msg = typeof first?.msg === "string" ? first.msg : null;
     const loc = Array.isArray(first?.loc)
@@ -55,11 +61,19 @@ async function parseErrorDetail(response: Response): Promise<string> {
           .join(".")
       : null;
 
-    if (msg && loc) return `${loc}: ${msg}`;
-    if (msg) return msg;
+    if (msg && loc) rawMessage = `${loc}: ${msg}`;
+    else if (msg) rawMessage = msg;
   }
 
-  return fallback;
+  if (!rawMessage) return fallback;
+
+  // Filter out internal code traces / developer jargon for customer UI
+  const isTechnicalError = /AttributeError|TypeError|ValueError|Internal Server Error|traceback|SQLAlchemy|PostgreSQL|fetch|Failed to upload/i.test(rawMessage);
+  if (isTechnicalError) {
+    return "Ocurrió un inconveniente inesperado. Por favor intenta de nuevo más tarde.";
+  }
+
+  return rawMessage;
 }
 
 export async function request<T>(
@@ -79,29 +93,45 @@ export async function request<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    if (response.status === 401 && typeof window !== "undefined") {
-      clearAccessToken();
-      // Redirect to login if we are not already on an auth page
-      if (!window.location.pathname.startsWith("/auth/")) {
-        window.location.href = `/auth/login?redirect=${encodeURIComponent(
-          window.location.pathname + window.location.search
-        )}`;
-        // Halt JS execution to prevent React error boundaries from triggering during navigation
-        return new Promise(() => {});
+    if (!response.ok) {
+      if (response.status === 401 && typeof window !== "undefined") {
+        clearAccessToken();
+        // Redirect to login if we are not already on an auth page
+        if (!window.location.pathname.startsWith("/auth/")) {
+          window.location.href = `/auth/login?redirect=${encodeURIComponent(
+            window.location.pathname + window.location.search
+          )}`;
+          // Halt JS execution to prevent React error boundaries from triggering during navigation
+          return new Promise(() => {});
+        }
+      }
+      throw new Error(await parseErrorDetail(response));
+    }
+
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    return response.json() as Promise<T>;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      if (
+        err.name === "TypeError" ||
+        err.message.includes("fetch") ||
+        err.message.includes("Failed to fetch") ||
+        err.message.includes("NetworkError")
+      ) {
+        throw new Error(
+          "No pudimos conectar con el servidor. Por favor verifica tu conexión a internet e inténtalo de nuevo."
+        );
       }
     }
-    throw new Error(await parseErrorDetail(response));
+    throw err;
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
 }

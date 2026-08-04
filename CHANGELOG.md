@@ -6,6 +6,19 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.25] - 2026-08-04
+
+### Added
+- **Componente Reutilizable de Encuadre de Imágenes**:
+  - Creación de `ImageFramingField` (`frontend/components/ui/ImageFramingField.tsx`) para la carga, previsualización en vivo y encuadre óptimo de imágenes en formularios.
+  - Refactorización de `ServiceFormModal` y `StaffFormModal` integrando el nuevo control de imágenes.
+
+### Improved
+- **Experiencia de Usuario y Manejo de Errores en API**:
+  - Robustecimiento del cliente de API `client.ts` (`frontend/lib/api/client.ts`) para respuestas de error estructuradas.
+  - Mejoras en la validación y feedback visual de los formularios de autenticación (`login/page.tsx` y `register/page.tsx`).
+  - Actualización del componente de alertas `CustomToaster` (`frontend/components/ui/CustomToaster.tsx`).
+
 ## [0.4.24] - 2026-08-03
 
 ### Fixed
