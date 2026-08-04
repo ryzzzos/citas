@@ -6,6 +6,12 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.4.26] - 2026-08-04
+
+### Added
+- **Servidor WSGI/ASGI Gunicorn en Dependencias Backend**:
+  - Inclusión de `gunicorn==26.0.0` en `backend/requirements.txt` para entornos de producción en la nube con FastAPI y workers Uvicorn.
+
 ## [0.4.25] - 2026-08-04
 
 ### Added
