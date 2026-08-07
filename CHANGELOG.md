@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.0] - 2026-08-07
+
+### 🎉 Added & Major Release Milestone
+- **Hito de Despliegue Exitoso a Producción Cloud**:
+  - **Variante de Botón Interactivo (`variant="interactive"`)**: Implementación del componente `InteractiveButton` (`frontend/components/ui/Button.tsx`) con efecto de inversión cromática `mix-blend-mode: difference` 100% nativo y responsivo.
+  - **Acceso Demo en 1-Clic Refinado**: Integración fluida del botón de demostración instantánea (`DemoLoginButton.tsx`) en el Navbar y Landing Page.
+  - **Módulo de Precios Transparentes en Moneda Local (COP)**: Tarjetas interactivas de suscripción (Emprendedor, Pro, Multi-Sucursal) con alternador de facturación mensual/anual.
+  - **Infraestructura Cloud Storage R2 / S3 & Supabase**: Almacenamiento seguro de imágenes de negocios, servicios y personal, con verificación estricta de credenciales en producción (`SUPABASE_SERVICE_ROLE_KEY`).
+  - **Seguridad, Resiliencia y Pruebas Multihilo**: Actualización a `python-jose==3.5.0`, `psycopg2-binary==2.9.12`, `gunicorn==26.0.0` y suite interactiva de pruebas de humo pre-despliegue con `ThreadPoolExecutor`.
+
 ## [0.4.27] - 2026-08-04
 
 ### Improved

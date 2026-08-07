@@ -158,7 +158,7 @@ function AnimatedPrice({
   return (
     <div className="flex flex-col items-start">
       <div className="flex items-baseline gap-1">
-        <span className="text-[0.88rem] font-semibold text-[var(--text-muted)]">
+        <span className="text-[0.82rem] md:text-[0.8rem] lg:text-[0.88rem] font-semibold text-[var(--text-muted)]">
           $
         </span>
         <AnimatePresence mode="wait">
@@ -168,12 +168,12 @@ function AnimatedPrice({
             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ y: -12, opacity: 0, filter: "blur(4px)" }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--text-primary)]"
+            className="text-3xl md:text-[1.65rem] lg:text-4xl font-extrabold tracking-tight text-[var(--text-primary)]"
           >
             {formattedPrice}
           </motion.span>
         </AnimatePresence>
-        <span className="text-[0.82rem] font-medium text-[var(--text-muted)] ml-0.5">
+        <span className="text-[0.78rem] md:text-[0.72rem] lg:text-[0.82rem] font-medium text-[var(--text-muted)] ml-0.5 whitespace-nowrap">
           COP/mes
         </span>
       </div>
@@ -185,7 +185,7 @@ function AnimatedPrice({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.2 }}
-          className="text-[0.7rem] text-[var(--text-muted)] mt-1"
+          className="text-[0.7rem] md:text-[0.66rem] lg:text-[0.7rem] text-[var(--text-muted)] mt-1"
         >
           {isYearly
             ? `Facturado anualmente ($${formattedYearlyTotal}/año)`
@@ -222,9 +222,9 @@ function PlanCard({
         ease: [0.32, 0.72, 0, 1],
       }}
       className={cn(
-        "relative flex flex-col rounded-[var(--radius-2xl)] border p-5 sm:p-7 transition-all duration-300",
+        "relative flex flex-col rounded-[var(--radius-2xl)] border p-5 md:p-4.5 lg:p-7 transition-all duration-300",
         plan.highlighted
-          ? "bg-[var(--surface-3)] border-[var(--app-primary)]/30 shadow-[var(--shadow-lg)] scale-[1.02] lg:scale-105"
+          ? "bg-[var(--surface-3)] border-[var(--app-primary)]/30 shadow-[var(--shadow-lg)] md:scale-100 lg:scale-105"
           : "bg-[var(--surface-2)] border-[var(--border-strong)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
       )}
     >
@@ -236,26 +236,26 @@ function PlanCard({
       {/* Badge */}
       {plan.badge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="inline-flex items-center rounded-full bg-primary-gradient px-3.5 py-1 text-[0.65rem] font-bold text-white shadow-[var(--shadow-md)] tracking-wide uppercase">
+          <span className="inline-flex items-center rounded-full bg-primary-gradient px-3.5 py-1 text-[0.65rem] md:text-[0.62rem] lg:text-[0.65rem] font-bold text-white shadow-[var(--shadow-md)] tracking-wide uppercase whitespace-nowrap">
             {plan.badge}
           </span>
         </div>
       )}
 
       {/* Header */}
-      <div className="mb-3">
-        <h3 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+      <div className="mb-3 md:mb-2.5 lg:mb-3">
+        <h3 className="text-xl md:text-[1.1rem] lg:text-xl font-bold tracking-tight text-[var(--text-primary)]">
           {plan.name}
         </h3>
       </div>
 
       {/* Description */}
-      <p className="text-[0.8rem] leading-relaxed text-[var(--text-muted)] mb-6 min-h-[2.5rem]">
+      <p className="text-[0.8rem] md:text-[0.74rem] lg:text-[0.8rem] leading-relaxed text-[var(--text-muted)] mb-6 md:mb-4 lg:mb-6 min-h-[2.5rem] md:min-h-[2.8rem] lg:min-h-[2.5rem]">
         {plan.description}
       </p>
 
       {/* Price */}
-      <div className="mb-6">
+      <div className="mb-6 md:mb-4 lg:mb-6">
         <AnimatedPrice price={displayPrice} isYearly={isYearly} />
       </div>
 
@@ -263,7 +263,7 @@ function PlanCard({
       <Link
         href="/auth/register"
         className={cn(
-          "inline-flex h-11 items-center justify-center rounded-full px-6 text-[0.82rem] font-semibold transition-all duration-200 active:scale-[0.98] mb-6",
+          "inline-flex h-11 md:h-9.5 lg:h-11 items-center justify-center rounded-full px-6 md:px-3 lg:px-6 text-[0.82rem] md:text-[0.76rem] lg:text-[0.82rem] font-semibold transition-all duration-200 active:scale-[0.98] mb-6 md:mb-4 lg:mb-6",
           plan.highlighted
             ? "bg-primary-gradient text-white shadow-[var(--shadow-md)] hover:brightness-110"
             : "bg-[var(--surface-3)] border border-[var(--border-strong)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)]"
@@ -273,25 +273,25 @@ function PlanCard({
       </Link>
 
       {/* Separator */}
-      <div className="h-px bg-[var(--border-strong)]/50 mb-5" />
+      <div className="h-px bg-[var(--border-strong)]/50 mb-5 md:mb-3.5 lg:mb-5" />
 
       {/* Features List */}
-      <ul className="space-y-3 flex-1">
+      <ul className="space-y-3 md:space-y-2 lg:space-y-3 flex-1">
         {plan.features.map((feature) => (
-          <li key={feature.text} className="flex items-start gap-2.5">
+          <li key={feature.text} className="flex items-start gap-2.5 md:gap-2 lg:gap-2.5">
             <div
               className={cn(
-                "mt-0.5 h-4 w-4 rounded-full flex items-center justify-center shrink-0 shadow-xs",
+                "mt-0.5 h-4 w-4 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4 rounded-full flex items-center justify-center shrink-0 shadow-xs",
                 plan.highlighted
                   ? "bg-[var(--app-primary)]"
                   : "bg-[var(--color-success)]"
               )}
             >
-              <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
+              <Check className="h-2.5 w-2.5 md:h-2 md:w-2 lg:h-2.5 lg:w-2.5 text-white" strokeWidth={3} />
             </div>
             <span
               className={cn(
-                "text-[0.78rem] leading-snug",
+                "text-[0.78rem] md:text-[0.72rem] lg:text-[0.78rem] leading-snug",
                 feature.highlighted
                   ? "text-[var(--text-primary)] font-medium"
                   : "text-[var(--text-secondary)]"
@@ -312,9 +312,9 @@ export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <section className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 py-12 sm:py-24">
+    <section className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 md:px-4 lg:px-6 py-12 md:py-16 lg:py-24">
       {/* Section Header */}
-      <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+      <div className="text-center max-w-2xl mx-auto mb-10 md:mb-8 lg:mb-12">
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ export default function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-2xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
+          className="text-2xl sm:text-4xl md:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
         >
           Un plan para cada etapa de tu negocio
         </motion.h2>
@@ -340,7 +340,7 @@ export default function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-[0.85rem] sm:text-[0.92rem] text-[var(--text-muted)] mt-2.5 leading-relaxed"
+          className="text-[0.85rem] sm:text-[0.92rem] md:text-[0.86rem] lg:text-[0.92rem] text-[var(--text-muted)] mt-2.5 leading-relaxed"
         >
           Comienza gratis y escala según tu ritmo. Sin contratos a largo plazo,
           sin costos ocultos.
@@ -353,7 +353,7 @@ export default function PricingSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.25 }}
-        className="flex justify-center mb-10 sm:mb-12"
+        className="flex justify-center mb-10 md:mb-8 lg:mb-12"
       >
         <BillingToggle
           isYearly={isYearly}
@@ -362,7 +362,7 @@ export default function PricingSection() {
       </motion.div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-5 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-3.5 lg:gap-5 items-start">
         {PLANS.map((plan, idx) => (
           <PlanCard
             key={plan.id}
@@ -379,7 +379,7 @@ export default function PricingSection() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="text-center text-[0.72rem] text-[var(--text-muted)] mt-8 tracking-wide"
+        className="text-center text-[0.72rem] md:text-[0.7rem] lg:text-[0.72rem] text-[var(--text-muted)] mt-8 tracking-wide"
       >
         Sin contratos a largo plazo. Cambia de plan o cancela en cualquier momento.
       </motion.p>

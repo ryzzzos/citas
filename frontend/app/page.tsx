@@ -90,7 +90,7 @@ export default function HomePage() {
           setDbBusinesses(data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -149,7 +149,7 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.85, ease: [0.32, 0.72, 0, 1] }}
             className="mt-4 sm:mt-6 text-[0.85rem] sm:text-[1.05rem] leading-relaxed text-[var(--text-muted)] max-w-xl"
           >
-            Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones. 
+            Permite a tus clientes reservar en línea 24/7 sin llamadas ni confusiones.
             Controla tu agenda, sucursales y equipo en un solo lugar con una interfaz intuitiva y profesional.
           </motion.p>
 
@@ -234,10 +234,11 @@ export default function HomePage() {
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer className="border-t border-[var(--border-strong)]/40 bg-[var(--surface-3)]/60 py-8 sm:py-12 px-6 text-center text-[0.72rem] text-[var(--text-muted)] flex flex-col items-center justify-center gap-4">
-        <BrandLogo size={24} />
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <BrandLogo size={28} />
+          <DemoLoginButton />
+        </div>
         <p>© {new Date().getFullYear()} Agenda Web. Todos los derechos reservados. Diseñado para simplificar tu día.</p>
-        <div className="w-12 h-px bg-[var(--border-strong)]/60" />
-        <DemoLoginButton />
       </footer>
     </main>
   );
