@@ -248,7 +248,7 @@ export default function BalancePage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 shrink-0">
+      <section className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4 shrink-0">
         <KpiCard
           title="Ingresos Brutos"
           value={formatCurrency(balance.gross_income.value)}
@@ -354,7 +354,7 @@ export default function BalancePage() {
       </section>
 
       {/* Staff commissions table */}
-      <section className="flex-1 min-h-0 flex flex-col">
+      <section className="flex-1 min-h-[350px] sm:min-h-0 flex flex-col">
         <div className="mb-2 shrink-0">
           <h3 className="text-[16px] font-bold text-[var(--text-primary)]">Liquidación de Staff</h3>
         </div>

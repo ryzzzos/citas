@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/refs */
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { DateTime } from "luxon";
 import { Clock, User, Check, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2, Wallet, Banknote, CreditCard, ArrowLeftRight, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,6 +8,7 @@ import type { PaymentMethod } from "@/lib/api/bookings";
 import type { Staff } from "@/types";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import BookingTimeline from "./BookingTimeline";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 
 interface AgendaTimelineProps {
   columns: AgendaDayColumn[];
@@ -25,7 +26,8 @@ interface AgendaTimelineProps {
   initialBookingId?: string | null;
 }
 
-const PX_PER_MINUTE = 2.0;
+const PX_PER_MINUTE_DESKTOP = 2.0;
+const PX_PER_MINUTE_MOBILE = 1.2;
 
 interface DragState {
 booking: AgendaBooking;
@@ -54,7 +56,11 @@ const end = booking.endAt.hour * 60 + booking.endAt.minute;
 return { start, end: Math.max(end, start + 15) };
 }
 
-function layoutDayBookings(bookings: AgendaBooking[]): PositionedBooking[] {
+/** PX_PER_MINUTE gutter size constants for responsive grid */
+const GUTTER_MOBILE = 48;
+const GUTTER_DESKTOP = 92;
+
+function layoutDayBookings(bookings: AgendaBooking[], pxPerMin: number): PositionedBooking[] {
 const sorted = [...bookings].sort((a, b) => a.startAt.toMillis() - b.startAt.toMillis());
 const laneById = new Map<string, number>();
 const active: Array<{ bookingId: string; end: number; lane: number }> = [];
@@ -96,8 +102,8 @@ return {
 booking,
 lane,
 laneCount,
-top: (bTime.start - 6 * 60) * PX_PER_MINUTE,                                                       
-height: Math.max(30, (bTime.end - bTime.start) * PX_PER_MINUTE),
+top: (bTime.start - 6 * 60) * pxPerMin,                                                       
+height: Math.max(30, (bTime.end - bTime.start) * pxPerMin),
 };
 });
 }
@@ -339,7 +345,7 @@ color: `var(${statusVar})`,
 );
 }
 
-function CurrentTimeLine() {
+function CurrentTimeLine({ pxPerMin }: { pxPerMin: number }) {
 const [now, setNow] = useState(DateTime.local());
 
 useEffect(() => {
@@ -349,7 +355,7 @@ return () => clearInterval(interval);
 
 const minutes = now.hour * 60 + now.minute;
 if (minutes < 6 * 60 || minutes > 22 * 60) return null;
-const top = (minutes - 6 * 60) * PX_PER_MINUTE;
+const top = (minutes - 6 * 60) * pxPerMin;
 
 return (
 <div
@@ -374,6 +380,10 @@ export default function AgendaTimeline({
 onPaymentRegister,
 initialBookingId,
 }: AgendaTimelineProps) {
+const isDesktop = useMediaQuery("(min-width: 640px)");
+const pxPerMin = isDesktop ? PX_PER_MINUTE_DESKTOP : PX_PER_MINUTE_MOBILE;
+const gutter = isDesktop ? GUTTER_DESKTOP : GUTTER_MOBILE;
+
 const [selectedBooking, setSelectedBooking] = useState<AgendaBooking | null>(null);
 const [drawerStatus, setDrawerStatus] = useState<AgendaBooking["status"] | null>(null);
 const [statusBeforeCancel, setStatusBeforeCancel] = useState<AgendaBooking["status"] | null>(null);
@@ -486,7 +496,7 @@ targetTime: string;
       if (columnEl) {
         const rect = columnEl.getBoundingClientRect();
         const relativeY = ev.clientY - rect.top;
-        const minutes = Math.max(0, Math.min((22 - 6) * 60, relativeY / PX_PER_MINUTE));
+        const minutes = Math.max(0, Math.min((22 - 6) * 60, relativeY / pxPerMin));
         const snapped = Math.round(minutes / 15) * 15;
         const total = 6 * 60 + snapped;
         const h = Math.floor(total / 60);
@@ -556,7 +566,7 @@ targetTime: string;
         setActiveDrag({ ...updated });
       }, 300);
     }
-  }, [handleSelectBooking]);
+  }, [handleSelectBooking, pxPerMin]);
 
 const handleCopy = (text: string, type: "tel" | "wa") => {
 if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -588,13 +598,13 @@ setCopiedText(null);
 useEffect(() => {
 if (selectedBooking && scrollContainerRef.current) {
 const { start } = toMinutes(selectedBooking);
-const top = (start - 6 * 60) * PX_PER_MINUTE;
+const top = (start - 6 * 60) * pxPerMin;
 scrollContainerRef.current.scrollTo({
 top: Math.max(0, top - 60),
 behavior: "smooth",
 });
 }
-}, [selectedBooking]);
+}, [selectedBooking, pxPerMin]);
 
 
 
@@ -624,36 +634,39 @@ window.history.replaceState({}, "", url.toString());
 };
 
 const hourMarkers = timelineSlots.filter((slot) => slot.endsWith(":00"));
-const canvasHeight = (22 - 6) * 60 * PX_PER_MINUTE;
+const canvasHeight = (22 - 6) * 60 * pxPerMin;
 
 return (
 <section
 aria-label="Timeline de citas"
-className="flex h-full min-h-0 flex-col rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 shadow-[var(--shadow-md)] sm:p-4 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
+className="flex h-full min-h-0 flex-col rounded-2xl sm:rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 shadow-[var(--shadow-md)] sm:p-4 dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:shadow-[var(--shadow-md)]"
 >
 <div ref={scrollContainerRef} className="min-h-0 overflow-auto">
-<div className="min-w-[880px]">
-<div className={`grid gap-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}>
+<div className="min-w-0 sm:min-w-[880px]">
+<div className={`grid gap-1 sm:gap-2 ${columns.length > 1 ? `grid-cols-[${gutter}px_repeat(${columns.length},minmax(0,1fr))]` : `grid-cols-[${gutter}px_minmax(0,1fr)]`}`} style={{ gridTemplateColumns: columns.length > 1 ? `${gutter}px repeat(${columns.length}, minmax(0, 1fr))` : `${gutter}px minmax(0, 1fr)` }}>
 {/* ── Sticky Header Row ── */}
 <div
-className={`sticky top-0 z-40 col-span-full grid gap-2 pb-2 ${columns.length > 1 ? "grid-cols-[92px_repeat(7,minmax(0,1fr))]" : "grid-cols-[92px_minmax(0,1fr)]"}`}
+className={`sticky top-0 z-40 col-span-full grid gap-1 sm:gap-2 pb-2`}
 style={{
 background: `linear-gradient(to bottom, var(--surface-3) 70%, color-mix(in srgb, var(--surface-3) 95%, transparent) 92%, transparent 100%)`,
+gridTemplateColumns: columns.length > 1 ? `${gutter}px repeat(${columns.length}, minmax(0, 1fr))` : `${gutter}px minmax(0, 1fr)`,
 }}
 >
-<div className="flex items-center px-2 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
+<div className="flex items-center px-1 sm:px-2 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
 Hora
 </div>
 {columns.length > 1 && columns.map((column) => {
   const dt = DateTime.fromISO(column.isoDate).setLocale("es");
-  const formattedDate = dt.isValid ? dt.toFormat("LLLL d") : column.dateLabel;
+  const formattedDateDesktop = dt.isValid ? dt.toFormat("LLLL d") : column.dateLabel;
+  const formattedDateMobile = dt.isValid ? `${dt.toFormat("ccc")} ${dt.toFormat("d")}` : column.dateLabel;
+  const formattedDate = isDesktop ? formattedDateDesktop : formattedDateMobile;
   return (
     <div
       key={column.isoDate}
-      className="flex items-center justify-center py-2 text-xs text-center"
+      className="flex items-center justify-center py-1.5 sm:py-2 text-[10px] sm:text-xs text-center"
     >
       <span
-        className={`font-bold capitalize tracking-tight flex items-center gap-1.5 ${
+        className={`font-bold capitalize tracking-tight flex items-center gap-1 sm:gap-1.5 ${
           column.isToday
             ? "text-[var(--app-primary)] font-extrabold"
             : "text-[var(--text-primary)] dark:text-[var(--text-secondary)]"
@@ -674,22 +687,22 @@ Hora
 {hourMarkers.map((hour) => {
 const [hours] = hour.split(":");
 // Posicionar la etiqueta exactamente en la línea de la hora, no a la mitad (+30)
-const top = (Number(hours) - 6) * 60 * PX_PER_MINUTE;
+const top = (Number(hours) - 6) * 60 * pxPerMin;
 return (
 <div key={hour} className="absolute inset-x-0" style={{ top }}>
-<p className="-translate-y-1/2 px-2 text-[11px] font-bold tracking-widest text-[var(--text-muted)]">{hour}</p>
+<p className="-translate-y-1/2 px-1 sm:px-2 text-[9px] sm:text-[11px] font-bold tracking-widest text-[var(--text-muted)]">{hour}</p>
 </div>
 );
 })}
 </div>
 
 {columns.map((column) => {
-const positioned = layoutDayBookings(bookingsByDay[column.isoDate] ?? []);
+const positioned = layoutDayBookings(bookingsByDay[column.isoDate] ?? [], pxPerMin);
 
 return (
 <div
 key={column.isoDate}
-className="agenda-column relative overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
+className="agenda-column relative overflow-hidden rounded-xl sm:rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
 data-column-date={column.isoDate}
 style={{ height: canvasHeight }}
 role="group"
@@ -702,7 +715,7 @@ className="absolute border-2 border-dashed border-[var(--app-primary)] bg-[var(-
 style={{
 top: (() => {
 const [h, m] = activeDrag.targetTime.split(":").map(Number);
-return ((h - 6) * 60 + m) * PX_PER_MINUTE;
+return ((h - 6) * 60 + m) * pxPerMin;
 })(),
 height: activeDrag.height,
 left: 3,
@@ -718,7 +731,7 @@ Mover a las {activeDrag.targetTime}
 )}
 {hourMarkers.map((hour) => {
 const [hours] = hour.split(":");
-const top = (Number(hours) - 6) * 60 * PX_PER_MINUTE;
+const top = (Number(hours) - 6) * 60 * pxPerMin;
 return (
 <div
 key={`${column.isoDate}-${hour}`}
@@ -729,7 +742,7 @@ aria-hidden="true"
 );
 })}
 
-{column.isToday && <CurrentTimeLine />}
+{column.isToday && <CurrentTimeLine pxPerMin={pxPerMin} />}
 
                         {positioned.map((item) => renderEventBlock(
                           item,

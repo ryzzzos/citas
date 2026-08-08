@@ -141,7 +141,7 @@ export function ChartPieLegend({
               </ChartContainer>
             </div>
 
-            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-4 gap-1 sm:gap-2">
               {chartData.map((item) => {
                 const percentage = total > 0 ? (item.value / total) * 100 : 0
                 const Icon = item.icon

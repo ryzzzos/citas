@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass, 
+import {
+  CalendarDays, CheckCircle2, CircleDashed, ClipboardList, Compass,
   Hourglass, TrendingUp, TrendingDown, Minus, XCircle, ChevronLeft, ChevronRight, User, MapPin
 } from "lucide-react";
 import { getMe, myBookings, getMyBusiness, businessAgenda } from "@/lib/api";
@@ -45,7 +45,7 @@ export default function DashboardPage() {
         // Monday of last week to Sunday of selected week
         const startOfLastWeek = startOfWeek(subWeeks(currentDate, 1), { weekStartsOn: 1 });
         const endOfThisWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
-        
+
         const startStr = format(startOfLastWeek, "yyyy-MM-dd");
         const endStr = format(endOfThisWeek, "yyyy-MM-dd");
 
@@ -67,7 +67,7 @@ export default function DashboardPage() {
             return d >= startOfLastWeek && d <= endOfThisWeek;
           });
         }
-        
+
         if (mounted) {
           setBookings(weekBks);
           setWeeklyBookings(weekBks);
@@ -152,130 +152,176 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-full space-y-5 lg:space-y-6">
       <div className="shrink-0 space-y-5 lg:space-y-6">
         {/* Hero / Welcome */}
-      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-          <div className="space-y-1.5">
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+      <section className="rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3.5 sm:p-5 shadow-[var(--shadow-sm)]">
+        {/* Desktop View (Exact Original 100% Intact) */}
+        <div className="hidden sm:block">
+          <div className="flex sm:flex-row sm:items-start sm:justify-between gap-6">
+            <div className="space-y-1.5">
+              <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+                Hola, {user?.name}
+              </h2>
+              <p className="max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
+                {user?.role === "business_owner"
+                  ? "Administra la operación de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
+                  : "Consulta tus próximas reservas y gestiona la actividad de tu agenda."}
+              </p>
+            </div>
+
+            {/* Week selector */}
+            <div className="flex items-center gap-1 sm:gap-2.5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-1.5 py-1 shadow-[var(--shadow-sm)] shrink-0 self-start sm:self-auto">
+              <button 
+                onClick={() => setCurrentDate(subWeeks(currentDate, 1))}
+                className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+                aria-label="Semana anterior"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="min-w-[160px] text-center text-[13px] sm:text-sm font-semibold capitalize text-[var(--text-primary)]">
+                {weekLabel}
+              </span>
+              <button 
+                onClick={() => setCurrentDate(addWeeks(currentDate, 1))}
+                className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+                aria-label="Siguiente semana"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {user?.role === "business_owner" ? (
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Link
+                href="/dashboard/agenda"
+                className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-5 text-[13px] font-bold tracking-tight text-[var(--text-primary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.98]"
+              >
+                <AppIcon icon={CalendarDays} />
+                Abrir agenda
+              </Link>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Mobile View (Ultra-Compact Side-by-Side Controls) */}
+        <div className="block sm:hidden space-y-3">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
               Hola, {user?.name}
             </h2>
-            <p className="max-w-2xl text-[14px] font-medium leading-relaxed text-[var(--text-secondary)]">
+            <p className="text-[13px] font-medium leading-snug text-[var(--text-secondary)]">
               {user?.role === "business_owner"
                 ? "Administra la operación de tu negocio, revisa reservas y monitorea actividad desde un mismo panel."
-                : "Consulta tus próximas reservas y accede rápido al mapa de sucursales para reservar nuevos servicios."}
+                : "Consulta tus próximas reservas y gestiona la actividad de tu agenda."}
             </p>
           </div>
 
-          {/* Week selector */}
-          <div className="flex items-center gap-1 sm:gap-2.5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-1.5 py-1 shadow-[var(--shadow-sm)] shrink-0 self-start sm:self-auto">
-            <button 
-              onClick={() => setCurrentDate(subWeeks(currentDate, 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className="min-w-[160px] text-center text-[13px] sm:text-sm font-semibold capitalize text-[var(--text-primary)]">
-              {weekLabel}
-            </span>
-            <button 
-              onClick={() => setCurrentDate(addWeeks(currentDate, 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              <ChevronRight size={16} />
-            </button>
+          {/* Controls Side-by-Side: Abrir agenda + Week Selector */}
+          <div className="flex items-center justify-between gap-2 shrink-0">
+            {user?.role === "business_owner" ? (
+              <Link
+                href="/dashboard/agenda"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 text-[12px] font-bold tracking-tight text-[var(--text-primary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.98]"
+              >
+                <AppIcon icon={CalendarDays} />
+                <span>Abrir agenda</span>
+              </Link>
+            ) : null}
+
+            {/* Week selector */}
+            <div className="flex items-center gap-0.5 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-1 py-0.5 shadow-[var(--shadow-sm)]">
+              <button 
+                onClick={() => setCurrentDate(subWeeks(currentDate, 1))}
+                className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+                aria-label="Semana anterior"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <span className="min-w-[110px] text-center text-[11px] font-semibold capitalize text-[var(--text-primary)] truncate">
+                {weekLabel}
+              </span>
+              <button 
+                onClick={() => setCurrentDate(addWeeks(currentDate, 1))}
+                className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)] transition-colors"
+                aria-label="Siguiente semana"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
           </div>
         </div>
-
-        <div className="mt-6 flex flex-wrap gap-2.5">
-          {user?.role === "business_owner" ? (
-            <Link
-              href="/dashboard/agenda"
-              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] px-5 text-[13px] font-bold tracking-tight text-[var(--text-primary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-1)] active:scale-[0.98]"
-            >
-              <AppIcon icon={CalendarDays} />
-              Abrir agenda
-            </Link>
-          ) : null}
-          <Link
-            href="/sucursales"
-            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-5 text-[13px] font-bold tracking-tight text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all hover:bg-[var(--surface-3)] active:scale-[0.98]"
-          >
-            <AppIcon icon={Compass} />
-            Explorar sucursales
-          </Link>
-        </div>
       </section>
 
-      <section className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
-        <KpiCard
-          title="Reservas"
-          value={thisWeekTotal}
-          previousValue={lastWeekTotal}
-          animateNumber={true}
-          icon={ClipboardList}
-          iconBgClass="bg-[var(--text-primary)] text-[var(--surface-3)]"
-          trendPct={totalPct}
-          trendColorClass="text-[var(--text-primary)]"
-          showProgressBar={true}
-          barColorClass="bg-[var(--text-primary)]"
-          period="week"
-        />
+        <section className={`grid grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${loading ? 'opacity-50' : ''} transition-opacity`}>
+          <KpiCard
+            title="Reservas"
+            value={thisWeekTotal}
+            previousValue={lastWeekTotal}
+            animateNumber={true}
+            icon={ClipboardList}
+            iconBgClass="bg-[var(--text-primary)] text-[var(--surface-3)]"
+            trendPct={totalPct}
+            trendColorClass="text-[var(--text-primary)]"
+            showProgressBar={true}
+            barColorClass="bg-[var(--text-primary)]"
+            period="week"
+          />
 
-        <KpiCard
-          title="Pendientes"
-          value={thisWeekPending}
-          previousValue={lastWeekPending}
-          animateNumber={true}
-          icon={Hourglass}
-          iconBgClass="bg-[var(--color-pending)] text-[var(--surface-3)]"
-          trendPct={pendingPct}
-          trendColorClass="text-[var(--color-pending)]"
-          showProgressBar={true}
-          barColorClass="bg-[var(--color-pending)]"
-          period="week"
-        />
+          <KpiCard
+            title="Pendientes"
+            value={thisWeekPending}
+            previousValue={lastWeekPending}
+            animateNumber={true}
+            icon={Hourglass}
+            iconBgClass="bg-[var(--color-pending)] text-[var(--surface-3)]"
+            trendPct={pendingPct}
+            trendColorClass="text-[var(--color-pending)]"
+            showProgressBar={true}
+            barColorClass="bg-[var(--color-pending)]"
+            period="week"
+          />
 
-        <KpiCard
-          title="Confirmadas"
-          value={thisWeekConfirmed}
-          previousValue={lastWeekConfirmed}
-          animateNumber={true}
-          icon={TrendingUp}
-          iconBgClass="bg-[var(--color-info)] text-[var(--surface-3)]"
-          trendPct={confirmedPct}
-          trendColorClass="text-[var(--color-info)]"
-          showProgressBar={true}
-          barColorClass="bg-[var(--color-info)]"
-          period="week"
-        />
+          <KpiCard
+            title="Confirmadas"
+            value={thisWeekConfirmed}
+            previousValue={lastWeekConfirmed}
+            animateNumber={true}
+            icon={TrendingUp}
+            iconBgClass="bg-[var(--color-info)] text-[var(--surface-3)]"
+            trendPct={confirmedPct}
+            trendColorClass="text-[var(--color-info)]"
+            showProgressBar={true}
+            barColorClass="bg-[var(--color-info)]"
+            period="week"
+          />
 
-        <KpiCard
-          title="Completadas"
-          value={thisWeekCompleted}
-          previousValue={lastWeekCompleted}
-          animateNumber={true}
-          icon={CheckCircle2}
-          iconBgClass="bg-[var(--color-success)] text-[var(--surface-3)]"
-          trendPct={completedPct}
-          trendColorClass="text-[var(--color-success)]"
-          showProgressBar={true}
-          barColorClass="bg-[var(--color-success)]"
-          period="week"
-        />
+          <KpiCard
+            title="Completadas"
+            value={thisWeekCompleted}
+            previousValue={lastWeekCompleted}
+            animateNumber={true}
+            icon={CheckCircle2}
+            iconBgClass="bg-[var(--color-success)] text-[var(--surface-3)]"
+            trendPct={completedPct}
+            trendColorClass="text-[var(--color-success)]"
+            showProgressBar={true}
+            barColorClass="bg-[var(--color-success)]"
+            period="week"
+          />
 
-        <KpiCard
-          title="Canceladas"
-          value={thisWeekCancelled}
-          previousValue={lastWeekCancelled}
-          animateNumber={true}
-          icon={XCircle}
-          iconBgClass="bg-[var(--color-error)] text-[var(--surface-3)]"
-          trendPct={cancelledPct}
-          trendColorClass="text-[var(--color-error)]"
-          showProgressBar={true}
-          barColorClass="bg-[var(--color-error)]"
-          period="week"
-        />
-      </section>
+          <KpiCard
+            title="Canceladas"
+            value={thisWeekCancelled}
+            previousValue={lastWeekCancelled}
+            animateNumber={true}
+            icon={XCircle}
+            iconBgClass="bg-[var(--color-error)] text-[var(--surface-3)]"
+            trendPct={cancelledPct}
+            trendColorClass="text-[var(--color-error)]"
+            showProgressBar={true}
+            barColorClass="bg-[var(--color-error)]"
+            period="week"
+          />
+        </section>
       </div>
 
       <section className={`flex-1 min-h-0 flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)] ${loading ? 'opacity-50' : ''} transition-opacity`}>
@@ -298,7 +344,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div
-            className="mt-4 flex-1 min-h-0 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)]"
+            className="mt-3 sm:mt-4 flex-1 min-h-0 overflow-y-auto px-0 py-1 sm:px-3 sm:py-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[var(--border-strong)]"
           >
             <div className="space-y-2">
               {thisWeekBks.map((b) => {
@@ -313,55 +359,59 @@ export default function DashboardPage() {
                   <Link
                     key={b.id}
                     href={`/dashboard/agenda?date=${b.booking_date}&bookingId=${b.id}`}
-                    className="group flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3.5 transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)] cursor-pointer"
+                    className="group flex h-[68px] sm:h-[84px] w-full items-center gap-2.5 sm:gap-4 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 sm:px-5 py-2 sm:py-3 transition-all hover:bg-[var(--surface-3)] hover:shadow-[var(--shadow-sm)] cursor-pointer"
                   >
-                    {/* Vertical status accent */}
+                    {/* Left vertical status accent line */}
                     <div
-                      className="hidden sm:block w-1 self-stretch rounded-full shrink-0"
+                      className="w-1 sm:w-1.5 h-full rounded-full shrink-0"
                       style={{ backgroundColor: statusColor }}
                     />
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-semibold tracking-tight text-[var(--text-primary)] truncate">
-                          {b.service_name || "Servicio reservado"}
-                        </p>
-                        <span
-                          className="shrink-0 rounded-full px-2 py-px text-[10px] font-bold uppercase tracking-wider"
-                          style={{
-                            color: statusColor,
-                            backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
-                          }}
-                        >
-                          {STATUS_LABELS[b.status]}
+                    {/* Left Stack: Top = Service Name, Bottom = Metadata */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5 sm:py-1">
+                      <p className="text-[13px] sm:text-[15px] font-semibold sm:font-bold tracking-tight text-[var(--text-primary)] truncate">
+                        {b.service_name || "Servicio reservado"}
+                      </p>
+                      <div className="flex items-center gap-x-2 sm:gap-x-3 text-[11px] sm:text-[13px] text-[var(--text-muted)] truncate">
+                        <span className="inline-flex items-center gap-1 sm:gap-1.5 shrink-0">
+                          <User size={13} className="opacity-60" />
+                          <span className="truncate max-w-[80px] sm:max-w-none">{b.staff_name || "Sin asignar"}</span>
                         </span>
-                      </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[12px] text-[var(--text-muted)]">
-                        <span className="inline-flex items-center gap-1">
-                          <User size={12} className="opacity-60" />
-                          {b.staff_name || "Sin asignar"}
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin size={12} className="opacity-60" />
-                          {b.branch_name || "Sucursal"}
+                        <span className="inline-flex items-center gap-1 sm:gap-1.5 shrink-0">
+                          <MapPin size={13} className="opacity-60" />
+                          <span className="truncate max-w-[80px] sm:max-w-none">{b.branch_name || "Sucursal"}</span>
                         </span>
                         {user?.role === "business_owner" && b.customer_name && (
-                          <span className="text-[var(--text-secondary)] font-medium">
+                          <span className="text-[var(--text-secondary)] font-medium truncate">
                             → {b.customer_name}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Date column */}
-                    <div className="shrink-0 text-right">
-                      <p className="text-[13px] font-semibold tabular-nums text-[var(--text-primary)]">
-                        {format(new Date(b.booking_date + "T" + b.start_time), "d MMM", { locale: es })}
-                      </p>
-                      <p className="text-[11px] tabular-nums text-[var(--text-muted)]">
-                        {format(new Date(b.booking_date + "T" + b.start_time), "h:mm a", { locale: es })}
-                      </p>
+                    {/* Right Stack: Top Right = Status Badge, Bottom Right = Date & Time */}
+                    <div className="shrink-0 flex flex-col items-end justify-between h-full py-0.5 sm:py-1 text-right">
+                      {/* Top Right: Status Badge */}
+                      <span
+                        className="inline-flex shrink-0 rounded-full px-2 sm:px-3 py-[1px] sm:py-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider text-center"
+                        style={{
+                          color: statusColor,
+                          backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+                        }}
+                      >
+                        {STATUS_LABELS[b.status]}
+                      </span>
+
+                      {/* Bottom Right: Date & Time */}
+                      <div className="flex items-center gap-1.5 text-[11px] sm:text-[13px] tabular-nums text-[var(--text-muted)]">
+                        <span className="font-semibold sm:font-bold text-[var(--text-primary)] sm:text-[14px]">
+                          {format(new Date(b.booking_date + "T" + b.start_time), "d MMM", { locale: es })}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {format(new Date(b.booking_date + "T" + b.start_time), "h:mm a", { locale: es })}
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 );

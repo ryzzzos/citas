@@ -63,9 +63,8 @@ function CustomDropdownSelect<T extends string | number>({
                     onChange(opt.value);
                     setOpen(false);
                   }}
-                  className={`w-full px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] focus:outline-none cursor-pointer ${
-                    isSelected ? "bg-[var(--app-primary)]/10 font-bold text-[var(--app-primary)]" : "text-[var(--text-primary)]"
-                  }`}
+                  className={`w-full px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] focus:outline-none cursor-pointer ${isSelected ? "bg-[var(--app-primary)]/10 font-bold text-[var(--app-primary)]" : "text-[var(--text-primary)]"
+                    }`}
                 >
                   {opt.label}
                 </button>
@@ -201,22 +200,20 @@ export default function AgendaHorizontalDays({
 
     container.addEventListener("wheel", handleWheel, { passive: false });
     return () => container.removeEventListener("wheel", handleWheel);
-  }, []);
-
-  return (
+  }, []);  return (
     <div className="mb-2 flex">
       <div ref={pickerRef} className="relative flex min-w-max shrink-0 items-center pr-2 pb-4 pt-1">
         <button
           type="button"
           onClick={() => setPickerOpen((prev) => !prev)}
-          className="flex h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2.5 sm:p-3 shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] hover:border-[var(--app-primary)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] cursor-pointer group"
+          className="flex h-[66px] sm:h-[76px] flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 sm:p-3 shadow-[var(--shadow-sm)] hover:bg-[var(--surface-2)] hover:border-[var(--app-primary)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] cursor-pointer group shrink-0"
         >
-          <AppIcon icon={CalendarDays} className="mb-1 text-[var(--text-muted)] group-hover:text-[var(--app-primary)] transition-colors duration-300" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+          <AppIcon icon={CalendarDays} className="mb-0.5 sm:mb-1 text-[var(--text-muted)] group-hover:text-[var(--app-primary)] transition-colors duration-300" />
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
             {anchorDate.setZone(timezone).setLocale("es").toFormat("MMM, yyyy")}
           </span>
         </button>
-        <div className="ml-2 h-10 w-[1px] bg-[var(--border-strong)]" />
+        <div className="ml-2 h-9 sm:h-10 w-[1px] bg-[var(--border-strong)]" />
 
         <AnimatePresence>
           {pickerOpen && (
@@ -262,7 +259,7 @@ export default function AgendaHorizontalDays({
       <div className="relative flex-1 min-w-0" style={{ maxWidth: "100%" }}>
         <div 
           ref={containerRef}
-          className="flex w-full items-center gap-2 overflow-x-auto overflow-y-hidden pb-4 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar px-1"
+          className="flex w-full items-center gap-1.5 sm:gap-2 overflow-x-auto overflow-y-hidden pb-4 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar px-1"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
 
@@ -274,7 +271,7 @@ export default function AgendaHorizontalDays({
               const isThisWeek = date.hasSame(today, "week");
 
               let btnClasses =
-                "relative snap-center flex min-w-[190px] sm:min-w-[220px] h-[72px] sm:h-[76px] items-center justify-between rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-4 sm:px-5 py-2.5 sm:py-3 shrink-0 z-10";
+                "relative snap-center flex min-w-[138px] sm:min-w-[220px] h-[66px] sm:h-[76px] items-center justify-between rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-2.5 sm:px-5 py-2 sm:py-3 shrink-0 z-10";
 
               if (isSelected) {
                 btnClasses += " border-transparent font-bold shadow-[var(--shadow-md)] text-[var(--surface-3)]";
@@ -285,7 +282,6 @@ export default function AgendaHorizontalDays({
                   btnClasses += " border-[var(--border-strong)] bg-[var(--surface-3)] shadow-[var(--shadow-sm)] hover:scale-[1.02] hover:border-[var(--app-primary)] hover:bg-[var(--surface-2)] active:scale-95 text-[var(--text-secondary)]";
                 }
               }
-
 
               return (
                 <motion.button
@@ -298,25 +294,25 @@ export default function AgendaHorizontalDays({
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 >
                   {/* Left: large week number with accent bar */}
-                  <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     <div className="flex flex-col items-center">
-                      <span className={`text-[22px] sm:text-[26px] font-black leading-none tracking-tighter ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+                      <span className={`text-[19px] sm:text-[26px] font-black leading-none tracking-tighter ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
                         {date.weekNumber}
                       </span>
-                      <span className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] mt-0.5 ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
+                      <span className={`text-[7.5px] sm:text-[9px] font-bold uppercase tracking-[0.15em] mt-0.5 ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
                         sem
                       </span>
                     </div>
                     {/* Vertical accent divider */}
-                    <div className={`h-9 sm:h-10 w-[2px] rounded-full shrink-0 ${isSelected ? "bg-white/25" : "bg-[var(--border-strong)]"}`} />
+                    <div className={`h-8 sm:h-10 w-[2px] rounded-full shrink-0 ${isSelected ? "bg-white/25" : "bg-[var(--border-strong)]"}`} />
                   </div>
 
                   {/* Right: clean date info */}
-                  <div className="flex flex-col items-start text-left flex-1 min-w-0 ml-3 sm:ml-4">
-                    <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
+                  <div className="flex flex-col items-start text-left flex-1 min-w-0 ml-2 sm:ml-4">
+                    <span className={`text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.15em] ${isSelected ? "text-white/60" : "text-[var(--text-muted)]"}`}>
                       {isThisWeek && !isSelected ? "Esta semana" : `${weekEnd.toFormat("MMM")} · ${weekEnd.toFormat("yyyy")}`}
                     </span>
-                    <span className={`text-[14px] sm:text-[16px] font-extrabold tracking-tight leading-snug mt-0.5 ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+                    <span className={`text-[13px] sm:text-[16px] font-extrabold tracking-tight leading-snug mt-0.5 ${isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
                       {weekStart.toFormat("dd")} — {weekEnd.toFormat("dd")}
                     </span>
                   </div>
@@ -342,7 +338,7 @@ export default function AgendaHorizontalDays({
             const dayNumber = date.toFormat("d");
 
             let btnClasses =
-              "relative snap-center flex min-w-[68px] sm:min-w-[72px] h-[72px] sm:h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-2 shrink-0 z-10";
+              "relative snap-center flex min-w-[60px] sm:min-w-[72px] h-[66px] sm:h-[76px] flex-col items-center justify-center rounded-[1.25rem] border transition-all duration-300 ease-out focus:outline-none px-2 shrink-0 z-10";
 
             if (isSelected) {
               btnClasses += " border-transparent font-bold shadow-[var(--shadow-md)] text-[var(--surface-3)]";
@@ -364,10 +360,10 @@ export default function AgendaHorizontalDays({
                 className={btnClasses}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
-                <span className={`text-[11px] font-semibold uppercase tracking-wider ${isSelected ? "text-[var(--surface-3)]" : (isToday ? "text-[var(--color-info)]" : "")}`}>
+                <span className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${isSelected ? "text-[var(--surface-3)]" : (isToday ? "text-[var(--color-info)]" : "")}`}>
                   {isToday && !isSelected ? "Hoy" : dayName}
                 </span>
-                <span className={`mt-1 text-lg sm:text-xl tracking-tight ${isSelected ? "text-[var(--surface-3)]" : "text-[var(--text-primary)]"}`}>
+                <span className={`mt-0.5 sm:mt-1 text-base sm:text-xl tracking-tight ${isSelected ? "text-[var(--surface-3)]" : "text-[var(--text-primary)]"}`}>
                   {dayNumber}
                 </span>
                 {isSelected && (

@@ -153,27 +153,27 @@ export function KpiCard({
   }
 
   return (
-    <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-5 shadow-[var(--shadow-sm)]">
+    <article className="flex flex-col justify-between rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-3 sm:p-5 shadow-[var(--shadow-sm)]">
       {/* Card Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-1 sm:gap-3">
         
         {/* Left Side: Icon & Title (with hover tooltip) */}
-        <div className="flex items-center gap-3">
-          <div className={`flex h-9 w-9 items-center justify-center rounded-full ${iconBgClass}`}>
-            <AppIcon icon={icon} size="md" />
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
+          <div className={`flex h-6 w-6 sm:h-9 sm:w-9 items-center justify-center rounded-full shrink-0 ${iconBgClass}`}>
+            <AppIcon icon={icon} size="md" className="h-3 w-3 sm:h-5 sm:w-5" />
           </div>
           {tooltipTarget === "title" && tooltipText ? (
             <Tooltip
               content={tooltipText}
-              className="relative"
+              className="relative min-w-0 flex-1"
               tooltipClassName="max-w-[12rem] whitespace-normal text-center text-[10px] leading-relaxed font-semibold text-[var(--text-secondary)]"
             >
-              <p className="cursor-help border-b border-dashed border-[var(--border-strong)]/60 pb-0.5 text-[14px] sm:text-[15px] font-bold text-[var(--text-secondary)]">
+              <p className="cursor-help border-b border-dashed border-[var(--border-strong)]/60 pb-0.5 text-[12px] sm:text-[15px] font-bold text-[var(--text-secondary)] truncate">
                 {title}
               </p>
             </Tooltip>
           ) : (
-            <p className="text-[14px] sm:text-[15px] font-bold text-[var(--text-secondary)]">
+            <p className="text-[11px] sm:text-[15px] font-bold text-[var(--text-secondary)] line-clamp-2 leading-tight sm:truncate sm:leading-normal flex-1 min-w-0">
               {title}
             </p>
           )}
@@ -181,8 +181,8 @@ export function KpiCard({
 
         {/* Right Side: Trend percentage */}
         {(trendDelta !== undefined || trendPct !== undefined) && (
-          <div className={`flex items-center gap-1 text-sm font-bold shrink-0 ${calculatedTrendColorClass}`}>
-            <AppIcon icon={calculatedTrendIcon} size="md" className="h-4 w-4" />
+          <div className={`flex items-start sm:items-center pt-0.5 sm:pt-0 gap-0.5 sm:gap-1 text-[10px] sm:text-sm font-bold shrink-0 ${calculatedTrendColorClass}`}>
+            <AppIcon icon={calculatedTrendIcon} size="md" className="h-3 w-3 sm:h-4 sm:w-4" />
             <span>
               {animateNumber ? (
                 <NumberTicker value={Math.abs(trendValue)} />
@@ -196,13 +196,13 @@ export function KpiCard({
       </div>
 
       {/* Card Content & Progress Bar */}
-      <div className="mt-4">
-        <p className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
+      <div className="mt-2 sm:mt-4">
+        <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
           {renderAnimatedValue()}
         </p>
 
         {showProgressBar && (
-          <div className="mt-2.5">
+          <div className="mt-2 sm:mt-2.5">
             {generatedBarTooltipText ? (
               <Tooltip
                 content={generatedBarTooltipText}

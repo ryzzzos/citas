@@ -35,6 +35,7 @@ agenda-web/
 ### Frontend UI Architecture Decisions
 
 - **Dashboard shell pattern**: use a left sidebar navigation layout for all dashboard routes.
+- **Strict Desktop Protection Rule (CRITICAL)**: The desktop/PC view is 100% finished, polished, and FROZEN. It is STRICTLY FORBIDDEN to alter, rearrange, re-style, or break desktop/PC layouts, styles, or break-point classes (`sm:`, `md:`, `lg:`, `xl:`). All responsiveness adjustments, layout compacting, touch optimizations, and drawer refactors MUST be strictly isolated and targeted to mobile/tablet viewports (`< sm:` / `< md:` or scoped via `block sm:hidden` / `hidden sm:block`).
 - **Layout ownership**: create `frontend/app/dashboard/layout.tsx` as the shared shell for dashboard pages.
 - **Sidebar component**: create and keep navigation in `frontend/components/layout/DashboardSidebar.tsx`.
 - **Componentization rule**: keep route files focused on page content and data; navigation/chrome belongs to reusable components.
@@ -171,6 +172,28 @@ agenda-web/
   4. Stage, commit (`git commit -m "<msg>"`), and push changes to `main`.
   5. Create a local annotated Git tag: `git tag -a vMAJOR.MINOR.PATCH -m "Release vMAJOR.MINOR.PATCH"`.
   6. Push the tag to the remote origin: `git push origin vMAJOR.MINOR.PATCH`.
+
+## Command Shortcut: "ya sabes que hacer"
+
+When the user sends the command **"ya sabes que hacer"**, it automatically triggers the complete pre-release and Git deployment workflow. The agent MUST execute the following sequence autonomously without asking or hesitating:
+
+1. **Verify Codebase Quality & Errors**:
+   - Run `pnpm lint` and `pnpm build` from `frontend/`.
+   - Run backend smoke tests (`.\.venv\Scripts\python.exe test_predeploy_smoke.py` from `backend/`).
+2. **Inspect New/Untracked Files**:
+   - Run `git status` to identify all new, modified, or untracked files.
+   - Inspect new files for potential errors, missing imports, or bad practices, and fix them cleanly without breaking new functionality.
+3. **Bump Version & Update Documentation**:
+   - Increment the patch/minor version in `frontend/package.json` (e.g. `0.5.0` -> `0.5.1`).
+   - Append the release entry under the new version in `CHANGELOG.md` adhering strictly to Keep a Changelog format.
+4. **Git Commit & Tag Release Protocol**:
+   - Stage all relevant changes (`git add .`).
+   - Commit with a descriptive release message (`git commit -m "chore: release vMAJOR.MINOR.PATCH - <summary>"`).
+   - Create local annotated Git tag: `git tag -a vMAJOR.MINOR.PATCH -m "Release vMAJOR.MINOR.PATCH"`.
+   - Push changes and tag to origin: `git push origin main` and `git push origin vMAJOR.MINOR.PATCH`.
+5. **Follow Best Practices**:
+   - Ensure clean console/lint states, correct file naming conventions, and proper design token usage before finalizing the push.
+
 
 ## UX & Role Separation Paradigm (Customer vs. Entrepreneur)
 

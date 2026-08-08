@@ -234,7 +234,7 @@ export default function AgendaPage() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 lg:gap-5">
+    <div className="flex min-h-full sm:min-h-0 sm:h-full flex-col gap-4 lg:gap-5">
       <AgendaHeader
         title={formatViewLabel(anchorDate, view)}
         timezone={timezone}
@@ -259,7 +259,7 @@ export default function AgendaPage() {
           </div>
         ) : (
           <>
-            <div className="flex min-h-0 flex-col gap-4">
+            <div className="flex flex-col gap-4 h-[52vh] sm:h-auto sm:min-h-0">
               <div className="min-h-0 flex-1">
                 <AgendaTimeline
                   columns={columns}

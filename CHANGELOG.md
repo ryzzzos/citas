@@ -6,6 +6,18 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.1] - 2026-08-08
+
+### Fixed
+- **Optimización SSR y Corrección Lint en `useMediaQuery`**:
+  - Refactorización del hook `useMediaQuery` (`frontend/lib/useMediaQuery.ts`) sustituyendo la actualización sincrónica en `useEffect` por React `useSyncExternalStore` con callbacks memorizados (`useCallback`), resolviendo la advertencia `react-hooks/set-state-in-effect` y garantizando compatibilidad SSR segura.
+- **Aislamiento de IDs Vectoriales en `BrandLogo`**:
+  - Dinamización de identidades de gradientes y filtros SVG en `BrandLogo.tsx` para evitar colisiones de IDs al renderizar múltiples instancias del logotipo.
+
+### Added
+- **Directiva de Comando Automatizado "ya sabes que hacer" en `AGENTS.md`**:
+  - Documentación e integración del flujo automático de despliegue Git en 5 pasos (validación, revisión de código, bump de versión, actualización de changelog, commit, tag y push) en `AGENTS.md`.
+
 ## [0.5.0] - 2026-08-07
 
 ### 🎉 Added & Major Release Milestone
