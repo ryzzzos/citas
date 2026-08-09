@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.3] - 2026-08-09
+
+### Improved
+- **Optimización de Disposición Responsiva en Perfil de Negocio**:
+  - Ajustes de compactación táctil en insignias de categoría y ubicación en `BusinessProfileView.tsx`.
+  - Disposición horizontal en 2 columnas/fila (`flex-row`) para los botones primarios de acción en vista móvil (< sm), reduciendo el consumo vertical de pantalla.
+  - Inclusión de restricciones de ancho mínimo (`min-w-0`) para evitar desbordamientos horizontales en paneles laterales y acordeones de catálogo.
+
 ## [0.5.2] - 2026-08-09
 
 ### Improved

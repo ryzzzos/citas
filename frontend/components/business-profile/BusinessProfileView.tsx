@@ -72,7 +72,7 @@ function InfoRow({
       <div className={`rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] p-2 dark:border-[var(--border-strong)] dark:bg-[var(--surface-2)] ${colorClass || "text-[var(--text-secondary)]"}`}>
         <AppIcon icon={Icon} className="text-current" />
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)] ">
           {label}
         </p>
@@ -81,12 +81,12 @@ function InfoRow({
             href={href}
             target={opensExternal ? "_blank" : undefined}
             rel={opensExternal ? "noreferrer" : undefined}
-            className="dashboard-focusable mt-1 inline-flex break-all text-sm leading-6 text-[var(--text-primary)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--text-secondary)] dark:decoration-[var(--border-strong)] dark:hover:decoration-[var(--text-secondary)]"
+            className="dashboard-focusable mt-1 block break-words text-sm leading-6 text-[var(--text-primary)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--text-secondary)] dark:decoration-[var(--border-strong)] dark:hover:decoration-[var(--text-secondary)]"
           >
             {value}
           </Link>
         ) : (
-          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">{value}</p>
+          <p className="mt-1 block break-words text-sm leading-6 text-[var(--text-secondary)]">{value}</p>
         )}
       </div>
     </div>
@@ -229,63 +229,63 @@ export default function BusinessProfileView({
         <div className="relative px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
           <div className="-mt-14 rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-glass)] p-4 shadow-[var(--shadow-md)] backdrop-blur-md backdrop-saturate-150 dark:border-[var(--border-strong)] dark:bg-[var(--surface-glass)] sm:-mt-16 sm:p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="flex flex-row items-stretch sm:items-end gap-3 sm:gap-4">
                 <Avatar logoUrl={business.logo_image_url} businessName={business.name} />
-                <div className="min-w-0">
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
+                <div className="min-w-0 flex flex-col justify-between py-0.5 sm:py-0 sm:block">
+                  <div className="mb-1 sm:mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)]">
                       {business.category}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] ">
-                      <MapPin className="h-3.5 w-3.5 text-[var(--text-secondary)]" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[11px] font-medium text-[var(--text-secondary)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] ">
+                      <MapPin className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[var(--text-secondary)]" aria-hidden="true" />
                       {displayCity}
                     </span>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem] break-words">
+                  <h1 className="text-2xl leading-tight sm:leading-normal sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-[2.15rem] break-words">
                     {business.name}
                   </h1>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">
+                  <p className="mt-1 sm:mt-2 max-w-3xl text-xs sm:text-sm leading-snug sm:leading-6 text-[var(--text-secondary)] line-clamp-2 sm:line-clamp-none">
                     {businessBio}
                   </p>
                 </div>
               </div>
 
-              <div className="flex w-full flex-col gap-3 pt-4 sm:w-[240px] lg:pt-0">
+              <div className="flex w-full flex-row sm:flex-col gap-2 sm:gap-3 pt-3 sm:pt-4 sm:w-[240px] lg:pt-0">
                 {mode === "dashboard-preview" && onToggleEditing ? (
                   <button
                     type="button"
                     onClick={onToggleEditing}
-                    className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-6 text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
+                    className="dashboard-focusable inline-flex flex-1 sm:flex-none sm:w-full min-h-10 sm:min-h-11 items-center justify-center gap-1.5 sm:gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 sm:px-6 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
                   >
                     <AppIcon icon={Pencil} />
-                    {isEditing ? "Cerrar editor" : "Editar perfil"}
+                    {isEditing ? "Cerrar" : "Editar"}
                   </button>
                 ) : null}
 
                 {mode === "dashboard-preview" ? (
                   <Link
                     href={publicProfileHref}
-                    className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
+                    className="dashboard-focusable inline-flex flex-1 sm:flex-none sm:w-full min-h-10 sm:min-h-11 items-center justify-center gap-1.5 sm:gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-3 sm:px-6 text-xs sm:text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
                   >
-                    Ver perfil publico
-                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                    Ver perfil
+                    <ExternalLink className="h-3.5 sm:h-4 w-3.5 sm:w-4" aria-hidden="true" />
                   </Link>
                 ) : (
-                  <div className="flex w-full flex-col gap-3">
+                  <div className="flex w-full flex-row sm:flex-col gap-2 sm:gap-3">
                     {hasActiveServices && (
                       <Link
                         href={bookingHref}
-                        className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
+                        className="dashboard-focusable inline-flex flex-1 sm:flex-none sm:w-full min-h-10 sm:min-h-11 items-center justify-center gap-1.5 sm:gap-2 rounded-full border-transparent bg-[var(--app-primary)] px-3 sm:px-6 text-xs sm:text-sm font-semibold text-white shadow-[var(--shadow-md)] transition-colors hover:brightness-110"
                       >
-                        Reservar ahora
-                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        Reservar
+                        <ExternalLink className="h-3.5 sm:h-4 w-3.5 sm:w-4" aria-hidden="true" />
                       </Link>
                     )}
                     <button
                       type="button"
-                      className="dashboard-focusable inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-6 text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
+                      className="dashboard-focusable inline-flex flex-1 sm:flex-none sm:w-full min-h-10 sm:min-h-11 items-center justify-center gap-1.5 sm:gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-3)] px-3 sm:px-6 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-2)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] dark:hover:bg-[var(--surface-2)]"
                     >
-                      <Share2 className="h-4 w-4" aria-hidden="true" />
+                      <Share2 className="h-3.5 sm:h-4 w-3.5 sm:w-4" aria-hidden="true" />
                       Compartir
                     </button>
                   </div>
@@ -296,8 +296,8 @@ export default function BusinessProfileView({
         </div>
 
         <div className="px-4 pb-6 sm:px-6 sm:pb-7 lg:px-8 lg:pb-8">
-          <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
-            <aside className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
+            <aside className="min-w-0 space-y-4">
               <section className="h-fit rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[var(--surface-3)] p-4 shadow-[var(--shadow-md)] dark:border-[var(--border-strong)] dark:bg-[var(--surface-3)] sm:p-5">
                 <h2 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
                   Informacion del negocio
@@ -330,7 +330,7 @@ export default function BusinessProfileView({
               </section>
             </aside>
 
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               {groupedCategories.length > 0 ? (
                 <AccordionGroup>
                   {groupedCategories.map((group, groupIndex) => {
