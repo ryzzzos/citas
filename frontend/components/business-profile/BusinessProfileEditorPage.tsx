@@ -303,7 +303,7 @@ export default function BusinessProfileEditorPage() {
       {/* MAIN PREVIEW AREA */}
       <div
         className={cn(
-          "h-full w-full overflow-y-auto px-4 pb-24 pt-6 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-6 lg:px-8",
+          "h-full w-full overflow-y-auto pb-24 pt-4 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
           isEditing && "opacity-60"
         )}
       >

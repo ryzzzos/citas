@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.4] - 2026-08-09
+
+### Fixed
+- **Corrección de Desbordamiento y Alineación Móvil en Perfil de Negocio**:
+  - Ajuste de jerarquía de flex-box y alineación vertical estirada (`items-stretch justify-between`) para emparejar la información del perfil con la foto del negocio en móviles (`BusinessProfileView.tsx`).
+  - Resolución de desbordamiento horizontal en Safari/iOS al reemplazar `inline-flex break-all` por `block break-words` en filas de información de contacto (`InfoRow`).
+  - Prevención de desbordamiento de CSS Grid (`min-w-0 grid-cols-1`) en mapa embebido y carrusel de servicios.
+  - Eliminación de paddings horizontales redundantes en `BusinessProfileEditorPage.tsx` para evitar que el contenedor sobrepase el viewport en dispositivos móviles.
+
 ## [0.5.3] - 2026-08-09
 
 ### Improved
