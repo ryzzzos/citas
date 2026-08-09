@@ -57,38 +57,38 @@ export default function ServicesHeader({ services, onCreate, onManageCategories 
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Catálogo Activo */}
-        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-info)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+        <article className="flex flex-1 items-center justify-between gap-1.5 sm:gap-3 rounded-[var(--radius-lg)] sm:rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-info)_8%,var(--surface-3)),var(--surface-3))] p-3 sm:p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-info)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
               <AppIcon icon={CheckCircle2} size="sm" />
             </div>
-            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Catálogo activo</p>
+            <p className="text-[12px] sm:text-[15px] font-bold tracking-tight text-[var(--text-primary)] truncate">Catálogo activo</p>
           </div>
-          <p className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">{activeCount}</p>
+          <p className="text-[18px] sm:text-[28px] font-bold tracking-tight text-[var(--text-primary)] shrink-0">{activeCount}</p>
         </article>
 
         {/* Categorías */}
-        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--app-primary)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--app-primary)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+        <article className="flex flex-1 items-center justify-between gap-1.5 sm:gap-3 rounded-[var(--radius-lg)] sm:rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--app-primary)_8%,var(--surface-3)),var(--surface-3))] p-3 sm:p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-primary)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
               <AppIcon icon={Tags} size="sm" />
             </div>
-            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Categorías</p>
+            <p className="text-[12px] sm:text-[15px] font-bold tracking-tight text-[var(--text-primary)] truncate">Categorías</p>
           </div>
-          <p className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">{categoriesCount}</p>
+          <p className="text-[18px] sm:text-[28px] font-bold tracking-tight text-[var(--text-primary)] shrink-0">{categoriesCount}</p>
         </article>
 
         {/* Rango de Precios */}
-        <article className="flex flex-1 items-center justify-between rounded-[var(--radius-2xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-success)_8%,var(--surface-3)),var(--surface-3))] p-5 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
+        <article className="col-span-2 sm:col-span-2 lg:col-span-1 flex flex-1 items-center justify-between gap-2 sm:gap-3 rounded-[var(--radius-lg)] sm:rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-success)_8%,var(--surface-3)),var(--surface-3))] p-3 sm:p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-success)] text-[var(--surface-3)] shadow-[var(--shadow-sm)]">
               <AppIcon icon={CircleDollarSign} size="sm" />
             </div>
-            <p className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">Rango precios</p>
+            <p className="text-[13px] sm:text-[15px] font-bold tracking-tight text-[var(--text-primary)] truncate">Rango precios</p>
           </div>
-          <p className="text-[20px] sm:text-[22px] font-bold tracking-tight text-[var(--text-primary)]">{priceRange}</p>
+          <p className="text-[16px] sm:text-[22px] font-bold tracking-tight text-[var(--text-primary)] shrink-0">{priceRange}</p>
         </article>
       </div>
     </header>

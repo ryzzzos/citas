@@ -64,6 +64,11 @@ agenda-web/
   - Text: `text-[var(--text-primary)]`, `text-[var(--text-secondary)]`, `text-[var(--text-muted)]`.
   - Accents: `bg-[var(--app-primary)]`, `text-[var(--color-pending)]`, etc.
   - **Note on Semantic Colors**: Do not be afraid to creatively use `color-pending`, `color-info`, `color-success`, and `color-error` for general aesthetic design elements (like badges, active states, soft backgrounds, glowing shadows) even if the context isn't strictly an "error" or "info" alert. They are part of the vibrant palette.
+- **Nested Border Radius Consistency (Hierarchy & Scaling Rule)**:
+  - Maintain geometric visual harmony between outer surfaces (parent containers) and inner elements (cards, badges, buttons, inputs).
+  - Outer containers / page shells / modals use larger radii (`rounded-[var(--radius-2xl)]` or `rounded-[var(--radius-xl)]`).
+  - Nested child elements (cards inside a surface, badges, inputs, or compact cards in multi-column grids) MUST scale down to proportionally smaller radii (`rounded-[var(--radius-xl)]`, `rounded-[var(--radius-lg)]`, `rounded-[var(--radius-md)]`, or `rounded-[var(--radius-sm)]`).
+  - Never force large radii (`rounded-[var(--radius-2xl)]`) on small inner elements or compact mobile items where the curvature becomes disproportionate to its dimensions or parent container.
 
 ### Modals, Drawers & Forms (Apple-Inspired Standard)
 

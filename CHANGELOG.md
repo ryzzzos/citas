@@ -6,6 +6,13 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.2] - 2026-08-09
+
+### Improved
+- **Optimización Responsiva Móvil en Módulo de Servicios**:
+  - Refinamiento de botones de alternancia de vista cuadrícula/lista (`ServicesFilters.tsx`) con píldoras redondeadas (`rounded-full`), espaciado adaptativo y estado de cursor explícito (`cursor-pointer`).
+  - Rediseño responsivo de tarjetas de resumen de catálogo en la cabecera de servicios (`ServicesHeader.tsx`), introduciendo disposición de rejilla en 2 columnas en móviles (`grid-cols-2`), tamaños de fuente e iconos proporcionales y prevención de desbordamiento de texto (`truncate`).
+
 ## [0.5.1] - 2026-08-08
 
 ### Fixed

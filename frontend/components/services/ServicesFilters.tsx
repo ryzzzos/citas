@@ -48,7 +48,7 @@ export default function ServicesFilters({
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+      <div className="flex flex-row items-center gap-2 sm:gap-3 w-full xl:w-auto">
         <CustomSelect<ServiceStatusFilter>
           id="services-status"
           value={filters.status}
@@ -60,7 +60,8 @@ export default function ServicesFilters({
           }
           options={STATUS_OPTIONS}
           icon={ShieldCheck}
-          className="flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto"
+          variant="glass"
+          className="flex-1 min-w-0 sm:flex-none sm:min-w-[170px] sm:w-auto"
         />
 
         <CustomSelect<string>
@@ -78,21 +79,22 @@ export default function ServicesFilters({
             ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
           ]}
           icon={Tags}
-          className="flex-1 sm:flex-none min-w-[170px] w-full sm:w-auto"
+          variant="glass"
+          className="flex-1 min-w-0 sm:flex-none sm:min-w-[170px] sm:w-auto"
         />
 
-        <div className="inline-flex h-11 items-center gap-1 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-3)] p-1 shadow-[var(--shadow-sm)] shrink-0 w-full sm:w-auto justify-center">
+        <div className="inline-flex h-9 sm:h-10 items-center gap-0.5 sm:gap-1 rounded-full border border-[var(--glass-border)] bg-[var(--surface-glass)] backdrop-blur-md p-1 shadow-[var(--glass-shadow)] shrink-0 justify-center">
           <button
             type="button"
             onClick={() => onViewModeChange("grid")}
-            className="group relative inline-flex h-full items-center justify-center rounded-lg px-3 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)]"
+            className="group relative inline-flex h-full items-center justify-center rounded-full px-2.5 sm:px-3 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] cursor-pointer"
             aria-label="Vista cuadrícula"
             title="Vista cuadrícula"
           >
             {viewMode === "grid" && (
               <motion.div
                 layoutId="view-mode-pill"
-                className="absolute inset-0 rounded-lg bg-[var(--surface-1)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]"
+                className="absolute inset-0 rounded-full bg-[var(--surface-1)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]"
                 initial={false}
                 transition={{ type: "spring", stiffness: 350, damping: 30 }}
               />
@@ -103,14 +105,14 @@ export default function ServicesFilters({
           <button
             type="button"
             onClick={() => onViewModeChange("list")}
-            className="group relative inline-flex h-full items-center justify-center rounded-lg px-3 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)]"
+            className="group relative inline-flex h-full items-center justify-center rounded-full px-2.5 sm:px-3 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-primary)] cursor-pointer"
             aria-label="Vista lista"
             title="Vista lista"
           >
             {viewMode === "list" && (
               <motion.div
                 layoutId="view-mode-pill"
-                className="absolute inset-0 rounded-lg bg-[var(--surface-1)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]"
+                className="absolute inset-0 rounded-full bg-[var(--surface-1)] shadow-[var(--shadow-sm)] border border-[var(--border-strong)]"
                 initial={false}
                 transition={{ type: "spring", stiffness: 350, damping: 30 }}
               />
