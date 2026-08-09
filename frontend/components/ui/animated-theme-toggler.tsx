@@ -181,15 +181,15 @@ export const AnimatedThemeToggler = ({
     const applyTheme = (useCSSFallback: boolean) => {
       const newTheme = !isDark
       setIsDark(newTheme)
-      
+
       if (useCSSFallback) {
         // Aplicar transición suave temporalmente sólo como fallback
         document.documentElement.classList.add("theme-transition")
       }
-      
+
       document.documentElement.classList.toggle("dark")
       localStorage.setItem("theme", newTheme ? "dark" : "light")
-      
+
       if (useCSSFallback) {
         setTimeout(() => {
           document.documentElement.classList.remove("theme-transition")

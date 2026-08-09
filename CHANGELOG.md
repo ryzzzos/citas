@@ -6,6 +6,11 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.5] - 2026-08-09
+
+### Fixed
+- **Optimización visual**: Eliminación temporal de 'filter' en la transición global del tema oscuro para prevenir glitches o parpadeos (globals.css y theme-toggler).
+
 ## [0.5.4] - 2026-08-09
 
 ### Fixed
