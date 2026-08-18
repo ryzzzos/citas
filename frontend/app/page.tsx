@@ -199,7 +199,7 @@ export default function HomePage() {
           <InfiniteMarquee
             title="NEGOCIOS QUE CONFÍAN EN NOSOTROS"
             items={marqueeDisplayItems}
-            speed={45}
+            speed={100}
             pauseOnHover={true}
           />
         </section>

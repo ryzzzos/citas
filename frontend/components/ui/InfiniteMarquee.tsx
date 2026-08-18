@@ -19,7 +19,7 @@ export function InfiniteMarquee({
   items,
   children,
   title,
-  speed = 45,
+  speed = 90,
   direction = "left",
   pauseOnHover = true,
   fadeEdges = true,

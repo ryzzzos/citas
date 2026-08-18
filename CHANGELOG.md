@@ -6,6 +6,21 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.6] - 2026-08-18
+
+### Added
+- **Componente DynamicSearch Interactivo**:
+  - Buscador inteligente con morfismo y animación fluida estilo Apple (`DynamicSearch.tsx`).
+  - Filtrado reactivo por texto, ciudad y categoría con badges dinámicos.
+  - Menú dropdown con desenfoque de fondo y lista de resultados inmediatos.
+  - Soporte para variante compacta (botón expansible) y extendida (cápsula fija).
+
+### Improved
+- **Integración de Búsqueda y Navegación Pública**:
+  - Integración de búsqueda dinámica en `Navbar.tsx` y menú de usuario rediseñado con `AnimatePresence`.
+  - Rediseño responsivo en `SucursalesDiscoveryPage.tsx` y `SucursalesFiltersPanel.tsx` con paneles adaptables a móvil (bottom sheet) y tablet (drawer lateral).
+  - Optimización de velocidad en `InfiniteMarquee.tsx` e iconos en `animated-theme-toggler.tsx`.
+
 ## [0.5.5] - 2026-08-09
 
 ### Fixed

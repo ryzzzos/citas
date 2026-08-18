@@ -99,6 +99,7 @@ export default function SucursalesDiscoveryPage() {
   const handleSelectBusiness = useCallback((businessId: string) => {
     setSelectedBusinessId(businessId);
     setDetailDismissed(false);
+    setFiltersOpenMobile(false);
   }, []);
 
   const handleSelectBusinessFromFilters = useCallback((businessId: string) => {
@@ -363,6 +364,9 @@ export default function SucursalesDiscoveryPage() {
 
       <SucursalesDetailSheet
         business={selectedBusiness}
+        businesses={viewportItems.length > 0 ? viewportItems : items}
+        onSelectBusiness={handleSelectBusiness}
+        hideOnMobile={filtersOpenMobile}
         onClose={() => {
           setSelectedBusinessId(null);
           setDetailDismissed(true);

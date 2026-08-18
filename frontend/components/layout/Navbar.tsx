@@ -2,32 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  ChevronRight,
-  Compass,
   LayoutDashboard,
   LogIn,
   LogOut,
-  MapPin,
-  Search,
-  SlidersHorizontal,
   Store,
-  User as UserIcon,
   UserRoundCheck,
-  X,
 } from "lucide-react";
 
 import AppIcon from "@/components/ui/AppIcon";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import BrandLogo from "@/components/ui/BrandLogo";
+import DynamicSearch from "@/components/ui/DynamicSearch";
 import { getMe, getMyBusiness, logout } from "@/lib/api";
 import type { User } from "@/types";
 import { useDiscoverySearch } from "@/components/sucursales/DiscoverySearchContext";
-import type { DiscoveryFilters } from "@/components/sucursales/types";
-import CustomSelect from "@/components/ui/CustomSelect";
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -38,55 +29,20 @@ type SessionState =
   | { status: "guest" }
   | { status: "authenticated"; user: User; onboardingPending: boolean };
 
-const MAX_AUTOCOMPLETE_RESULTS = 5;
-
-function toInitials(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((chunk) => chunk[0]?.toUpperCase() ?? "")
-    .join("") || "?";
-}
-
-/* ── Tiny avatar for autocomplete ───────────────────────────── */
-
-function ResultAvatar({ logoUrl, name }: { logoUrl: string | null; name: string }) {
-  const [errored, setErrored] = useState(false);
-  const show = Boolean(logoUrl && !errored);
-
-  return (
-    <div className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)]">
-      {show ? (
-        <Image
-          src={logoUrl as string}
-          alt={name}
-          fill
-          sizes="32px"
-          className="object-cover"
-          unoptimized
-          onError={() => setErrored(true)}
-        />
-      ) : (
-        <span className="text-[0.5rem] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-          {toInitials(name)}
-        </span>
-      )}
-    </div>
-  );
-}
-
-/* ── Navbar Component ───────────────────────────────────────── */
-
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-
-  const [isIntroActive, setIsIntroActive] = useState(() => pathname === "/");
+  const [isIntroActive, setIsIntroActive] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.sessionStorage.getItem("agenda_web_splash_shown") !== "1";
+  });
 
   useEffect(() => {
     if (isIntroActive) {
-      const timer = setTimeout(() => {
+      window.sessionStorage.setItem("agenda_web_splash_shown", "1");
+      const timer = window.setTimeout(() => {
         setIsIntroActive(false);
       }, 800);
       return () => {
@@ -99,40 +55,12 @@ export default function Navbar() {
 
   const [session, setSession] = useState<SessionState>({ status: "loading" });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  /* ── Morphing Search State ────────────────────────────────── */
   const [searchExpanded, setSearchExpanded] = useState(false);
-  const [query, setQuery] = useState("");
-  const [filtersVisible, setFiltersVisible] = useState(true);
 
   const navbarRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   /* ── Discovery Search Context ─────────────────────────────── */
   const ctx = useDiscoverySearch();
-  const items = ctx?.items ?? [];
-  const filters = ctx?.filters ?? { city: "", category: "" };
-  const onFiltersChange = ctx?.onFiltersChange;
-  const onSelectBusiness = ctx?.onSelectBusiness;
-  const loading = ctx?.loading ?? false;
-
-  const categories = ctx
-    ? ["", ...Array.from(new Set(items.map((item) => item.category))).sort((a, b) => a.localeCompare(b, "es"))]
-    : [];
-
-  const results = ctx
-    ? query.trim().length === 0
-      ? []
-      : items
-        .filter((biz) =>
-          `${biz.name} ${biz.category} ${biz.city} ${biz.address}`
-            .toLocaleLowerCase("es")
-            .includes(query.trim().toLocaleLowerCase("es")),
-        )
-        .slice(0, MAX_AUTOCOMPLETE_RESULTS)
-    : [];
-
-  const hasActiveFilters = filters.city.trim().length > 0 || filters.category.trim().length > 0;
 
   useEffect(() => {
     if (hideOnDashboard) return;
@@ -179,27 +107,17 @@ export default function Navbar() {
     };
   }, [hideOnDashboard]);
 
-  // Click outside listener for user menu AND search panel
+  // Click outside listener for user menu
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (navbarRef.current && !navbarRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
-        if (searchExpanded) {
-          setSearchExpanded(false);
-          setQuery("");
-          setFiltersVisible(false);
-        }
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setUserMenuOpen(false);
-        if (searchExpanded) {
-          setSearchExpanded(false);
-          setQuery("");
-          setFiltersVisible(false);
-        }
       }
     }
 
@@ -209,7 +127,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [searchExpanded]);
+  }, []);
 
   const handleLogout = useCallback(() => {
     logout();
@@ -218,44 +136,14 @@ export default function Navbar() {
     router.push("/");
   }, [router]);
 
-  const handleSelectResult = useCallback(
-    (businessId: string) => {
-      onSelectBusiness?.(businessId);
-      setSearchExpanded(false);
-      setQuery("");
-      setFiltersVisible(false);
-    },
-    [onSelectBusiness],
-  );
-
-  const handleFilterChange = useCallback(
-    (patch: Partial<DiscoveryFilters>) => {
-      onFiltersChange?.({ ...filters, ...patch });
-    },
-    [filters, onFiltersChange],
-  );
-
-  const handleClearFilters = useCallback(() => {
-    onFiltersChange?.({ city: "", category: "" });
-    setQuery("");
-  }, [onFiltersChange]);
-
-  const openSearch = useCallback(() => {
-    setSearchExpanded(true);
-    requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-    });
-  }, []);
-
   if (hideOnDashboard) {
     return null;
   }
 
   const navItemClassName = cn(
-    "inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 py-1.5",
-    "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
+    "inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium",
+    "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] hover:bg-[var(--surface-2)]",
     "whitespace-nowrap transition-colors duration-200",
-    "glass-floating",
   );
 
   const isAuthenticated = session.status === "authenticated";
@@ -280,25 +168,25 @@ export default function Navbar() {
             key="splash-overlay"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-0 z-[9998] bg-[var(--surface-1)] pointer-events-auto"
-          />
-        )}
-        {isIntroActive && (
-          <div
-            key="splash-logo-container"
-            className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[color:var(--surface-0)] backdrop-blur-md"
           >
             <motion.div
-              layoutId="navbar-brand-logo-svg"
-              transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
-              className="pointer-events-auto w-[160px] h-[176px]"
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="flex flex-col items-center gap-4"
             >
-              <BrandLogo size={160} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
+              <BrandLogo size={64} variant="icon" />
+              <div className="flex items-center gap-1 text-2xl font-bold tracking-tight">
+                <span className="text-[color:var(--text-primary)]">Agenda</span>
+                <span className="text-[color:var(--text-secondary)] font-light">Web</span>
+              </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
+
       <header
         className={cn(
           "z-[760] px-2.5 sm:px-4 pt-[max(env(safe-area-inset-top),0.45rem)] md:px-6",
@@ -313,29 +201,25 @@ export default function Navbar() {
             "bg-[var(--surface-glass)] shadow-[var(--shadow-md)] backdrop-blur-md border border-[var(--border-strong)]",
           )}
         >
-          {/* Logo/Brand */}
+          {/* Brand Logo & Name */}
           <Link
             href="/"
-            onClick={() => setSearchExpanded(false)}
-            className="dashboard-focusable rounded-full px-1.5 shrink-0 flex items-center justify-center h-full"
+            className="dashboard-focusable group flex items-center gap-2.5 rounded-full p-1 transition-transform active:scale-95 shrink-0"
+            aria-label="Ir a la página principal de Agenda Web"
           >
-            <div className="inline-flex items-center gap-2 select-none">
-              <div className="relative w-9 h-[39.6px] flex items-center justify-center shrink-0">
-                {!isIntroActive && (
-                  <motion.div
-                    layoutId="navbar-brand-logo-svg"
-                    transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
-                    className="absolute inset-0 w-9 h-[39.6px] flex items-center justify-center"
-                  >
-                    <BrandLogo size={36} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
-                  </motion.div>
-                )}
-              </div>
+            <div className="relative flex items-center gap-2">
               <motion.div
-                initial={isIntroActive ? { opacity: 0, x: -6 } : { opacity: 1, x: 0 }}
+                initial={isIntroActive ? { scale: 0.8, opacity: 0 } : { scale: 1, opacity: 1 }}
+                animate={!isIntroActive ? { scale: 1, opacity: 1 } : {}}
+                transition={{ duration: 0.5, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <BrandLogo size={36} variant="icon" />
+              </motion.div>
+              <motion.div
+                initial={isIntroActive ? { opacity: 0, x: -10 } : { opacity: 1, x: 0 }}
                 animate={!isIntroActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                className="hidden sm:flex items-baseline leading-none font-sans text-[1.22rem] tracking-tight"
+                transition={{ duration: 0.5, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                className="hidden sm:flex items-center text-base tracking-tight"
               >
                 <span className="font-bold text-[var(--text-primary)]">
                   Agenda
@@ -347,355 +231,196 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* ── CENTER ELONGATED SEARCH CAPSULE & COMBOBOX (hidden on mobile — FAB handles it) ── */}
-          {isMapRoute && ctx && (
-            <div className="hidden md:block flex-1 max-w-md mx-2 relative">
-              {/* Input Capsule Box */}
-              <div
-                className={cn(
-                  "flex h-10 items-center gap-2 rounded-full px-3.5 bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text-primary)] w-full transition-all duration-300",
-                  searchExpanded && "bg-[var(--surface-3)] border-[var(--app-primary)]/35 shadow-[var(--shadow-sm)]"
-                )}
-              >
-                <Search className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={openSearch}
-                  placeholder="Buscar sucursal..."
-                  className="flex-1 bg-transparent text-[0.82rem] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
-                />
-                {(query.trim() || hasActiveFilters) && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleClearFilters();
-                    }}
-                    className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                )}
-                {searchExpanded && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSearchExpanded(false);
-                      setQuery("");
-                      setFiltersVisible(false);
-                    }}
-                    className="shrink-0 text-[0.72rem] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] px-1 transition-colors"
-                  >
-                    Cerrar
-                  </button>
-                )}
-              </div>
-
-              {/* Dropdown Combobox panel hanging directly under capsule */}
-              {searchExpanded && (
-                <div
-                  className={cn(
-                    "absolute top-[calc(100%+0.5rem)] left-0 w-full z-[800] p-3 flex flex-col gap-3 rounded-[var(--radius-lg)]",
-                    "bg-[var(--surface-3)] shadow-[var(--shadow-lg)] border border-[var(--border-strong)] backdrop-blur-3xl",
-                    "animate-in fade-in slide-in-from-top-2 duration-200"
-                  )}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Filters pill row */}
-                  <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setFiltersVisible((v) => !v);
-                      }}
-                      className={cn(
-                        "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.65rem] font-semibold transition-all duration-200",
-                        filtersVisible
-                          ? "bg-[var(--app-primary)] text-white"
-                          : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-strong)] hover:bg-[var(--surface-3)]",
-                      )}
-                    >
-                      <SlidersHorizontal className="h-2.5 w-2.5" />
-                      Filtros
-                    </button>
-
-                    {filters.city && (
-                      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.65rem] font-semibold bg-[color-mix(in_oklab,var(--color-info)_10%,transparent)] text-[var(--color-info)] border border-[var(--color-info)]/15">
-                        <MapPin className="h-2.5 w-2.5" />
-                        {filters.city}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFilterChange({ city: "" });
-                          }}
-                          className="ml-0.5 hover:opacity-70"
-                        >
-                          <X className="h-2 w-2" />
-                        </button>
-                      </span>
-                    )}
-
-                    {filters.category && (
-                      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.65rem] font-semibold bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)] text-[var(--color-success)] border border-[var(--color-success)]/15">
-                        {filters.category}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFilterChange({ category: "" });
-                          }}
-                          className="ml-0.5 hover:opacity-70"
-                        >
-                          <X className="h-2 w-2" />
-                        </button>
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Collapsible Inputs */}
-                  {filtersVisible && (
-                    <div className="grid grid-cols-2 gap-2.5 pb-2 border-b border-[var(--border-strong)]/20 shrink-0 animate-in slide-in-from-top-1 duration-200">
-                      <label className="space-y-0.5">
-                        <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                          Ciudad
-                        </span>
-                        <input
-                          type="text"
-                          value={filters.city}
-                          onChange={(e) => handleFilterChange({ city: e.target.value })}
-                          placeholder="Ej: Medellín"
-                          className="w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 py-1 text-[0.75rem] text-[var(--text-primary)] outline-none focus:border-[var(--app-primary)] placeholder:text-[var(--text-muted)]"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </label>
-                      <div className="space-y-0.5" onClick={(e) => e.stopPropagation()}>
-                        <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                          Categoría
-                        </span>
-                        <CustomSelect<string>
-                          value={filters.category}
-                          onChange={(val) => handleFilterChange({ category: val })}
-                          options={categories.map((cat) => ({
-                            value: cat,
-                            label: cat || "Todas",
-                          }))}
-                          buttonClassName="!h-[26px] !py-0.5 !px-2 !rounded-[var(--radius-sm)] !text-[0.75rem] !bg-[var(--surface-2)] font-semibold"
-                          menuClassName="!rounded-[var(--radius-sm)]"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Results List */}
-                  <div className="flex-1 overflow-y-auto max-h-[220px] pr-0.5 space-y-1">
-                    {loading && results.length === 0 && query.trim().length > 0 && (
-                      <div className="flex items-center justify-center py-4">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)]" />
-                      </div>
-                    )}
-
-                    {query.trim().length === 0 && (
-                      <div className="text-center py-6 text-[0.78rem] text-[var(--text-muted)]">
-                        <Search className="h-4 w-4 mx-auto opacity-30 mb-1" />
-                        <p>Escribe para buscar sucursales...</p>
-                      </div>
-                    )}
-
-                    {query.trim().length > 0 && results.length === 0 && !loading && (
-                      <div className="text-center py-6">
-                        <Search className="h-4 w-4 mx-auto text-[var(--text-muted)] opacity-40 mb-1" />
-                        <p className="text-[0.75rem] font-semibold text-[var(--text-primary)]">Sin resultados</p>
-                      </div>
-                    )}
-
-                    {results.map((biz) => (
-                      <button
-                        key={biz.id}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectResult(biz.id);
-                        }}
-                        className="w-full flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left hover:bg-[var(--surface-2)] transition-colors group"
-                      >
-                        <ResultAvatar logoUrl={biz.logo_image_url} name={biz.name} />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[0.78rem] font-semibold text-[var(--text-primary)] group-hover:text-[var(--app-primary)] transition-colors">
-                            {biz.name}
-                          </p>
-                          <p className="truncate text-[0.65rem] text-[var(--text-muted)]">
-                            {biz.category} · {biz.city}
-                          </p>
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-[var(--text-muted)] opacity-0 group-hover:opacity-60 transition-all" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Navigation list & Actions on the right side */}
           <motion.div
             initial={isIntroActive ? { opacity: 0, y: -4 } : { opacity: 1, y: 0 }}
             animate={!isIntroActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.5, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
             className="flex items-center gap-2 shrink-0"
           >
             {/* Main scrollable nav list */}
-            <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto text-sm font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {(isGuest || isLoading) && !searchExpanded && (
+            {(isGuest || isLoading) && (
+              <motion.nav
+                initial={false}
+                animate={{
+                  width: searchExpanded ? 0 : "auto",
+                  opacity: searchExpanded ? 0 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 420, damping: 35, mass: 0.6 }}
+                className="flex items-center overflow-hidden shrink-0 text-sm font-medium"
+                style={{ pointerEvents: searchExpanded ? "none" : "auto" }}
+              >
                 <Link
                   href="/sucursales"
                   className={cn(
                     navItemClassName,
                     isMapRoute
-                      ? "border-[color:var(--app-primary)] text-[color:var(--text-primary)] shadow-[var(--shadow-sm)]"
-                      : undefined,
+                      ? "bg-[var(--surface-2)] text-[color:var(--text-primary)] border border-[var(--border-strong)] font-semibold"
+                      : "border border-transparent",
                   )}
                 >
-                  <AppIcon icon={Store} size="md" className="sm:mr-1.5 inline" />
+                  <AppIcon icon={Store} size="sm" className="sm:mr-1.5 inline" />
                   <span className="hidden sm:inline">Sucursales</span>
                 </Link>
-              )}
-            </nav>
+              </motion.nav>
+            )}
 
-            {/* Action Group (Kept outside the scrollable nav to prevent dropdown clipping) */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Theme toggler */}
-              <AnimatedThemeToggler
-                className={cn(
-                  "dashboard-focusable inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2",
-                  "text-[color:var(--text-secondary)] focus-visible:ring-[color:var(--app-primary)]",
-                  "glass-floating-muted",
-                )}
-                aria-label="Cambiar tema"
+            {/* ── UNIFIED DYNAMIC SEARCH CAPSULE (Variant small for both PC & Mobile) ── */}
+            {isMapRoute && ctx && (
+              <DynamicSearch
+                variant="small"
+                items={ctx.items}
+                loading={ctx.loading}
+                filters={ctx.filters}
+                onFiltersChange={ctx.onFiltersChange}
+                onSelectResult={ctx.onSelectBusiness}
+                isExpanded={searchExpanded}
+                onExpandedChange={setSearchExpanded}
               />
+            )}
 
-              {/* Profile Avatar / Login Button */}
-              {isLoading && (
-                <div className="inline-flex min-h-10 w-10 items-center justify-center">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)]" />
-                </div>
+            {/* Action Group (Hides smoothly on mobile & desktop when search is expanded) */}
+            <motion.div
+              initial={false}
+              animate={{
+                width: searchExpanded ? 0 : "auto",
+                opacity: searchExpanded ? 0 : 1,
+              }}
+              transition={{ type: "spring", stiffness: 420, damping: 35, mass: 0.6 }}
+              className={cn(
+                "flex items-center gap-2 shrink-0",
+                searchExpanded ? "overflow-hidden pointer-events-none" : "overflow-visible pointer-events-auto",
               )}
-
-              {isGuest && (
-                <Link
-                  href="/auth/login"
-                  className={cn(
-                    "inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5",
-                    "text-[color:var(--text-primary)] hover:text-[color:var(--text-secondary)]",
-                    "whitespace-nowrap transition-colors duration-200",
-                    "glass-floating",
-                  )}
-                >
-                  <AppIcon icon={LogIn} />
-                  <span className="hidden sm:inline">Iniciar sesión</span>
-                </Link>
-              )}
-
-              {isAuthenticated && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setUserMenuOpen((prev) => !prev);
-                    }}
+            >
+                  {/* Theme toggler */}
+                  <AnimatedThemeToggler
                     className={cn(
-                      "inline-flex h-10 items-center gap-2 rounded-full pl-1 pr-3 transition-all duration-200",
-                      "glass-floating",
-                      userMenuOpen
-                        ? "bg-[var(--surface-3)] border border-[var(--app-primary)]/30 shadow-[var(--shadow-sm)]"
-                        : "hover:bg-[var(--surface-2)]",
+                      "dashboard-focusable inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2",
+                      "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] hover:bg-[var(--surface-2)] focus-visible:ring-[color:var(--app-primary)] transition-colors duration-200",
                     )}
-                    aria-label="Menú de usuario"
-                    aria-expanded={userMenuOpen}
-                  >
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--app-primary)] text-white text-[0.65rem] font-bold tracking-wider shrink-0">
-                      {getUserInitials()}
-                    </span>
-                    <span className="text-[0.8rem] font-semibold text-[var(--text-primary)] hidden sm:inline truncate max-w-[120px]">
-                      {session.user.name.split(" ")[0]}
-                    </span>
-                  </button>
+                    aria-label="Cambiar tema"
+                  />
 
-                  {/* User dropdown menu */}
-                  {userMenuOpen && (
-                    <div
-                      className={cn(
-                        "absolute right-0 top-full mt-2 w-56 rounded-[var(--radius-lg)] overflow-hidden z-[800]",
-                        "bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-lg)]",
-                        "animate-in fade-in slide-in-from-top-2 duration-200",
-                      )}
-                    >
-                      <div className="px-4 py-3 border-b border-[var(--border-strong)]">
-                        <p className="text-[0.82rem] font-semibold text-[var(--text-primary)] truncate">
-                          {session.user.name}
-                        </p>
-                        <p className="text-[0.72rem] text-[var(--text-muted)] truncate mt-0.5">
-                          {session.user.email}
-                        </p>
-                      </div>
-
-                      <div className="p-1.5">
-                        {session.user.role === "business_owner" && !session.onboardingPending && (
-                          <Link
-                            href="/dashboard"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors"
-                          >
-                            <LayoutDashboard className="h-4 w-4" />
-                            Mi panel
-                          </Link>
-                        )}
-
-                        {session.user.role === "business_owner" && session.onboardingPending && (
-                          <Link
-                            href="/onboarding/business"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--color-pending)] hover:bg-[color-mix(in_oklab,var(--color-pending)_8%,transparent)] transition-colors"
-                          >
-                            <UserRoundCheck className="h-4 w-4" />
-                            Completar registro
-                          </Link>
-                        )}
-
-                        <Link
-                          href="/sucursales"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors"
-                        >
-                          <Store className="h-4 w-4" />
-                          Explorar sucursales
-                        </Link>
-
-                        <div className="my-1.5 h-px bg-[var(--border-strong)]" />
-
-                        <button
-                          type="button"
-                          onClick={handleLogout}
-                          className="flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--color-error)] hover:bg-[color-mix(in_oklab,var(--color-error)_8%,transparent)] transition-colors"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          Cerrar sesión
-                        </button>
-                      </div>
+                  {/* Profile Avatar / Login Button */}
+                  {isLoading && (
+                    <div className="inline-flex min-h-10 w-10 items-center justify-center">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--app-primary)]" />
                     </div>
                   )}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </div>
-      </header>
-    </>
-  );
-}
+
+                  {isGuest && (
+                    <Link
+                      href="/auth/login"
+                      className={cn(
+                        "inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium",
+                        "text-[color:var(--text-primary)] hover:text-[color:var(--text-secondary)] hover:bg-[var(--surface-2)]",
+                        "whitespace-nowrap transition-colors duration-200 border border-transparent",
+                      )}
+                    >
+                      <AppIcon icon={LogIn} size="sm" />
+                      <span className="hidden sm:inline">Iniciar sesión</span>
+                    </Link>
+                  )}
+
+                  {isAuthenticated && (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setUserMenuOpen((prev) => !prev);
+                        }}
+                        className={cn(
+                          "inline-flex h-10 items-center gap-2 rounded-full pl-1 pr-3 transition-all duration-200 border cursor-pointer select-none",
+                          userMenuOpen
+                            ? "bg-[var(--surface-3)] border-[var(--border-strong)]"
+                            : "bg-transparent border-transparent hover:bg-[var(--surface-2)]",
+                        )}
+                        aria-label="Menú de usuario"
+                        aria-expanded={userMenuOpen}
+                      >
+                        <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--app-primary)] text-white text-[0.65rem] font-bold tracking-wider shrink-0">
+                          {getUserInitials()}
+                        </span>
+                        <span className="text-[0.8rem] font-semibold text-[var(--text-primary)] hidden sm:inline truncate max-w-[120px]">
+                          {session.user.name.split(" ")[0]}
+                        </span>
+                      </button>
+
+                      {/* User dropdown menu */}
+                      <AnimatePresence>
+                        {userMenuOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+                            className={cn(
+                              "absolute right-0 top-full mt-2 w-56 rounded-[var(--radius-lg)] overflow-hidden z-[800]",
+                              "bg-[var(--surface-3)] border border-[var(--border-strong)] shadow-[var(--shadow-lg)]",
+                            )}
+                          >
+                            <div className="px-4 py-3 border-b border-[var(--border-strong)]">
+                              <p className="text-[0.82rem] font-semibold text-[var(--text-primary)] truncate">
+                                {session.user.name}
+                              </p>
+                              <p className="text-[0.72rem] text-[var(--text-muted)] truncate mt-0.5">
+                                {session.user.email}
+                              </p>
+                            </div>
+
+                            <div className="p-1.5">
+                              {session.user.role === "business_owner" && !session.onboardingPending && (
+                                <Link
+                                  href="/dashboard"
+                                  onClick={() => setUserMenuOpen(false)}
+                                  className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors"
+                                >
+                                  <LayoutDashboard className="h-4 w-4" />
+                                  Mi panel
+                                </Link>
+                              )}
+
+                              {session.user.role === "business_owner" && session.onboardingPending && (
+                                <Link
+                                  href="/onboarding/business"
+                                  onClick={() => setUserMenuOpen(false)}
+                                  className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--color-pending)] hover:bg-[color-mix(in_oklab,var(--color-pending)_8%,transparent)] transition-colors"
+                                >
+                                  <UserRoundCheck className="h-4 w-4" />
+                                  Completar registro
+                                </Link>
+                              )}
+
+                              <Link
+                                href="/sucursales"
+                                onClick={() => setUserMenuOpen(false)}
+                                className="flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors"
+                              >
+                                <Store className="h-4 w-4" />
+                                Explorar sucursales
+                              </Link>
+
+                              <div className="my-1.5 h-px bg-[var(--border-strong)]" />
+
+                              <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-2 text-[0.8rem] font-medium text-[var(--color-error)] hover:bg-[color-mix(in_oklab,var(--color-error)_8%,transparent)] transition-colors cursor-pointer"
+                              >
+                                <LogOut className="h-4 w-4" />
+                                Cerrar sesión
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+            </motion.div>
+            </motion.div>
+          </div>
+        </header>
+      </>
+    );
+  }
