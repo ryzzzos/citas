@@ -1,18 +1,20 @@
 /* eslint-disable react-hooks/refs */
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { DateTime } from "luxon";
-import { Clock, User, Check, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2, Wallet, Banknote, CreditCard, ArrowLeftRight, ChevronDown } from "lucide-react";
+import { Clock, User, Check, Phone, Mail, MessageSquare, ChevronRight, CheckCircle2, Wallet, Banknote, CreditCard, ArrowLeftRight, ChevronDown, CalendarOff, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { AgendaBooking, AgendaDayColumn } from "@/lib/agenda/types";
+import type { AgendaBooking, AgendaDayColumn, AgendaScheduleBlock } from "@/lib/agenda/types";
 import type { PaymentMethod } from "@/lib/api/bookings";
 import type { Staff } from "@/types";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import BookingTimeline from "./BookingTimeline";
+import ScheduleBlockDetailModal from "./ScheduleBlockDetailModal";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 
 interface AgendaTimelineProps {
   columns: AgendaDayColumn[];
   bookingsByDay: Record<string, AgendaBooking[]>;
+  blocksByDay?: Record<string, AgendaScheduleBlock[]>;
   timelineSlots: string[];
   staff: Staff[];
   onConfirm: (bookingId: string) => void;
@@ -23,37 +25,41 @@ interface AgendaTimelineProps {
     status: "pending" | "confirmed" | "cancelled" | "completed"
   ) => void;
   onPaymentRegister?: (bookingId: string, method: PaymentMethod) => void;
+  onSelectSlot?: (data: { date: string; hour: number; startTime: string; endTime: string; isAllDay?: boolean }) => void;
+  onOpenCreateBlock?: (data: { date: string; startTime: string; endTime: string; isAllDay?: boolean }) => void;
+  onDeleteBlock?: (blockId: string) => Promise<void>;
   initialBookingId?: string | null;
 }
+
 
 const PX_PER_MINUTE_DESKTOP = 2.0;
 const PX_PER_MINUTE_MOBILE = 1.2;
 
 interface DragState {
-booking: AgendaBooking;
-initialX: number;
-initialY: number;
-currentX: number;
-currentY: number;
-top: number;
-height: number;
-isDragging: boolean;
-targetDate: string;
-targetTime: string;
+  booking: AgendaBooking;
+  initialX: number;
+  initialY: number;
+  currentX: number;
+  currentY: number;
+  top: number;
+  height: number;
+  isDragging: boolean;
+  targetDate: string;
+  targetTime: string;
 }
 
 interface PositionedBooking {
-booking: AgendaBooking;
-lane: number;
-laneCount: number;
-top: number;
-height: number;
+  booking: AgendaBooking;
+  lane: number;
+  laneCount: number;
+  top: number;
+  height: number;
 }
 
 function toMinutes(booking: AgendaBooking): { start: number; end: number } {
-const start = booking.startAt.hour * 60 + booking.startAt.minute;
-const end = booking.endAt.hour * 60 + booking.endAt.minute;
-return { start, end: Math.max(end, start + 15) };
+  const start = booking.startAt.hour * 60 + booking.startAt.minute;
+  const end = booking.endAt.hour * 60 + booking.endAt.minute;
+  return { start, end: Math.max(end, start + 15) };
 }
 
 /** PX_PER_MINUTE gutter size constants for responsive grid */
@@ -61,214 +67,210 @@ const GUTTER_MOBILE = 48;
 const GUTTER_DESKTOP = 92;
 
 function layoutDayBookings(bookings: AgendaBooking[], pxPerMin: number): PositionedBooking[] {
-const sorted = [...bookings].sort((a, b) => a.startAt.toMillis() - b.startAt.toMillis());
-const laneById = new Map<string, number>();
-const active: Array<{ bookingId: string; end: number; lane: number }> = [];
+  const sorted = [...bookings].sort((a, b) => a.startAt.toMillis() - b.startAt.toMillis());
+  const laneById = new Map<string, number>();
+  const active: Array<{ bookingId: string; end: number; lane: number }> = [];
 
-for (const booking of sorted) {
-const { start, end } = toMinutes(booking);
+  for (const booking of sorted) {
+    const { start, end } = toMinutes(booking);
 
-for (let index = active.length - 1; index >= 0; index -= 1) {
-if (active[index].end <= start) {
-active.splice(index, 1);
-}
-}
+    for (let index = active.length - 1; index >= 0; index -= 1) {
+      if (active[index].end <= start) {
+        active.splice(index, 1);
+      }
+    }
 
-const usedLanes = new Set(active.map((item) => item.lane));
-let lane = 0;
-while (usedLanes.has(lane)) {
-lane += 1;
-}
+    const usedLanes = new Set(active.map((item) => item.lane));
+    let lane = 0;
+    while (usedLanes.has(lane)) {
+      lane += 1;
+    }
 
-laneById.set(booking.id, lane);
-active.push({ bookingId: booking.id, end, lane });
-}
+    laneById.set(booking.id, lane);
+    active.push({ bookingId: booking.id, end, lane });
+  }
 
-return sorted.map((booking) => {
-const bTime = toMinutes(booking);
-const lane = laneById.get(booking.id) ?? 0;
+  return sorted.map((booking) => {
+    const bTime = toMinutes(booking);
+    const lane = laneById.get(booking.id) ?? 0;
 
-let laneCount = 1;
-for (const candidate of sorted) {
-const other = toMinutes(candidate);
-const overlaps = bTime.start < other.end && other.start < bTime.end;
-if (!overlaps) continue;
+    let laneCount = 1;
+    for (const candidate of sorted) {
+      const other = toMinutes(candidate);
+      const overlaps = bTime.start < other.end && other.start < bTime.end;
+      if (!overlaps) continue;
 
-const candidateLane = laneById.get(candidate.id) ?? 0;
-laneCount = Math.max(laneCount, candidateLane + 1);
-}
+      const candidateLane = laneById.get(candidate.id) ?? 0;
+      laneCount = Math.max(laneCount, candidateLane + 1);
+    }
 
-return {
-booking,
-lane,
-laneCount,
-top: (bTime.start - 6 * 60) * pxPerMin,                                                       
-height: Math.max(30, (bTime.end - bTime.start) * pxPerMin),
-};
-});
+    return {
+      booking,
+      lane,
+      laneCount,
+      top: (bTime.start - 6 * 60) * pxPerMin,
+      height: Math.max(30, (bTime.end - bTime.start) * pxPerMin),
+    };
+  });
 }
 
 /* ── Status → CSS variable name mapping ────────────────────────── */
 const STATUS_VAR: Record<string, string> = {
-pending: "--color-pending",
-confirmed: "--color-info",
-completed: "--color-success",
-cancelled: "--color-error",
+  pending: "--color-pending",
+  confirmed: "--color-info",
+  completed: "--color-success",
+  cancelled: "--color-error",
 };
 
 const STATUS_LABEL: Record<string, string> = {
-pending: "Pendiente",
-confirmed: "Confirmada",
-completed: "Completada",
-cancelled: "Cancelada",
+  pending: "Pendiente",
+  confirmed: "Confirmada",
+  completed: "Completada",
+  cancelled: "Cancelada",
 };
 
 function renderEventBlock(
-item: PositionedBooking,
-onSelect: (booking: AgendaBooking) => void,
-isWeekly = false,
-activeDrag: DragState | null = null,
-onPointerDown?: (
-e: React.PointerEvent<HTMLElement>,
-item: PositionedBooking,
-originalDate: string
-) => void
+  item: PositionedBooking,
+  onSelect: (booking: AgendaBooking) => void,
+  isWeekly = false,
+  activeDrag: DragState | null = null,
+  onPointerDown?: (
+    e: React.PointerEvent<HTMLElement>,
+    item: PositionedBooking,
+    originalDate: string
+  ) => void
 ) {
-const widthPercent = 100 / item.laneCount;
-const leftPercent = item.lane * widthPercent;
-const booking = item.booking;
-const statusVar = STATUS_VAR[booking.status] ?? "--color-pending";
+  const widthPercent = 100 / item.laneCount;
+  const leftPercent = item.lane * widthPercent;
+  const booking = item.booking;
+  const statusVar = STATUS_VAR[booking.status] ?? "--color-pending";
 
-/* Density tiers */
-const isCompact = item.height < 45;
-const isMedium = item.height >= 45 && item.height < 90;
-const isLarge = item.height >= 90;
+  /* Density tiers */
+  const isCompact = item.height < 45;
+  const isMedium = item.height >= 45 && item.height < 90;
+  const isLarge = item.height >= 90;
 
-const isThisDragging = activeDrag && activeDrag.booking.id === booking.id && activeDrag.isDragging;
+  const isThisDragging = activeDrag && activeDrag.booking.id === booking.id && activeDrag.isDragging;
 
-return (
-<article
-key={booking.id}
-onPointerDown={onPointerDown ? (e) => onPointerDown(e, item, booking.booking_date) : undefined}
-onClick={onPointerDown ? undefined : () => onSelect(booking)}
-className={`absolute group/card overflow-hidden select-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-onPointerDown ? (isThisDragging ? "z-50 duration-0 cursor-grabbing" : "cursor-grab hover:z-20") : "cursor-pointer hover:z-20"
-}`}
-style={{
-top: item.top,
-height: item.height,
-left: `calc(${leftPercent}% + 3px)`,
-width: `calc(${widthPercent}% - 6px)`,
-opacity: isThisDragging ? 0.65 : 1,
-transform: isThisDragging
-? `translate(${activeDrag.currentX - activeDrag.initialX}px, ${activeDrag.currentY - activeDrag.initialY}px) scale(1.025)`
-: undefined,
-boxShadow: isThisDragging ? "var(--shadow-lg)" : undefined,
-touchAction: onPointerDown ? "none" : undefined,
-}}
-role="article"
-aria-label={`${booking.serviceName} ${booking.startAt.toFormat("HH:mm")} a ${booking.endAt.toFormat("HH:mm")}`}
->
-{/* ── Card shell with status-tinted background ── */}
-<div
-className="relative flex h-full flex-col overflow-hidden rounded-[var(--radius-xs)] border transition-all duration-300 bg-[color-mix(in_srgb,var(--status-color)_6%,var(--surface-3))] hover:bg-[color-mix(in_srgb,var(--status-color)_15%,var(--surface-3))] border-[color-mix(in_srgb,var(--status-color)_25%,var(--border-soft))] hover:border-[color-mix(in_srgb,var(--status-color)_65%,var(--border-strong))]"
-style={{
-  '--status-color': `var(${statusVar})`,
-  boxShadow: `0 1px 3px -1px color-mix(in srgb, var(${statusVar}) 15%, transparent), 0 1px 2px -1px rgba(0,0,0,0.04)`,
-} as React.CSSProperties}
->
-{/* ── Top accent gradient line ── */}
-<div
-className="absolute inset-x-0 top-0 h-[2.5px] opacity-90"
-style={{
-background: `linear-gradient(90deg, var(${statusVar}), color-mix(in srgb, var(${statusVar}) 40%, var(--surface-3)))`,
-}}
-aria-hidden="true"
-/>
+  return (
+    <article
+      key={booking.id}
+      onPointerDown={onPointerDown ? (e) => onPointerDown(e, item, booking.booking_date) : undefined}
+      onClick={onPointerDown ? undefined : () => onSelect(booking)}
+      className={`absolute z-20 group/card overflow-hidden select-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        onPointerDown ? (isThisDragging ? "!z-50 duration-0 cursor-grabbing" : "cursor-grab hover:z-30") : "cursor-pointer hover:z-30"
+      }`}
+      style={{
+        top: item.top,
+        height: item.height,
+        left: `calc(${leftPercent}% + 3px)`,
+        width: `calc(${widthPercent}% - 6px)`,
+        opacity: isThisDragging ? 0.65 : 1,
+        transform: isThisDragging
+          ? `translate(${activeDrag.currentX - activeDrag.initialX}px, ${activeDrag.currentY - activeDrag.initialY}px) scale(1.025)`
+          : undefined,
+        boxShadow: isThisDragging ? "var(--shadow-lg)" : undefined,
+        touchAction: onPointerDown ? "none" : undefined,
+      }}
+      role="article"
+      aria-label={`${booking.serviceName} ${booking.startAt.toFormat("HH:mm")} a ${booking.endAt.toFormat("HH:mm")}`}
+    >
+      {/* ── Card shell with status-tinted background ── */}
+      <div
+        className="relative flex h-full flex-col overflow-hidden rounded-[var(--radius-xs)] border transition-all duration-300 bg-[color-mix(in_srgb,var(--status-color)_6%,var(--surface-3))] hover:bg-[color-mix(in_srgb,var(--status-color)_15%,var(--surface-3))] border-[color-mix(in_srgb,var(--status-color)_25%,var(--border-soft))] hover:border-[color-mix(in_srgb,var(--status-color)_65%,var(--border-strong))]"
+        style={{
+          '--status-color': `var(${statusVar})`,
+          boxShadow: `0 1px 3px -1px color-mix(in srgb, var(${statusVar}) 15%, transparent), 0 1px 2px -1px rgba(0,0,0,0.04)`,
+        } as React.CSSProperties}
+      >
+        {/* ── Top accent gradient line ── */}
+        <div
+          className="absolute inset-x-0 top-0 h-[2.5px] opacity-90"
+          style={{
+            background: `linear-gradient(90deg, var(${statusVar}), color-mix(in srgb, var(${statusVar}) 40%, var(--surface-3)))`,
+          }}
+          aria-hidden="true"
+        />
 
-{/* ── Hover glow effect ── */}
-<div
-className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100"
-style={{
-boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(${statusVar}) 20%, transparent), 0 8px 24px -6px color-mix(in srgb, var(${statusVar}) 20%, transparent)`,
-}}
-aria-hidden="true"
-/>
+        {/* ── Hover glow effect ── */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100"
+          style={{
+            boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(${statusVar}) 20%, transparent), 0 8px 24px -6px color-mix(in srgb, var(${statusVar}) 20%, transparent)`,
+          }}
+          aria-hidden="true"
+        />
 
-{/* ═══════ COMPACT ═══════ */}
-{isCompact && (
-<div className="flex h-full items-center gap-1.5 px-2.5 pt-[3px]">
-<p className="min-w-0 flex-1 truncate text-[10.5px] font-semibold leading-none tracking-tight text-[var(--text-primary)]">
-{isWeekly ? booking.startAt.toFormat("HH:mm") : booking.serviceName}
-</p>
-{!isWeekly && (
-<span
-className="shrink-0 text-[9px] font-bold tabular-nums"
-style={{ color: `var(${statusVar})` }}
->
-{booking.startAt.toFormat("HH:mm")}
-</span>
-)}
-</div>
-)}
+        {/* ═══════ COMPACT ═══════ */}
+        {isCompact && (
+          <div className="flex h-full items-center gap-1.5 px-2.5 pt-[3px]">
+            <p className="min-w-0 flex-1 truncate text-[10.5px] font-semibold leading-none tracking-tight text-[var(--text-primary)]">
+              {isWeekly ? booking.startAt.toFormat("HH:mm") : booking.serviceName}
+            </p>
+            {!isWeekly && (
+              <span
+                className="shrink-0 text-[9px] font-bold tabular-nums"
+                style={{ color: `var(${statusVar})` }}
+              >
+                {booking.startAt.toFormat("HH:mm")}
+              </span>
+            )}
+          </div>
+        )}
 
-{/* ═══════ MEDIUM ═══════ */}
-{isMedium && (
-<div className={`flex h-full flex-col justify-between ${isWeekly ? "px-2 pb-1.5 pt-[5px]" : "px-3 pb-2 pt-[7px]"}`}>
-{/* Top row: time (weekly) or service + time (daily) */}
-<div className="flex items-start justify-between gap-1">
-<p className={`min-w-0 flex-1 truncate font-bold leading-tight tracking-tight text-[var(--text-primary)] ${isWeekly ? "text-[10px]" : "text-[12px]"}`}>
-{isWeekly ? booking.startAt.toFormat("HH:mm") : booking.serviceName}
-</p>
-{!isWeekly && (
-<span className="shrink-0 rounded-md px-1.5 py-0.5 text-[8.5px] font-bold tabular-nums"
-style={{
-backgroundColor: `color-mix(in srgb, var(${statusVar}) 10%, var(--surface-3))`,
-color: `var(${statusVar})`,
-}}
->
-{booking.startAt.toFormat("HH:mm")}
-</span>
-)}
-</div>
+        {/* ═══════ MEDIUM ═══════ */}
+        {isMedium && (
+          <div className={`flex h-full flex-col justify-between ${isWeekly ? "px-2 pb-1.5 pt-[5px]" : "px-3 pb-2 pt-[7px]"}`}>
+            {/* Top row: time (weekly) or service + time (daily) */}
+            <div className="flex items-start justify-between gap-1">
+              <p className={`min-w-0 flex-1 truncate font-bold leading-tight tracking-tight text-[var(--text-primary)] ${isWeekly ? "text-[10px]" : "text-[12px]"}`}>
+                {isWeekly ? booking.startAt.toFormat("HH:mm") : booking.serviceName}
+              </p>
+              {!isWeekly && (
+                <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[8.5px] font-bold tabular-nums"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, var(${statusVar}) 10%, var(--surface-3))`,
+                    color: `var(${statusVar})`,
+                  }}
+                >
+                  {booking.startAt.toFormat("HH:mm")}
+                </span>
+              )}
+            </div>
 
-{/* Bottom row */}
-<div className="flex items-center gap-1 mt-auto">
-{isWeekly ? (
-<p className="min-w-0 flex-1 truncate text-[9px] font-medium text-[var(--text-secondary)]">
-{booking.serviceName}
-</p>
-) : (
-<>
-{/* Mini avatar */}
-<div
-className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[7.5px] font-bold uppercase"
-style={{
-backgroundColor: `color-mix(in srgb, var(${statusVar}) 14%, var(--surface-2))`,
-color: `var(${statusVar})`,
-}}
->
-{(booking.customer_name ?? "C").charAt(0)}
-</div>
-<span className="min-w-0 flex-1 truncate text-[10px] font-medium text-[var(--text-secondary)]">
-{booking.customer_name ?? "Cliente"}
-</span>
-<span className="min-w-0 flex-1 truncate text-[10px] font-medium text-[var(--text-secondary)]">
-{booking.customer_name ?? "Cliente"}
-</span>
-<span className="hidden sm:inline shrink-0 truncate text-[9px] font-medium text-[var(--text-muted)] max-w-[35%]">
-{booking.staffName}
-</span>
-</>
-)}
-</div>
-</div>
-)}
+            {/* Bottom row */}
+            <div className="flex items-center gap-1 mt-auto">
+              {isWeekly ? (
+                <p className="min-w-0 flex-1 truncate text-[9px] font-medium text-[var(--text-secondary)]">
+                  {booking.serviceName}
+                </p>
+              ) : (
+                <>
+                  {/* Mini avatar */}
+                  <div
+                    className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[7.5px] font-bold uppercase"
+                    style={{
+                      backgroundColor: `color-mix(in srgb, var(${statusVar}) 14%, var(--surface-2))`,
+                      color: `var(${statusVar})`,
+                    }}
+                  >
+                    {(booking.customer_name ?? "C").charAt(0)}
+                  </div>
+                  <span className="min-w-0 flex-1 truncate text-[10px] font-medium text-[var(--text-secondary)]">
+                    {booking.customer_name ?? "Cliente"}
+                  </span>
+                  <span className="hidden sm:inline shrink-0 truncate text-[9px] font-medium text-[var(--text-muted)] max-w-[35%]">
+                    {booking.staffName}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
-{/* ═══════ LARGE ═══════ */}
-{isLarge && (
-<div className={`flex h-full flex-col ${isWeekly ? "px-2 pb-2 pt-[5px]" : "px-3.5 pb-3.5 pt-[10px]"}`}>
-{/* Row 1: Time badge + Status pill */}
+        {/* ═══════ LARGE ═══════ */}
+        {isLarge && (
+          <div className={`flex h-full flex-col ${isWeekly ? "px-2 pb-2 pt-[5px]" : "px-3.5 pb-3.5 pt-[10px]"}`}>
 <div className="flex items-center justify-between gap-1">
 {isWeekly ? (
 <span
@@ -332,7 +334,7 @@ color: `var(${statusVar})`,
 {/* Staff row */}
 <div className="flex items-center gap-1.5 pl-0.5">
 <User className="h-3.5 w-3.5 shrink-0 text-[var(--text-muted)]" />
-<span className="truncate text-[9.5px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+<span className="truncate">
 {booking.staffName}
 </span>
 </div>
@@ -343,6 +345,64 @@ color: `var(${statusVar})`,
 </div>
 </article>
 );
+}
+
+function renderBlockCard(
+  block: AgendaScheduleBlock,
+  onSelect: (block: AgendaScheduleBlock) => void,
+  pxPerMin: number,
+  isWeekly: boolean
+) {
+  const startMinutes = block.isAllDay
+    ? 6 * 60
+    : block.startAt.hour * 60 + block.startAt.minute;
+  const endMinutes = block.isAllDay
+    ? 22 * 60
+    : block.endAt.hour * 60 + block.endAt.minute;
+
+  const top = (Math.max(6 * 60, startMinutes) - 6 * 60) * pxPerMin;
+  const height = Math.max(28, (Math.min(22 * 60, endMinutes) - Math.max(6 * 60, startMinutes)) * pxPerMin);
+
+  return (
+    <article
+      key={block.id + block.dateKey}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(block);
+      }}
+      className="absolute left-[3px] right-[3px] z-20 group/block overflow-hidden select-none cursor-pointer rounded-[var(--radius-xs)] transition-all duration-200 hover:z-30 hover:scale-[1.005]"
+      style={{
+        top,
+        height,
+      }}
+      role="button"
+      aria-label={`Bloqueo ${block.reason || "Indisponible"} ${block.isAllDay ? "Todo el día" : `${block.start_time} a ${block.end_time}`}`}
+    >
+      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[var(--radius-xs)] border border-[color-mix(in_srgb,var(--color-error)_40%,var(--border-strong))] hover:border-[var(--color-error)] bg-[repeating-linear-gradient(-45deg,color-mix(in_srgb,var(--color-error)_8%,var(--surface-3)),color-mix(in_srgb,var(--color-error)_8%,var(--surface-3))_8px,color-mix(in_srgb,var(--color-error)_16%,var(--surface-2))_8px,color-mix(in_srgb,var(--color-error)_16%,var(--surface-2))_16px)] p-1.5 sm:p-2 shadow-[var(--shadow-sm)]">
+        {/* Top line accent */}
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--color-error)] opacity-80" />
+
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1 min-w-0">
+            <CalendarOff className="h-3 w-3 text-[var(--color-error)] shrink-0" />
+            <span className="truncate text-[10px] sm:text-[11px] font-extrabold text-[var(--color-error)]">
+              {block.reason || "Bloqueado"}
+            </span>
+          </div>
+          <span className="shrink-0 text-[8px] sm:text-[9px] font-bold tabular-nums text-[var(--text-secondary)] bg-[var(--surface-3)]/90 px-1 py-0.5 rounded border border-[var(--border-soft)]">
+            {block.isAllDay ? "Todo el día" : `${block.start_time?.slice(0, 5)} - ${block.end_time?.slice(0, 5)}`}
+          </span>
+        </div>
+
+        {!isWeekly && height >= 45 && (
+          <div className="flex items-center gap-1 text-[9px] font-semibold text-[var(--text-muted)] truncate mt-auto">
+            <User className="h-2.5 w-2.5 shrink-0" />
+            <span className="truncate">{block.staff_name ? `Especialista: ${block.staff_name}` : "Toda la sede inhabilitada"}</span>
+          </div>
+        )}
+      </div>
+    </article>
+  );
 }
 
 function CurrentTimeLine({ pxPerMin }: { pxPerMin: number }) {
@@ -371,20 +431,27 @@ style={{ top }}
 export default function AgendaTimeline({
   columns,
   bookingsByDay,
+  blocksByDay,
   timelineSlots,
   staff,
   onConfirm,
   onCancel,
   onReschedule,
   onStatusUpdate,
-onPaymentRegister,
-initialBookingId,
+  onPaymentRegister,
+  onSelectSlot,
+  onOpenCreateBlock,
+  onDeleteBlock,
+  initialBookingId,
 }: AgendaTimelineProps) {
 const isDesktop = useMediaQuery("(min-width: 640px)");
 const pxPerMin = isDesktop ? PX_PER_MINUTE_DESKTOP : PX_PER_MINUTE_MOBILE;
 const gutter = isDesktop ? GUTTER_DESKTOP : GUTTER_MOBILE;
 
 const [selectedBooking, setSelectedBooking] = useState<AgendaBooking | null>(null);
+const [selectedBlock, setSelectedBlock] = useState<AgendaScheduleBlock | null>(null);
+const [hoveredSlot, setHoveredSlot] = useState<{ date: string; hour: number } | null>(null);
+
 const [drawerStatus, setDrawerStatus] = useState<AgendaBooking["status"] | null>(null);
 const [statusBeforeCancel, setStatusBeforeCancel] = useState<AgendaBooking["status"] | null>(null);
 const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -402,6 +469,50 @@ const [activeDrag, setActiveDrag] = useState<DragState | null>(null);
 const dragStateRef = useRef<DragState | null>(null);
 const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 const cleanupDragRef = useRef<(() => void) | null>(null);
+
+const handleColumnPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>, isoDate: string) => {
+  if (activeDrag && activeDrag.isDragging) {
+    setHoveredSlot(null);
+    return;
+  }
+
+  // If hovering over an existing event (booking or schedule block), suppress hover preview completely
+  const target = e.target as HTMLElement | null;
+  if (target && target.closest("article")) {
+    setHoveredSlot(null);
+    return;
+  }
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const offsetY = e.clientY - rect.top;
+  const hour = Math.min(21, Math.max(6, Math.floor(offsetY / (60 * pxPerMin)) + 6));
+  setHoveredSlot({ date: isoDate, hour });
+}, [activeDrag, pxPerMin]);
+
+const handleColumnPointerLeave = useCallback(() => {
+  setHoveredSlot(null);
+}, []);
+
+const handleColumnClick = useCallback((e: React.MouseEvent<HTMLDivElement>, isoDate: string) => {
+  const target = e.target as HTMLElement | null;
+  if (target && target.closest("article")) {
+    // Clicked on an existing booking or block card, do not trigger slot action
+    return;
+  }
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const offsetY = e.clientY - rect.top;
+  const hour = Math.min(21, Math.max(6, Math.floor(offsetY / (60 * pxPerMin)) + 6));
+  const startTime = `${String(hour).padStart(2, "0")}:00`;
+  const endTime = `${String(Math.min(22, hour + 1)).padStart(2, "0")}:00`;
+  const isAllDay = columns.length > 1;
+
+  if (onSelectSlot) {
+    onSelectSlot({ date: isoDate, hour, startTime, endTime, isAllDay });
+  } else if (onOpenCreateBlock) {
+    onOpenCreateBlock({ date: isoDate, startTime, endTime, isAllDay });
+  }
+}, [columns.length, onOpenCreateBlock, onSelectSlot, pxPerMin]);
 
 // Safety cleanup when component unmounts mid-drag
 useEffect(() => {
@@ -702,12 +813,49 @@ const positioned = layoutDayBookings(bookingsByDay[column.isoDate] ?? [], pxPerM
 return (
 <div
 key={column.isoDate}
-className="agenda-column relative overflow-hidden rounded-xl sm:rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)]"
+className="agenda-column relative overflow-hidden rounded-xl sm:rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-2)] shadow-[var(--shadow-sm)] cursor-pointer"
 data-column-date={column.isoDate}
 style={{ height: canvasHeight }}
 role="group"
 aria-label={`${column.dayLabel} ${column.dateLabel}`}
+onClick={(e) => handleColumnClick(e, column.isoDate)}
+onPointerMove={(e) => handleColumnPointerMove(e, column.isoDate)}
+onPointerLeave={handleColumnPointerLeave}
 >
+{/* Hover Slot Preview to Inhabilitar/Bloquear */}
+{hoveredSlot && hoveredSlot.date === column.isoDate && (!activeDrag || !activeDrag.isDragging) && (
+  columns.length === 1 ? (
+    /* Daily View: 1-hour horizontal highlight */
+    <div
+      className="pointer-events-none absolute left-[3px] right-[3px] z-0 flex items-center justify-between rounded-[var(--radius-xs)] border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)]/80 px-2.5 sm:px-3 text-[var(--text-primary)] shadow-[var(--shadow-sm)] transition-all duration-150"
+      style={{
+        top: (hoveredSlot.hour - 6) * 60 * pxPerMin,
+        height: 60 * pxPerMin,
+      }}
+    >
+      <div className="flex items-center gap-1.5 font-semibold text-[11px] sm:text-xs text-[var(--text-secondary)] min-w-0">
+        <Plus className="h-3.5 w-3.5 text-[var(--app-primary)] shrink-0" />
+        <span className="truncate">Gestionar horario</span>
+      </div>
+      <span className="shrink-0 text-[9px] sm:text-[10px] font-bold tabular-nums text-[var(--text-muted)] bg-[var(--surface-2)] px-1.5 py-0.5 rounded border border-[var(--border-soft)]">
+        {String(hoveredSlot.hour).padStart(2, "0")}:00 – {String(Math.min(22, hoveredSlot.hour + 1)).padStart(2, "0")}:00
+      </span>
+    </div>
+  ) : (
+    /* Weekly View: Full-day vertical highlight */
+    <div
+      className="pointer-events-none absolute inset-x-[2px] inset-y-0 z-0 flex flex-col justify-start rounded-xl sm:rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-3)]/25 p-1.5 sm:p-2 transition-all duration-150"
+    >
+      <div className="inline-flex w-full min-w-0 items-center justify-center gap-1 rounded-md bg-[var(--surface-3)]/95 border border-[var(--border-strong)] px-1.5 py-1 text-center shadow-[var(--shadow-sm)]">
+        <Plus className="h-3 w-3 text-[var(--app-primary)] shrink-0" />
+        <span className="truncate text-[9px] sm:text-[10.5px] font-bold text-[var(--text-secondary)] leading-tight">
+          Gestionar día
+        </span>
+      </div>
+    </div>
+  )
+)}
+
 {/* Snap Preview Shadow */}
 {activeDrag && activeDrag.isDragging && activeDrag.targetDate === column.isoDate && (
 <div
@@ -744,13 +892,19 @@ aria-hidden="true"
 
 {column.isToday && <CurrentTimeLine pxPerMin={pxPerMin} />}
 
-                        {positioned.map((item) => renderEventBlock(
-                          item,
-                          handleSelectBooking,
-                          columns.length > 1,
-                          activeDrag,
-                          handlePointerDown
-                        ))}
+{/* Render Schedule Blocks */}
+{(blocksByDay?.[column.isoDate] ?? []).map((block) =>
+  renderBlockCard(block, setSelectedBlock, pxPerMin, columns.length > 1)
+)}
+
+{/* Render Bookings */}
+{positioned.map((item) => renderEventBlock(
+  item,
+  handleSelectBooking,
+  columns.length > 1,
+  activeDrag,
+  handlePointerDown
+))}
 </div>
 );
 })}
@@ -1172,6 +1326,18 @@ Confirmar
 </>
 )}
 </AnimatePresence>
+
+{/* ── Schedule Block Detail & Unlock Modal ── */}
+<ScheduleBlockDetailModal
+  isOpen={selectedBlock !== null}
+  block={selectedBlock}
+  onClose={() => setSelectedBlock(null)}
+  onDelete={async (blockId) => {
+    if (onDeleteBlock) {
+      await onDeleteBlock(blockId);
+    }
+  }}
+/>
 </section>
 );
 }

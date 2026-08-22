@@ -39,6 +39,7 @@ class Business(Base):
     services = relationship("Service", back_populates="business", lazy="select")
     staff = relationship("Staff", back_populates="business", lazy="select")
     schedules = relationship("Schedule", back_populates="business", lazy="select")
+    schedule_blocks = relationship("ScheduleBlock", back_populates="business", lazy="select")
     bookings = relationship("Booking", back_populates="business", lazy="select")
 
     # Backward compatibility properties for BusinessRead schema

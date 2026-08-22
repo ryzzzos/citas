@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getMyBusiness } from "@/lib/api/businesses";
 import { businessAgenda } from "@/lib/api/bookings";
+import { listScheduleBlocks } from "@/lib/api/scheduleBlocks";
 import { listServices } from "@/lib/api/services";
 import { listStaff } from "@/lib/api/staff";
-import type { Booking, Service, Staff } from "@/types";
+import type { Booking, ScheduleBlock, Service, Staff } from "@/types";
 import { useBranchContext } from "@/contexts/BranchContext";
+import { DateTime } from "luxon";
 
 import type { AgendaFilters, AgendaView } from "./types";
 
@@ -22,6 +23,7 @@ export interface UseAgendaDataOptions {
 
 interface UseAgendaDataState {
   bookings: Booking[];
+  scheduleBlocks: ScheduleBlock[];
   staff: Staff[];
   services: Service[];
   businessId: string | null;
@@ -39,6 +41,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
   const businessId = business?.id || null;
   const branchId = activeBranch?.id || null;
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [scheduleBlocks, setScheduleBlocks] = useState<ScheduleBlock[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +84,16 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     branchId,
   ]);
 
+  const fromDateStr = useMemo(() => {
+    if (!options.fromAtIso) return undefined;
+    return DateTime.fromISO(options.fromAtIso, { zone: options.timezone }).toISODate() ?? undefined;
+  }, [options.fromAtIso, options.timezone]);
+
+  const toDateStr = useMemo(() => {
+    if (!options.toAtIso) return undefined;
+    return DateTime.fromISO(options.toAtIso, { zone: options.timezone }).toISODate() ?? undefined;
+  }, [options.toAtIso, options.timezone]);
+
   const loadAgendaData = useCallback(async () => {
     if (!businessId) {
       return;
@@ -90,13 +103,20 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     setError(null);
 
     try {
-      const [bookingsResult, staffResult, servicesResult] = await Promise.all([
+      const [bookingsResult, blocksResult, staffResult, servicesResult] = await Promise.all([
         businessAgenda(businessId, bookingQuery),
+        listScheduleBlocks(businessId, {
+          branch_id: branchId || undefined,
+          from_date: fromDateStr,
+          to_date: toDateStr,
+          staff_id: options.filters.staffId === "all" ? undefined : options.filters.staffId,
+        }),
         listStaff(businessId, branchId || undefined),
         listServices(businessId),
       ]);
 
       setBookings(bookingsResult);
+      setScheduleBlocks(blocksResult);
       setStaff(staffResult);
       setServices(servicesResult);
     } catch {
@@ -104,7 +124,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     } finally {
       setLoading(false);
     }
-  }, [bookingQuery, businessId, branchId]);
+  }, [businessId, bookingQuery, branchId, fromDateStr, toDateStr, options.filters.staffId]);
 
   useEffect(() => {
     loadAgendaData();
@@ -112,6 +132,7 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
 
   return {
     bookings,
+    scheduleBlocks,
     staff,
     services,
     businessId,
@@ -120,3 +141,4 @@ export function useAgendaData(options: UseAgendaDataOptions): UseAgendaDataState
     reload: loadAgendaData,
   };
 }
+

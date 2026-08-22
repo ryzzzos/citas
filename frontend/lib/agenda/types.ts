@@ -1,6 +1,7 @@
 import type { DateTime } from "luxon";
+import type { Booking, BookingStatus, ScheduleBlock, Service, Staff } from "@/types";
 
-import type { Booking, BookingStatus, Service, Staff } from "@/types";
+
 
 export type AgendaView = "day" | "week" | "month";
 
@@ -26,8 +27,18 @@ export interface AgendaBooking extends Booking {
   isValidTime: boolean;
 }
 
+export interface AgendaScheduleBlock extends ScheduleBlock {
+  startAt: DateTime;
+  endAt: DateTime;
+  isAllDay: boolean;
+  isValidTime: boolean;
+  dateKey: string;
+}
+
 export interface AgendaDataSnapshot {
   bookings: Booking[];
+  scheduleBlocks: ScheduleBlock[];
   staff: Staff[];
   services: Service[];
 }
+

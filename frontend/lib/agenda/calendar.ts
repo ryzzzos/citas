@@ -103,3 +103,48 @@ export function formatViewLabel(anchorDate: DateTime, view: AgendaView): string 
 
   return anchorDate.toFormat("LLLL yyyy");
 }
+
+export function expandScheduleBlocksForRange(
+  blocks: import("@/types").ScheduleBlock[],
+  timezone: string,
+  fromIso: string,
+  toIso: string
+): import("./types").AgendaScheduleBlock[] {
+  const result: import("./types").AgendaScheduleBlock[] = [];
+  const fromDt = DateTime.fromISO(fromIso, { zone: timezone }).startOf("day");
+  const toDt = DateTime.fromISO(toIso, { zone: timezone }).endOf("day");
+
+  for (const block of blocks) {
+    const bStart = DateTime.fromISO(block.start_date, { zone: timezone }).startOf("day");
+    const bEnd = DateTime.fromISO(block.end_date, { zone: timezone }).startOf("day");
+
+    const effectiveStart = bStart < fromDt ? fromDt : bStart;
+    const effectiveEnd = bEnd > toDt ? toDt : bEnd;
+
+    let cursor = effectiveStart;
+    while (cursor <= effectiveEnd) {
+      const dateKey = cursor.toISODate() ?? "";
+      const isAllDay = !block.start_time || !block.end_time;
+      const startAt = isAllDay
+        ? DateTime.fromISO(`${dateKey}T06:00:00`, { zone: timezone })
+        : DateTime.fromISO(`${dateKey}T${block.start_time}`, { zone: timezone });
+      const endAt = isAllDay
+        ? DateTime.fromISO(`${dateKey}T22:00:00`, { zone: timezone })
+        : DateTime.fromISO(`${dateKey}T${block.end_time}`, { zone: timezone });
+
+      result.push({
+        ...block,
+        dateKey,
+        isAllDay,
+        startAt,
+        endAt,
+        isValidTime: startAt.isValid && endAt.isValid && endAt > startAt,
+      });
+
+      cursor = cursor.plus({ days: 1 });
+    }
+  }
+
+  return result;
+}
+

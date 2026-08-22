@@ -5,13 +5,16 @@ import { useSearchParams } from "next/navigation";
 import { sileo } from "sileo";
 import { DateTime } from "luxon";
 
-// import AgendaFiltersBar from "@/components/agenda/AgendaFiltersBar";
 import AgendaHeader from "@/components/agenda/AgendaHeader";
 import AgendaHorizontalDays from "@/components/agenda/AgendaHorizontalDays";
 import AgendaRightRail from "@/components/agenda/AgendaRightRail";
 import { AgendaErrorState, AgendaLoadingState } from "@/components/agenda/AgendaStates";
 import AgendaTimeline from "@/components/agenda/AgendaTimeline";
+import AgendaSlotActionModal from "@/components/agenda/AgendaSlotActionModal";
+import ManualBookingDrawer from "@/components/agenda/ManualBookingDrawer";
+import ScheduleBlockDrawer from "@/components/agenda/ScheduleBlockDrawer";
 import {
+  expandScheduleBlocksForRange,
   formatViewLabel,
   getAgendaDayColumns,
   getCanonicalTimezone,
@@ -21,11 +24,14 @@ import {
   shiftAnchorDate,
   toAgendaBooking,
 } from "@/lib/agenda/calendar";
-import type { AgendaBooking, AgendaFilters, AgendaView } from "@/lib/agenda/types";
+import type { AgendaBooking, AgendaFilters, AgendaScheduleBlock, AgendaView } from "@/lib/agenda/types";
 import { useAgendaData } from "@/lib/agenda/useAgendaData";
-import { updateBookingStatus, registerBookingPayment, rescheduleBooking } from "@/lib/api/bookings";
-import type { PaymentMethod } from "@/lib/api/bookings";
+import { updateBookingStatus, registerBookingPayment, rescheduleBooking, createBooking } from "@/lib/api/bookings";
+import { createScheduleBlock, deleteScheduleBlock } from "@/lib/api/scheduleBlocks";
+import type { CreateBookingInput, PaymentMethod } from "@/lib/api/bookings";
+import type { ScheduleBlockInput } from "@/types";
 import { useBranchContext } from "@/contexts/BranchContext";
+
 
 const DEFAULT_FILTERS: AgendaFilters = {
   status: "all",
@@ -44,7 +50,7 @@ function mapBookingsByDay(bookings: AgendaBooking[]): Record<string, AgendaBooki
 }
 
 export default function AgendaPage() {
-  const { business, setActiveBranch } = useBranchContext();
+  const { business, activeBranch, setActiveBranch } = useBranchContext();
   const timezone = useMemo(() => {
     return business?.timezone || getCanonicalTimezone();
   }, [business?.timezone]);
@@ -67,6 +73,33 @@ export default function AgendaPage() {
     }
     return getNowInTimezone(timezone);
   });
+
+  const [slotActionState, setSlotActionState] = useState<{
+    isOpen: boolean;
+    date: string;
+    hour?: number;
+    startTime?: string;
+    endTime?: string;
+    isAllDay?: boolean;
+  }>({ isOpen: false, date: "" });
+
+  const [manualBookingState, setManualBookingState] = useState<{
+    isOpen: boolean;
+    date?: string;
+    startTime?: string;
+    staffId?: string;
+  }>({ isOpen: false });
+
+  const [createBlockState, setCreateBlockState] = useState<{
+    isOpen: boolean;
+    date?: string;
+    startTime?: string;
+    endTime?: string;
+    staffId?: string;
+    isAllDay?: boolean;
+  }>({ isOpen: false });
+
+
 
   // Sync state during render if branchParam changes
   const [prevBranchParam, setPrevBranchParam] = useState<string | null>(null);
@@ -98,6 +131,7 @@ export default function AgendaPage() {
 
   const {
     bookings,
+    scheduleBlocks,
     staff,
     services,
     loading,
@@ -124,6 +158,23 @@ export default function AgendaPage() {
       .sort((a, b) => a.startAt.toMillis() - b.startAt.toMillis());
   }, [bookings, serviceById, staffById, timezone]);
 
+  const expandedBlocks = useMemo(() => {
+    return expandScheduleBlocksForRange(
+      scheduleBlocks,
+      timezone,
+      range.fromAt.toISODate() ?? "",
+      range.toAt.toISODate() ?? ""
+    );
+  }, [scheduleBlocks, timezone, range]);
+
+  const blocksByDay = useMemo(() => {
+    return expandedBlocks.reduce<Record<string, AgendaScheduleBlock[]>>((acc, block) => {
+      const current = acc[block.dateKey] ?? [];
+      acc[block.dateKey] = [...current, block];
+      return acc;
+    }, {});
+  }, [expandedBlocks]);
+
   const columns = useMemo(() => getAgendaDayColumns(anchorDate, view, timezone), [anchorDate, timezone, view]);
   const bookingsByDay = useMemo(() => mapBookingsByDay(enrichedBookings), [enrichedBookings]);
 
@@ -131,6 +182,109 @@ export default function AgendaPage() {
     const now = DateTime.now().setZone(timezone);
     return enrichedBookings.filter((booking) => booking.endAt >= now).slice(0, 4);
   }, [enrichedBookings, timezone]);
+
+  function handleSelectSlot(data: {
+    date: string;
+    hour: number;
+    startTime: string;
+    endTime: string;
+    isAllDay?: boolean;
+  }) {
+    setSlotActionState({
+      isOpen: true,
+      date: data.date,
+      hour: data.hour,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      isAllDay: data.isAllDay,
+    });
+  }
+
+  async function handleCreateManualBooking(input: CreateBookingInput) {
+    const promise = (async () => {
+      await createBooking(input);
+      await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("booking-updated"));
+      }
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Agendando cita manual..." },
+      success: {
+        title: "Cita agendada con éxito",
+        description: `Cita registrada para ${input.customer_name || "el cliente"}.`,
+      },
+      error: (err) => ({
+        title: "Error al agendar cita",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo.",
+      }),
+    });
+
+    try {
+      await promise;
+    } catch {
+      // Handled by toast
+    }
+  }
+
+  async function handleCreateBlock(input: ScheduleBlockInput) {
+    if (!business?.id) return;
+    const promise = (async () => {
+      await createScheduleBlock(business.id, input);
+      await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("schedule-blocks-updated"));
+      }
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Inhabilitando horario..." },
+      success: {
+        title: "Horario bloqueado con éxito",
+        description: "El periodo seleccionado ha quedado inhabilitado para reservas.",
+      },
+      error: (err) => ({
+        title: "Error al bloquear horario",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo.",
+      }),
+    });
+
+    try {
+      await promise;
+    } catch {
+      // Handled by toast
+    }
+  }
+
+  async function handleDeleteBlock(blockId: string) {
+    if (!business?.id) return;
+    const promise = (async () => {
+      await deleteScheduleBlock(business.id, blockId);
+      await reload();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("schedule-blocks-updated"));
+      }
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Liberando horario..." },
+      success: {
+        title: "Horario liberado con éxito",
+        description: "El periodo bloqueado está nuevamente disponible.",
+      },
+      error: (err) => ({
+        title: "Error al liberar horario",
+        description: err instanceof Error ? err.message : "Inténtalo de nuevo.",
+      }),
+    });
+
+    try {
+      await promise;
+    } catch {
+      // Handled by toast
+    }
+  }
 
   async function handleStatusUpdate(
     bookingId: string,
@@ -198,7 +352,6 @@ export default function AgendaPage() {
     }
   }
 
-
   async function handlePaymentRegister(bookingId: string, method: PaymentMethod) {
     const methodLabel = {
       cash: "Efectivo",
@@ -264,6 +417,7 @@ export default function AgendaPage() {
                 <AgendaTimeline
                   columns={columns}
                   bookingsByDay={bookingsByDay}
+                  blocksByDay={blocksByDay}
                   timelineSlots={timelineSlots}
                   staff={staff}
                   onConfirm={(bookingId) => handleStatusUpdate(bookingId, "confirmed")}
@@ -271,6 +425,8 @@ export default function AgendaPage() {
                   onStatusUpdate={handleStatusUpdate}
                   onPaymentRegister={handlePaymentRegister}
                   onReschedule={handleReschedule}
+                  onSelectSlot={handleSelectSlot}
+                  onDeleteBlock={handleDeleteBlock}
                   initialBookingId={initialBookingId}
                 />
               </div>
@@ -288,6 +444,64 @@ export default function AgendaPage() {
           </>
         )}
       </div>
+
+      {/* ── Slot Action Chooser Modal ── */}
+      <AgendaSlotActionModal
+        isOpen={slotActionState.isOpen}
+        onClose={() => setSlotActionState((prev) => ({ ...prev, isOpen: false }))}
+        date={slotActionState.date}
+        startTime={slotActionState.startTime}
+        endTime={slotActionState.endTime}
+        isAllDay={slotActionState.isAllDay}
+        onSelectManualBooking={() =>
+          setManualBookingState({
+            isOpen: true,
+            date: slotActionState.date,
+            startTime: slotActionState.startTime || "09:00",
+          })
+        }
+        onSelectBlockSchedule={() =>
+          setCreateBlockState({
+            isOpen: true,
+            date: slotActionState.date,
+            startTime: slotActionState.startTime,
+            endTime: slotActionState.endTime,
+            isAllDay: slotActionState.isAllDay,
+          })
+        }
+      />
+
+      {/* ── Manual Booking Creation Drawer ── */}
+      <ManualBookingDrawer
+        isOpen={manualBookingState.isOpen}
+        onClose={() => setManualBookingState((prev) => ({ ...prev, isOpen: false }))}
+        onSubmit={handleCreateManualBooking}
+        initialDate={manualBookingState.date}
+        initialStartTime={manualBookingState.startTime}
+        initialStaffId={manualBookingState.staffId}
+        staff={staff}
+        services={services}
+        businessId={business?.id ?? ""}
+        branchId={activeBranch?.id ?? ""}
+        branchName={activeBranch?.name}
+      />
+
+      {/* ── Create Schedule Block Drawer ── */}
+      <ScheduleBlockDrawer
+        isOpen={createBlockState.isOpen}
+        onClose={() => setCreateBlockState((prev) => ({ ...prev, isOpen: false }))}
+        onSubmit={handleCreateBlock}
+        initialDate={createBlockState.date}
+        initialStartTime={createBlockState.startTime}
+        initialEndTime={createBlockState.endTime}
+        initialStaffId={createBlockState.staffId}
+        initialIsAllDay={createBlockState.isAllDay}
+        staff={staff}
+        branchId={activeBranch?.id ?? ""}
+        branchName={activeBranch?.name}
+      />
     </div>
   );
 }
+
+

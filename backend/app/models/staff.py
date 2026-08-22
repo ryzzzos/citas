@@ -36,6 +36,7 @@ class Staff(Base):
     business = relationship("Business", back_populates="staff")
     branch = relationship("Branch", back_populates="staff")
     schedules = relationship("Schedule", back_populates="staff", lazy="select")
+    schedule_blocks = relationship("ScheduleBlock", back_populates="staff", lazy="select")
     bookings = relationship("Booking", back_populates="staff", lazy="select")
     services = relationship("Service", secondary=staff_services, back_populates="staff", lazy="select")
 

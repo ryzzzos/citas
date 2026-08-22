@@ -7,3 +7,5 @@ export * from "./staff";
 export * from "./schedules";
 export * from "./bookings";
 export * from "./branches";
+export * from "./scheduleBlocks";
+

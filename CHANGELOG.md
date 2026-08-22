@@ -6,6 +6,17 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.7] - 2026-08-22
+
+### Added
+- **Gestión de Bloqueos de Horario y Citas Manuales en Agenda**:
+  - Tabla y modelo `ScheduleBlock` con endpoints REST (`/schedule-blocks/`) para crear, listar y eliminar bloqueos temporales de agenda por sede o especialista.
+  - Actualización de `availability_service.py` y `booking_service.py` para sincronizar y respetar franjas bloqueadas en tiempo real.
+  - Drawer `ManualBookingDrawer.tsx` para agendamiento manual y presencial directo desde la vista de agenda.
+  - Drawer `ScheduleBlockDrawer.tsx` y modal `ScheduleBlockDetailModal.tsx` para creación y desbloqueo de espacios no disponibles.
+  - Modal contextual `AgendaSlotActionModal.tsx` al pulsar slots vacíos en la línea de tiempo de la agenda.
+  - Integración visual de franjas bloqueadas y slots interactivos en `AgendaTimeline.tsx` y `AgendaPage.tsx`.
+
 ## [0.5.6] - 2026-08-18
 
 ### Added

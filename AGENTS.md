@@ -70,6 +70,16 @@ agenda-web/
   - Nested child elements (cards inside a surface, badges, inputs, or compact cards in multi-column grids) MUST scale down to proportionally smaller radii (`rounded-[var(--radius-xl)]`, `rounded-[var(--radius-lg)]`, `rounded-[var(--radius-md)]`, or `rounded-[var(--radius-sm)]`).
   - Never force large radii (`rounded-[var(--radius-2xl)]`) on small inner elements or compact mobile items where the curvature becomes disproportionate to its dimensions or parent container.
 
+### Icon & Badge Design Standard (CRITICAL)
+
+- **NEVER use translucent or low-contrast icon badges** (such as `bg-[var(--app-primary)]/10 text-[var(--app-primary)]` or `bg-red-500/10 text-red-500`).
+- **ALWAYS style icon badges with solid or subtle gradient backgrounds and pure white icons**:
+  - Badge container: Solid token or rich gradient (e.g. `bg-[var(--app-primary)]`, `bg-[var(--color-info)]`, `bg-[var(--color-error)]`, `bg-[var(--color-success)]`, `bg-[var(--text-primary)]`, or `bg-[linear-gradient(135deg,var(--app-primary),color-mix(in_srgb,var(--app-primary)_80%,black))]`).
+  - Badge shape: Rounded (`rounded-full` or `rounded-[var(--radius-md)]`) with subtle elevation (`shadow-[var(--shadow-sm)]`).
+  - Icon color: **ALWAYS pure white (`text-white`)** (e.g. `<AppIcon icon={Icon} className="h-4 w-4 text-white" />` or `<CalendarPlus className="h-5 w-5 text-white" />`).
+  - Reference: See the KPI summary badges in `frontend/components/agenda/AgendaRightRail.tsx`.
+
+
 ### Modals, Drawers & Forms (Apple-Inspired Standard)
 
 - **Reference Implementation**: Use `frontend/components/business-profile/BusinessProfileEditorPage.tsx` as the gold standard for how drawers/modals must look and behave.

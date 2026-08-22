@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
-from app.routers import auth, users, businesses, branches, services, staff, schedules, bookings, service_categories, balance
+from app.routers import auth, users, businesses, branches, services, staff, schedules, schedule_blocks, bookings, service_categories, balance
 
 STORAGE_ROOT = Path(__file__).resolve().parent / "storage"
 STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
@@ -35,6 +35,7 @@ app.include_router(services.router, prefix="/api/v1/services", tags=["services"]
 app.include_router(service_categories.router, prefix="/api/v1/businesses/{business_id}/categories", tags=["service_categories"])
 app.include_router(staff.router, prefix="/api/v1/staff", tags=["staff"])
 app.include_router(schedules.router, prefix="/api/v1/schedules", tags=["schedules"])
+app.include_router(schedule_blocks.router, prefix="/api/v1/schedule-blocks", tags=["schedule_blocks"])
 app.include_router(bookings.router, prefix="/api/v1/bookings", tags=["bookings"])
 app.include_router(balance.router, prefix="/api/v1", tags=["balance"])
 if settings.app_env.strip().lower() != "production":

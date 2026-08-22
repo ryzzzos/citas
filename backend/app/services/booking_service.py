@@ -63,6 +63,29 @@ def create_booking(data: BookingCreate, user_id, db: Session) -> Booking:
             detail="Time slot is not available",
         )
 
+    # Schedule blocks conflict check (branch or staff time-offs / closures)
+    from sqlalchemy import or_
+    from app.models.schedule_block import ScheduleBlock
+    block_query = db.query(ScheduleBlock).filter(
+        ScheduleBlock.business_id == data.business_id,
+        ScheduleBlock.branch_id == data.branch_id,
+        ScheduleBlock.start_date <= data.booking_date,
+        ScheduleBlock.end_date >= data.booking_date,
+        or_(ScheduleBlock.staff_id == data.staff_id, ScheduleBlock.staff_id.is_(None)),
+    )
+    for b in block_query.all():
+        if b.start_time is None and b.end_time is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="El día seleccionado se encuentra bloqueado o inhabilitado para reservas.",
+            )
+        if b.start_time and b.end_time:
+            if _overlaps_any(data.start_time, end_time, [(b.start_time, b.end_time)]):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="El horario seleccionado se encuentra bloqueado o inhabilitado para reservas.",
+                )
+
     booking = Booking(
         user_id=user_id,
         business_id=data.business_id,
@@ -218,6 +241,29 @@ def reschedule_booking(
             status_code=status.HTTP_409_CONFLICT,
             detail="El horario seleccionado no está disponible debido a un conflicto de agenda con el personal.",
         )
+
+    # Schedule blocks conflict check (branch or staff time-offs / closures)
+    from sqlalchemy import or_
+    from app.models.schedule_block import ScheduleBlock
+    block_query = db.query(ScheduleBlock).filter(
+        ScheduleBlock.business_id == booking.business_id,
+        ScheduleBlock.branch_id == booking.branch_id,
+        ScheduleBlock.start_date <= data.booking_date,
+        ScheduleBlock.end_date >= data.booking_date,
+        or_(ScheduleBlock.staff_id == target_staff_id, ScheduleBlock.staff_id.is_(None)),
+    )
+    for b in block_query.all():
+        if b.start_time is None and b.end_time is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="El día seleccionado se encuentra bloqueado o inhabilitado para citas.",
+            )
+        if b.start_time and b.end_time:
+            if _overlaps_any(data.start_time, end_time, [(b.start_time, b.end_time)]):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="El horario seleccionado se encuentra bloqueado o inhabilitado para citas.",
+                )
 
     # Update date and times
     booking.booking_date = data.booking_date

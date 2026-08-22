@@ -5,7 +5,20 @@ from app.models.service_category import ServiceCategory
 from app.models.service import Service
 from app.models.staff import Staff
 from app.models.schedule import Schedule
+from app.models.schedule_block import ScheduleBlock
 from app.models.booking import Booking
 from app.models.payment import Payment
 
-__all__ = ["User", "Business", "Branch", "ServiceCategory", "Service", "Staff", "Schedule", "Booking", "Payment"]
+__all__ = [
+    "User",
+    "Business",
+    "Branch",
+    "ServiceCategory",
+    "Service",
+    "Staff",
+    "Schedule",
+    "ScheduleBlock",
+    "Booking",
+    "Payment",
+]
+

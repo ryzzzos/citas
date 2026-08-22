@@ -3,10 +3,12 @@ from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.models.booking import Booking
 from app.models.schedule import Schedule
+from app.models.schedule_block import ScheduleBlock
 from app.models.service import Service
 from app.models.staff import Staff
 from app.models.business import Business
@@ -34,6 +36,28 @@ def _get_staff_slots(
     if not schedule:
         return []
 
+    staff_obj = db.get(Staff, staff_id)
+    branch_id = staff_obj.branch_id if staff_obj else None
+
+    # Check schedule blocks (time-off, holidays, closures)
+    blocks_query = db.query(ScheduleBlock).filter(
+        ScheduleBlock.business_id == business_id,
+        ScheduleBlock.start_date <= target_date,
+        ScheduleBlock.end_date >= target_date,
+    )
+    if branch_id:
+        blocks_query = blocks_query.filter(ScheduleBlock.branch_id == branch_id)
+
+    blocks_query = blocks_query.filter(
+        or_(ScheduleBlock.staff_id == staff_id, ScheduleBlock.staff_id.is_(None))
+    )
+    blocks = blocks_query.all()
+
+    # If any block is full-day (no specific times), the entire day is unavailable
+    for b in blocks:
+        if b.start_time is None and b.end_time is None:
+            return []
+
     existing_bookings = (
         db.query(Booking)
         .filter(
@@ -45,6 +69,9 @@ def _get_staff_slots(
     )
 
     busy_intervals = [(b.start_time, b.end_time) for b in existing_bookings]
+    for b in blocks:
+        if b.start_time and b.end_time:
+            busy_intervals.append((b.start_time, b.end_time))
 
     slots: list[time] = []
     duration = timedelta(minutes=service.duration_minutes)
