@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.8] - 2026-08-25
+
+### Added
+- **CI/CD para Migraciones Automatizadas en Supabase (GitHub Actions)**:
+  - Workflow automatizado `.github/workflows/database-migration.yml` para aplicar migraciones de Alembic en Supabase al hacer push a `main` cuando se modifican modelos o scripts de migración.
+  - Soporte de ejecución manual vía `workflow_dispatch` con acciones para aplicar cambios (`upgrade_head`), inspeccionar el estado actual (`show_current`) o consultar el historial (`show_history`).
+  - Verificación de secreto de producción (`PROD_DATABASE_URL`) y reportes de estado antes y después de cada migración.
+
 ## [0.5.7] - 2026-08-22
 
 ### Added

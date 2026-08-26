@@ -1,0 +1,95 @@
+name: Database Migrations (Supabase)
+
+on:
+  # 1. Ejecución manual desde la pestaña 'Actions' en GitHub
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Acción a ejecutar en la BD'
+        required: true
+        default: 'upgrade_head'
+        type: choice
+        options:
+          - upgrade_head       # Aplica todas las migraciones pendientes
+          - show_current       # Muestra la versión actual de la BD sin modificar nada
+          - show_history       # Muestra el historial de migraciones
+  
+  # 2. Ejecución automática solo cuando se modifiquen modelos o migraciones en 'main'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/alembic/**'
+      - 'backend/app/models/**'
+      - '.github/workflows/database-migration.yml'
+
+jobs:
+  migrate:
+    name: Ejecutar Migración Segura en Supabase
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar dependencias del backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validar Secreto de Base de Datos
+        run: |
+          if [ -z "${{ secrets.PROD_DATABASE_URL }}" ]; then
+            echo "ERROR CRÍTICO: El secreto 'PROD_DATABASE_URL' no está configurado en GitHub Secrets."
+            echo "Ve a Settings > Secrets and variables > Actions y crea 'PROD_DATABASE_URL' con tu URL de Supabase."
+            exit 1
+          fi
+          echo "Secreto PROD_DATABASE_URL detectado correctamente."
+
+      - name: Inspeccionar versión actual de la BD
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Versión actual en Supabase antes de aplicar cambios:"
+          alembic current || true
+
+      - name: Aplicar Migraciones (upgrade head)
+        if: "${{ github.event_name == 'push' || github.event.inputs.action == 'upgrade_head' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Aplicando migraciones pendientes en Supabase..."
+          alembic upgrade head
+          echo "¡Migración completada con éxito!"
+
+      - name: Mostrar Historial de Migraciones
+        if: "${{ github.event.inputs.action == 'show_history' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          alembic history --verbose
+
+      - name: Resumen final
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Estado final de la base de datos:"
+          alembic current
