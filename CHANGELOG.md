@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.10] - 2026-09-12
+
+### Added
+- **Interactividad Directa y Priorización en Clústeres de Mapa**:
+  - Selección individual y apertura directa de sucursal haciendo clic sobre cualquier avatar/burbuja dentro de un clúster sin requerir zoom forzado (`SucursalesMapMarkers.tsx`).
+  - Priorización automática de la sucursal seleccionada en el grupo de avatares visibles con efecto de realce y mayor elevación.
+  - Accesibilidad mejorada con roles interactivos (`role="button"`), etiquetas ARIA y títulos descriptivos en cada burbuja.
+
 ## [0.5.9] - 2026-09-12
 
 ### Added
