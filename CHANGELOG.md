@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.12] - 2026-09-12
+
+### Added
+- **Sincronización de Datos y Almacenamiento a Supabase Producción**:
+  - Script automatizado `backend/scripts/sync_data_to_supabase.py` para sincronizar negocios, sedes, servicios, horarios e imágenes a Supabase Storage.
+  - Script SQL idempotente `backend/scripts/supabase_production_seed.sql` generado con URLs públicas permanentes de Supabase Storage.
+  - Nueva acción `sync_seed_data` en GitHub Actions (`.github/workflows/database-migration.yml`) para sincronizar datos bajo demanda en producción.
+
 ## [0.5.11] - 2026-09-12
 
 ### Added
