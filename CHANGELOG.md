@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.11] - 2026-09-12
+
+### Added
+- **Limpieza Automática de Pruebas de Humo y Script de Purga**:
+  - Teardown obligatorio en `test_predeploy_smoke.py` que elimina instantáneamente registros y archivos generados durante la ejecución de pruebas.
+  - Script utilitario `backend/scripts/clean_smoke_test_data.py` para purgar datos residuales históricos en orden topológico (con soporte `--dry-run` y conexión a Supabase).
+  - Nueva acción manual `purge_smoke_data` añadida en el flujo de GitHub Actions `.github/workflows/database-migration.yml`.
+
 ## [0.5.10] - 2026-09-12
 
 ### Added

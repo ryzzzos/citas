@@ -9,239 +9,353 @@ Validates Items 55-60:
 - Item 60: Alembic migration status
 """
 
+import concurrent.futures
+import shutil
 import sys
 import uuid
 from datetime import date, time, timedelta
+from pathlib import Path
 
 from fastapi.testclient import TestClient
+from sqlalchemy import or_
 
 from main import app
 from app.core.config import settings
 
 client = TestClient(app)
 
+
+def _teardown_smoke_resources(unique_suffix: str, business_ids: list[str], user_ids: list[str]):
+    """
+    Guaranteed teardown for smoke test data.
+    Safely purges any records created during this test run in strict foreign-key order.
+    """
+    from app.core.deps import get_db
+    from app.models.booking import Booking
+    from app.models.branch import Branch
+    from app.models.business import Business
+    from app.models.payment import Payment
+    from app.models.schedule import Schedule
+    from app.models.schedule_block import ScheduleBlock
+    from app.models.service import Service
+    from app.models.staff import Staff, staff_services
+    from app.models.user import User
+
+    print("\n[TEARDOWN] Ejecutando limpieza obligatoria de datos de prueba...")
+    try:
+        db = next(get_db())
+
+        # Target businesses: by ID or by unique suffix
+        biz_id_uuids = [uuid.UUID(bid) for bid in business_ids if bid]
+        suffix_bizs = db.query(Business).filter(
+            or_(
+                Business.slug == f"smoke-barber-{unique_suffix}",
+                Business.name == f"Barberia Smoke {unique_suffix}",
+                Business.id.in_(biz_id_uuids) if biz_id_uuids else False,
+            )
+        ).all()
+        target_biz_ids = list({b.id for b in suffix_bizs} | set(biz_id_uuids))
+
+        # Target users: by ID or by email containing unique_suffix
+        user_id_uuids = [uuid.UUID(uid) for uid in user_ids if uid]
+        suffix_users = db.query(User).filter(
+            or_(
+                User.email.ilike(f"%{unique_suffix}%"),
+                User.id.in_(user_id_uuids) if user_id_uuids else False,
+            )
+        ).all()
+        target_user_ids = list({u.id for u in suffix_users} | set(user_id_uuids))
+
+        # 1. Bookings & Payments
+        booking_filter = or_(
+            Booking.business_id.in_(target_biz_ids) if target_biz_ids else False,
+            Booking.customer_email.ilike(f"%{unique_suffix}%"),
+            Booking.user_id.in_(target_user_ids) if target_user_ids else False,
+        )
+        target_bookings = db.query(Booking).filter(booking_filter).all()
+        target_booking_ids = [b.id for b in target_bookings]
+
+        if target_booking_ids:
+            db.query(Payment).filter(Payment.booking_id.in_(target_booking_ids)).delete(synchronize_session=False)
+            db.query(Booking).filter(Booking.id.in_(target_booking_ids)).delete(synchronize_session=False)
+
+        # 2. Schedules & Schedule Blocks
+        if target_biz_ids:
+            db.query(ScheduleBlock).filter(ScheduleBlock.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
+            db.query(Schedule).filter(Schedule.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
+
+            # 3. Staff & Staff Services
+            target_staff = db.query(Staff).filter(Staff.business_id.in_(target_biz_ids)).all()
+            target_staff_ids = [s.id for s in target_staff]
+            if target_staff_ids:
+                db.execute(staff_services.delete().where(staff_services.c.staff_id.in_(target_staff_ids)))
+                db.query(Staff).filter(Staff.id.in_(target_staff_ids)).delete(synchronize_session=False)
+
+            # 4. Services
+            db.query(Service).filter(Service.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
+
+            # 5. Branches
+            db.query(Branch).filter(Branch.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
+
+            # 6. Businesses
+            db.query(Business).filter(Business.id.in_(target_biz_ids)).delete(synchronize_session=False)
+
+        # 7. Users
+        if target_user_ids:
+            db.query(User).filter(User.id.in_(target_user_ids)).delete(synchronize_session=False)
+
+        db.commit()
+
+        # 8. Local storage cleanup
+        backend_dir = Path(__file__).resolve().parent
+        for bid in target_biz_ids:
+            biz_str = str(bid)
+            for sub in ["services", "businesses", "staff"]:
+                local_dir = backend_dir / "storage" / sub / biz_str
+                if local_dir.exists():
+                    shutil.rmtree(local_dir, ignore_errors=True)
+
+        print(f"   [OK] Teardown finalizado: Base de datos limpia sin residuos de la prueba ({unique_suffix}).")
+    except Exception as cleanup_err:
+        print(f"   [AVISO] Error durante la rutina de teardown: {cleanup_err}")
+
+
 def run_predeploy_smoke_tests():
     print("=" * 60)
     print("INICIANDO PRUEBAS DE SMOKE PRE-DEPLOY (Items 55-60)")
+    if "supabase" in settings.database_url.lower():
+        print("   [AVISO] Conectado a base de datos remota/Supabase. Teardown garantizado.")
     print("=" * 60)
 
-    # 1. Test Item 55: Register & Login
     unique_suffix = uuid.uuid4().hex[:6]
     owner_email = f"owner.{unique_suffix}@smoke-test.com"
     customer_email = f"customer.{unique_suffix}@smoke-test.com"
     pwd = "SecurePassword123!"
 
-    print("\n[1/6] Testing Item 55: Registro y Login...")
-    reg_resp = client.post(
-        "/api/v1/auth/register",
-        json={"name": "Owner Test", "email": owner_email, "password": pwd, "role": "business_owner"},
-    )
-    assert reg_resp.status_code == 201, f"Owner Register failed: {reg_resp.text}"
-    owner_data = reg_resp.json()
-    assert "id" in owner_data
+    created_business_ids: list[str] = []
+    created_user_ids: list[str] = []
 
-    login_resp = client.post(
-        "/api/v1/auth/login",
-        json={"email": owner_email, "password": pwd},
-    )
-    assert login_resp.status_code == 200, f"Owner Login failed: {login_resp.text}"
-    token = login_resp.json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
-
-    me_resp = client.get("/api/v1/users/me", headers=headers)
-    assert me_resp.status_code == 200, f"/me failed: {me_resp.text}"
-    assert me_resp.json()["email"] == owner_email
-    print("   [OK] Item 55: Registro, JWT y /me pasaron con exito.")
-
-    # 2. Test Item 56: Business & Branch Creation with Geocoding
-    print("\n[2/6] Testing Item 56: Creacion de Negocio y Geocoding...")
-    biz_resp = client.post(
-        "/api/v1/businesses/",
-        json={
-            "name": f"Barberia Smoke {unique_suffix}",
-            "slug": f"smoke-barber-{unique_suffix}",
-            "category": "Barberia",
-            "phone": "+573001234567",
-            "email": owner_email,
-            "address": "Calle 10 #40-20",
-            "city": "Medellin",
-        },
-        headers=headers,
-    )
-    assert biz_resp.status_code == 201, f"Create business failed: {biz_resp.text}"
-    biz = biz_resp.json()
-    biz_id = biz["id"]
-
-    branch_resp = client.post(
-        f"/api/v1/businesses/{biz_id}/branches",
-        json={
-            "name": "Sede Central",
-            "address": "Calle 10 #40-20",
-            "city": "Medellin",
-            "phone": "+573001234567",
-        },
-        headers=headers,
-    )
-    assert branch_resp.status_code == 201, f"Create branch failed: {branch_resp.text}"
-    branch = branch_resp.json()
-    branch_id = branch["id"]
-    assert branch["geocoding_status"] in ("success", "pending", "failed")
-    print(f"   [OK] Item 56: Negocio y Sede creados (Geocoding status: {branch['geocoding_status']}).")
-
-    # 3. Test Item 57: Storage & Images
-    print("\n[3/6] Testing Item 57: Subida de Imagenes y Storage Service...")
-    service_resp = client.post(
-        f"/api/v1/services/{biz_id}/services",
-        json={"name": "Corte Deluxe", "description": "Corte y barba", "price": 35000, "duration_minutes": 30},
-        headers=headers,
-    )
-    assert service_resp.status_code == 201, f"Create service failed: {service_resp.text}"
-    service_id = service_resp.json()["id"]
-
-    # Binary JPEG magic bytes: FF D8 FF E0 ...
-    fake_jpeg_content = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xff\xfeSmokeTestJPEGData"
-    img_resp = client.post(
-        f"/api/v1/services/{biz_id}/image",
-        files={"file": ("test.jpg", fake_jpeg_content, "image/jpeg")},
-        headers=headers,
-    )
-    assert img_resp.status_code == 201, f"Upload service image failed: {img_resp.text}"
-    assert "image_url" in img_resp.json()
-    print("   [OK] Item 57: Validacion por Magic Bytes y subida de imagenes pasaron con exito.")
-
-    # 4. Test Item 58 & 27: Staff, Payment COP & Multithreaded Race Condition Protection
-    print("\n[4/7] Testing Item 58 & 27: Gestion de Citas, Payment COP y Concurrencia Real (ThreadPoolExecutor)...")
-    staff_resp = client.post(
-        f"/api/v1/staff/{biz_id}/staff",
-        json={"name": "Barbero Alex", "branch_id": branch_id, "service_ids": [service_id]},
-        headers=headers,
-    )
-    assert staff_resp.status_code == 201, f"Create staff failed: {staff_resp.text}"
-    staff_id = staff_resp.json()["id"]
-
-    booking_date = (date.today() + timedelta(days=2)).isoformat()
-    booking_payload = {
-        "business_id": biz_id,
-        "branch_id": branch_id,
-        "service_id": service_id,
-        "staff_id": staff_id,
-        "booking_date": booking_date,
-        "start_time": "10:00:00",
-        "customer_name": "Cliente Pruebas",
-        "customer_email": customer_email,
-        "customer_phone": "+573009998877",
-    }
-    
-    booking_resp = client.post("/api/v1/bookings/", json=booking_payload)
-    assert booking_resp.status_code == 201, f"Create booking failed: {booking_resp.text}"
-    booking_id = booking_resp.json()["id"]
-
-    # Verify Payment was created with currency COP
-    from app.core.deps import get_db
-    from app.models.payment import Payment
-    db = next(get_db())
-    payment = db.query(Payment).filter(Payment.booking_id == uuid.UUID(booking_id)).first()
-    assert payment is not None, "Payment object was not created for booking!"
-    assert payment.currency == "COP", f"Payment currency should be COP, got {payment.currency}"
-    assert payment.amount == 35000, f"Payment amount mismatch: {payment.amount}"
-    print("   [OK] Item 9 & 11: Payment creado correctamente con moneda COP.")
-
-    # Real Multithreaded Concurrency Test for another slot (11:00:00)
-    import concurrent.futures
-    
-    payload_thread_a = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario A Concurrent"}
-    payload_thread_b = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario B Concurrent"}
-
-    def make_concurrent_booking(p):
-        return client.post("/api/v1/bookings/", json=p)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        f_a = executor.submit(make_concurrent_booking, payload_thread_a)
-        f_b = executor.submit(make_concurrent_booking, payload_thread_b)
-        res_a = f_a.result()
-        res_b = f_b.result()
-
-    statuses = sorted([res_a.status_code, res_b.status_code])
-    assert statuses == [201, 409], f"Real concurrency test failed! Expected [201, 409], got {statuses}"
-    print("   [OK] Item 27: Concurrencia real probada con 2 hilos paralelos. 1 exitosa (201) y 1 rechazada por conflicto (409).")
-
-    # Test Item 14: Domain Integrity Mismatch Protection
-    invalid_staff_booking = {**booking_payload, "staff_id": str(uuid.uuid4()), "start_time": "14:00:00"}
-    mismatch_resp = client.post("/api/v1/bookings/", json=invalid_staff_booking)
-    assert mismatch_resp.status_code == 400, f"Expected 400 for unassigned staff, got {mismatch_resp.status_code}"
-    print("   [OK] Item 14: Intento de reserva con jerarquia inconsistente rechazado con 400 Bad Request.")
-
-    # Test Item 15: Availability Domain Integrity Protection
-    from app.services.availability_service import get_available_slots
-    bogus_staff_id = uuid.uuid4()
-    bogus_slots = get_available_slots(db, uuid.UUID(biz_id), uuid.UUID(service_id), date.today() + timedelta(days=2), staff_id=bogus_staff_id)
-    assert bogus_slots == {}, f"Expected empty dict for bogus staff, got {bogus_slots}"
-    print("   [OK] Item 15: Disponibilidad validada contra jerarquia de dominio (devuelve {} ante staff no perteneciente).")
-
-    # Test Item 16: Reschedule Domain Integrity Protection
-    reschedule_invalid_resp = client.patch(
-        f"/api/v1/bookings/{booking_id}/reschedule",
-        json={"booking_date": booking_date, "start_time": "15:00:00", "staff_id": str(uuid.uuid4())},
-        headers=headers,
-    )
-    assert reschedule_invalid_resp.status_code == 400, f"Expected 400 for reschedule to invalid staff, got {reschedule_invalid_resp.status_code}"
-    print("   [OK] Item 16: Reagendamiento con especialista invalido/inconsistente rechazado con 400 Bad Request.")
-
-    # 5. Test Item 59: Authorization & IDOR Protection
-    print("\n[5/7] Testing Item 59: Aislamiento IDOR y Permisos...")
-    reg_other = client.post(
-        "/api/v1/auth/register",
-        json={"name": "Owner B", "email": f"other.{unique_suffix}@test.com", "password": pwd, "role": "business_owner"},
-    )
-    other_token = client.post(
-        "/api/v1/auth/login",
-        json={"email": f"other.{unique_suffix}@test.com", "password": pwd},
-    ).json()["access_token"]
-    other_headers = {"Authorization": f"Bearer {other_token}"}
-
-    idor_agenda_resp = client.get(f"/api/v1/bookings/business/{biz_id}", headers=other_headers)
-    assert idor_agenda_resp.status_code in (403, 404), f"IDOR Vulnerability detected! Status: {idor_agenda_resp.status_code}"
-
-    idor_status_resp = client.patch(
-        f"/api/v1/bookings/{booking_id}/status",
-        json={"status": "confirmed"},
-        headers=other_headers,
-    )
-    assert idor_status_resp.status_code in (403, 404), f"IDOR Status change vulnerability detected! Status: {idor_status_resp.status_code}"
-    print("   [OK] Item 59: Intento de acceso ajeno (IDOR) bloqueado con 403 Forbidden.")
-
-    # 6. Test Item 60: Alembic Migration Execution & Status Check
-    print("\n[6/7] Testing Item 60: Ejecucion de Migraciones de Alembic (upgrade head)...")
-    from alembic.config import Config
-    from alembic import command
-    alembic_cfg = Config("alembic.ini")
     try:
-        command.upgrade(alembic_cfg, "head")
-        command.current(alembic_cfg)
-        print("   [OK] Item 60: alembic upgrade head ejecuto correctamente y la BD esta en la version head.")
-    except Exception as exc:
-        assert False, f"Alembic migration execution failed: {exc}"
+        # 1. Test Item 55: Register & Login
+        print("\n[1/6] Testing Item 55: Registro y Login...")
+        reg_resp = client.post(
+            "/api/v1/auth/register",
+            json={"name": "Owner Test", "email": owner_email, "password": pwd, "role": "business_owner"},
+        )
+        assert reg_resp.status_code == 201, f"Owner Register failed: {reg_resp.text}"
+        owner_data = reg_resp.json()
+        assert "id" in owner_data
+        created_user_ids.append(owner_data["id"])
 
-    # 7. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
-    print("\n[7/7] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")
-    from app.core.config import Settings
-    from pydantic import ValidationError
-    try:
-        Settings(app_env="production", supabase_url="", supabase_service_role_key="", database_url="postgresql://user:pass@localhost/db", secret_key="a-very-long-secret-key-for-testing-12345")
-        assert False, "Should have failed startup validation in production mode when storage credentials are missing"
-    except ValidationError as exc:
-        assert "Production startup failed" in str(exc)
-        print("   [OK] Item 4: Fallback de filesystem bloqueado en produccion sin credenciales.")
+        login_resp = client.post(
+            "/api/v1/auth/login",
+            json={"email": owner_email, "password": pwd},
+        )
+        assert login_resp.status_code == 200, f"Owner Login failed: {login_resp.text}"
+        token = login_resp.json()["access_token"]
+        headers = {"Authorization": f"Bearer {token}"}
 
-    from jose import jwt
-    encoded = jwt.encode({"sub": "test_user"}, "secret_key_123456789", algorithm="HS256")
-    decoded = jwt.decode(encoded, "secret_key_123456789", algorithms=["HS256"])
-    assert decoded["sub"] == "test_user"
-    print("   [OK] Item 6: python-jose 3.5.0 JWT encode/decode funciona perfectamente.")
+        me_resp = client.get("/api/v1/users/me", headers=headers)
+        assert me_resp.status_code == 200, f"/me failed: {me_resp.text}"
+        assert me_resp.json()["email"] == owner_email
+        print("   [OK] Item 55: Registro, JWT y /me pasaron con exito.")
 
-    print("\n" + "=" * 60)
-    print("ALL PRE-DEPLOY SMOKE TESTS PASSED SUCCESSFULLY!")
-    print("=" * 60)
+        # 2. Test Item 56: Business & Branch Creation with Geocoding
+        print("\n[2/6] Testing Item 56: Creacion de Negocio y Geocoding...")
+        biz_resp = client.post(
+            "/api/v1/businesses/",
+            json={
+                "name": f"Barberia Smoke {unique_suffix}",
+                "slug": f"smoke-barber-{unique_suffix}",
+                "category": "Barberia",
+                "phone": "+573001234567",
+                "email": owner_email,
+                "address": "Calle 10 #40-20",
+                "city": "Medellin",
+            },
+            headers=headers,
+        )
+        assert biz_resp.status_code == 201, f"Create business failed: {biz_resp.text}"
+        biz = biz_resp.json()
+        biz_id = biz["id"]
+        created_business_ids.append(biz_id)
+
+        branch_resp = client.post(
+            f"/api/v1/businesses/{biz_id}/branches",
+            json={
+                "name": "Sede Central",
+                "address": "Calle 10 #40-20",
+                "city": "Medellin",
+                "phone": "+573001234567",
+            },
+            headers=headers,
+        )
+        assert branch_resp.status_code == 201, f"Create branch failed: {branch_resp.text}"
+        branch = branch_resp.json()
+        branch_id = branch["id"]
+        assert branch["geocoding_status"] in ("success", "pending", "failed")
+        print(f"   [OK] Item 56: Negocio y Sede creados (Geocoding status: {branch['geocoding_status']}).")
+
+        # 3. Test Item 57: Storage & Images
+        print("\n[3/6] Testing Item 57: Subida de Imagenes y Storage Service...")
+        service_resp = client.post(
+            f"/api/v1/services/{biz_id}/services",
+            json={"name": "Corte Deluxe", "description": "Corte y barba", "price": 35000, "duration_minutes": 30},
+            headers=headers,
+        )
+        assert service_resp.status_code == 201, f"Create service failed: {service_resp.text}"
+        service_id = service_resp.json()["id"]
+
+        # Binary JPEG magic bytes: FF D8 FF E0 ...
+        fake_jpeg_content = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xff\xfeSmokeTestJPEGData"
+        img_resp = client.post(
+            f"/api/v1/services/{biz_id}/image",
+            files={"file": ("test.jpg", fake_jpeg_content, "image/jpeg")},
+            headers=headers,
+        )
+        assert img_resp.status_code == 201, f"Upload service image failed: {img_resp.text}"
+        assert "image_url" in img_resp.json()
+        print("   [OK] Item 57: Validacion por Magic Bytes y subida de imagenes pasaron con exito.")
+
+        # 4. Test Item 58 & 27: Staff, Payment COP & Multithreaded Race Condition Protection
+        print("\n[4/7] Testing Item 58 & 27: Gestion de Citas, Payment COP y Concurrencia Real (ThreadPoolExecutor)...")
+        staff_resp = client.post(
+            f"/api/v1/staff/{biz_id}/staff",
+            json={"name": "Barbero Alex", "branch_id": branch_id, "service_ids": [service_id]},
+            headers=headers,
+        )
+        assert staff_resp.status_code == 201, f"Create staff failed: {staff_resp.text}"
+        staff_id = staff_resp.json()["id"]
+
+        booking_date = (date.today() + timedelta(days=2)).isoformat()
+        booking_payload = {
+            "business_id": biz_id,
+            "branch_id": branch_id,
+            "service_id": service_id,
+            "staff_id": staff_id,
+            "booking_date": booking_date,
+            "start_time": "10:00:00",
+            "customer_name": "Cliente Pruebas",
+            "customer_email": customer_email,
+            "customer_phone": "+573009998877",
+        }
+
+        booking_resp = client.post("/api/v1/bookings/", json=booking_payload)
+        assert booking_resp.status_code == 201, f"Create booking failed: {booking_resp.text}"
+        booking_id = booking_resp.json()["id"]
+
+        # Verify Payment was created with currency COP
+        from app.core.deps import get_db
+        from app.models.payment import Payment
+        db = next(get_db())
+        payment = db.query(Payment).filter(Payment.booking_id == uuid.UUID(booking_id)).first()
+        assert payment is not None, "Payment object was not created for booking!"
+        assert payment.currency == "COP", f"Payment currency should be COP, got {payment.currency}"
+        assert payment.amount == 35000, f"Payment amount mismatch: {payment.amount}"
+        print("   [OK] Item 9 & 11: Payment creado correctamente con moneda COP.")
+
+        # Real Multithreaded Concurrency Test for another slot (11:00:00)
+        payload_thread_a = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario A Concurrent"}
+        payload_thread_b = {**booking_payload, "start_time": "11:00:00", "customer_name": "Usuario B Concurrent"}
+
+        def make_concurrent_booking(p):
+            return client.post("/api/v1/bookings/", json=p)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            f_a = executor.submit(make_concurrent_booking, payload_thread_a)
+            f_b = executor.submit(make_concurrent_booking, payload_thread_b)
+            res_a = f_a.result()
+            res_b = f_b.result()
+
+        statuses = sorted([res_a.status_code, res_b.status_code])
+        assert statuses == [201, 409], f"Real concurrency test failed! Expected [201, 409], got {statuses}"
+        print("   [OK] Item 27: Concurrencia real probada con 2 hilos paralelos. 1 exitosa (201) y 1 rechazada por conflicto (409).")
+
+        # Test Item 14: Domain Integrity Mismatch Protection
+        invalid_staff_booking = {**booking_payload, "staff_id": str(uuid.uuid4()), "start_time": "14:00:00"}
+        mismatch_resp = client.post("/api/v1/bookings/", json=invalid_staff_booking)
+        assert mismatch_resp.status_code == 400, f"Expected 400 for unassigned staff, got {mismatch_resp.status_code}"
+        print("   [OK] Item 14: Intento de reserva con jerarquia inconsistente rechazado con 400 Bad Request.")
+
+        # Test Item 15: Availability Domain Integrity Protection
+        from app.services.availability_service import get_available_slots
+        bogus_staff_id = uuid.uuid4()
+        bogus_slots = get_available_slots(db, uuid.UUID(biz_id), uuid.UUID(service_id), date.today() + timedelta(days=2), staff_id=bogus_staff_id)
+        assert bogus_slots == {}, f"Expected empty dict for bogus staff, got {bogus_slots}"
+        print("   [OK] Item 15: Disponibilidad validada contra jerarquia de dominio (devuelve {} ante staff no perteneciente).")
+
+        # Test Item 16: Reschedule Domain Integrity Protection
+        reschedule_invalid_resp = client.patch(
+            f"/api/v1/bookings/{booking_id}/reschedule",
+            json={"booking_date": booking_date, "start_time": "15:00:00", "staff_id": str(uuid.uuid4())},
+            headers=headers,
+        )
+        assert reschedule_invalid_resp.status_code == 400, f"Expected 400 for reschedule to invalid staff, got {reschedule_invalid_resp.status_code}"
+        print("   [OK] Item 16: Reagendamiento con especialista invalido/inconsistente rechazado con 400 Bad Request.")
+
+        # 5. Test Item 59: Authorization & IDOR Protection
+        print("\n[5/7] Testing Item 59: Aislamiento IDOR y Permisos...")
+        reg_other = client.post(
+            "/api/v1/auth/register",
+            json={"name": "Owner B", "email": f"other.{unique_suffix}@smoke-test.com", "password": pwd, "role": "business_owner"},
+        )
+        assert reg_other.status_code == 201, f"Other Owner Register failed: {reg_other.text}"
+        other_user_data = reg_other.json()
+        created_user_ids.append(other_user_data["id"])
+
+        other_token = client.post(
+            "/api/v1/auth/login",
+            json={"email": f"other.{unique_suffix}@smoke-test.com", "password": pwd},
+        ).json()["access_token"]
+        other_headers = {"Authorization": f"Bearer {other_token}"}
+
+        idor_agenda_resp = client.get(f"/api/v1/bookings/business/{biz_id}", headers=other_headers)
+        assert idor_agenda_resp.status_code in (403, 404), f"IDOR Vulnerability detected! Status: {idor_agenda_resp.status_code}"
+
+        idor_status_resp = client.patch(
+            f"/api/v1/bookings/{booking_id}/status",
+            json={"status": "confirmed"},
+            headers=other_headers,
+        )
+        assert idor_status_resp.status_code in (403, 404), f"IDOR Status change vulnerability detected! Status: {idor_status_resp.status_code}"
+        print("   [OK] Item 59: Intento de acceso ajeno (IDOR) bloqueado con 403 Forbidden.")
+
+        # 6. Test Item 60: Alembic Migration Execution & Status Check
+        print("\n[6/7] Testing Item 60: Ejecucion de Migraciones de Alembic (upgrade head)...")
+        from alembic.config import Config
+        from alembic import command
+        alembic_cfg = Config("alembic.ini")
+        try:
+            command.upgrade(alembic_cfg, "head")
+            command.current(alembic_cfg)
+            print("   [OK] Item 60: alembic upgrade head ejecuto correctamente y la BD esta en la version head.")
+        except Exception as exc:
+            assert False, f"Alembic migration execution failed: {exc}"
+
+        # 7. Test Items 4 & 6: Production Storage Strictness and python-jose 3.5.0
+        print("\n[7/7] Testing Item 4 & 6: Validacion de Storage en Produccion y JWT (python-jose 3.5.0)...")
+        from app.core.config import Settings
+        from pydantic import ValidationError
+        try:
+            Settings(app_env="production", supabase_url="", supabase_service_role_key="", database_url="postgresql://user:pass@localhost/db", secret_key="a-very-long-secret-key-for-testing-12345")
+            assert False, "Should have failed startup validation in production mode when storage credentials are missing"
+        except ValidationError as exc:
+            assert "Production startup failed" in str(exc)
+            print("   [OK] Item 4: Fallback de filesystem bloqueado en produccion sin credenciales.")
+
+        from jose import jwt
+        encoded = jwt.encode({"sub": "test_user"}, "secret_key_123456789", algorithm="HS256")
+        decoded = jwt.decode(encoded, "secret_key_123456789", algorithms=["HS256"])
+        assert decoded["sub"] == "test_user"
+        print("   [OK] Item 6: python-jose 3.5.0 JWT encode/decode funciona perfectamente.")
+
+        print("\n" + "=" * 60)
+        print("ALL PRE-DEPLOY SMOKE TESTS PASSED SUCCESSFULLY!")
+        print("=" * 60)
+
+    finally:
+        _teardown_smoke_resources(unique_suffix, created_business_ids, created_user_ids)
+
 
 if __name__ == "__main__":
     run_predeploy_smoke_tests()

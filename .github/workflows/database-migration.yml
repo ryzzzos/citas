@@ -13,6 +13,7 @@ on:
           - upgrade_head       # Aplica todas las migraciones pendientes
           - show_current       # Muestra la versión actual de la BD sin modificar nada
           - show_history       # Muestra el historial de migraciones
+          - clean_smoke_data   # Purga los registros residuales de prueba (Barberia Smoke) en Supabase
   
   # 2. Ejecución automática solo cuando se modifiquen modelos o migraciones en 'main'
   push:
@@ -84,6 +85,17 @@ jobs:
           APP_ENV: "development"
         run: |
           alembic history --verbose
+
+      - name: Purgar Datos de Prueba (Smoke Data)
+        if: "${{ github.event.inputs.action == 'clean_smoke_data' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Ejecutando script de purga en Supabase..."
+          python scripts/clean_smoke_test_data.py
+          echo "¡Purga completada con éxito en Supabase!"
 
       - name: Resumen final
         env:
