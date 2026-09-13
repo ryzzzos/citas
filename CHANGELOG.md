@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.9] - 2026-09-12
+
+### Added
+- **Rediseño Visual de Pines y Clústeres en Mapa de Sucursales**:
+  - Marcadores de mapa circulares estilo avatar/burbuja con renderizado de logo real y fallback a iconos estilizados por categoría (`SucursalesMapMarkers.tsx`).
+  - Etiquetas flotantes inferiores tipo píldora con desenfoque de fondo para nombres legibles y estilizados.
+  - Clústeres interactivos con superposición animada de avatares reales y badge de conteo residual `+N`.
+  - Nuevas micro-animaciones CSS keyframes (`marker-appear`, `cluster-bubble-pop`) para entrada fluida de pines y burbujas de mapa (`globals.css`).
+
 ## [0.5.8] - 2026-08-25
 
 ### Added

@@ -46,6 +46,15 @@ function getCategoryIcon(category: string, selected: boolean): string {
   return svg.replace('class="w-3.5 h-3.5 shrink-0"', `class="w-3.5 h-3.5 shrink-0 ${iconColor}"`);
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function getShortName(fullName: string): string {
   const words = fullName.split(" ").filter(Boolean);
   if (words.length === 0) return "Sucursal";
@@ -54,7 +63,7 @@ function getShortName(fullName: string): string {
     return firstWord;
   }
   const combined = `${words[0]} ${words[1]}`;
-  if (combined.length <= 15) {
+  if (combined.length <= 14) {
     return combined;
   }
   return firstWord;
@@ -63,51 +72,106 @@ function getShortName(fullName: string): string {
 function createPinIcon(business: BusinessMapPoint | undefined, selected: boolean): L.DivIcon {
   const name = business?.name ?? "Sucursal";
   const category = business?.category ?? "default";
+  const logoUrl = business?.logo_image_url;
   
   const shortName = getShortName(name);
   const iconSvg = getCategoryIcon(category, selected);
 
-  const bgClass = selected
-    ? "bg-[var(--app-primary)] text-white"
-    : "bg-[var(--surface-3)] text-[var(--text-primary)]";
-    
-  const ringClass = selected
-    ? "ring-[3px] ring-[var(--app-primary)]/20 shadow-[var(--shadow-md)] z-50 scale-105"
-    : "border border-[var(--border-strong)] shadow-[var(--shadow-sm)]";
-    
-  const arrowColor = selected
-    ? "border-t-[var(--app-primary)]"
-    : "border-t-[var(--surface-3)]";
+  const bubbleRing = selected
+    ? "ring-2 ring-white dark:ring-slate-300 border-2 border-slate-900/60 shadow-[0_12px_30px_rgba(0,0,0,0.5)] scale-115 z-50"
+    : "ring-2 ring-white dark:ring-slate-800 shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 group-hover:shadow-[0_10px_22px_rgba(0,0,0,0.4)]";
+
+  const pillClass = selected
+    ? "bg-slate-950 text-white border-2 border-white/40 shadow-[0_4px_14px_rgba(0,0,0,0.5)] font-bold scale-105"
+    : "bg-slate-950/85 text-white/95 border border-white/20 shadow-[0_4px_10px_rgba(0,0,0,0.4)] group-hover:bg-slate-950";
+
+  const imageHtml = logoUrl
+    ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover rounded-full select-none pointer-events-none" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+       <div class="w-full h-full items-center justify-center bg-gradient-to-tr from-[var(--surface-3)] to-[var(--surface-2)] text-[var(--app-primary)] select-none" style="display: none;">
+         ${iconSvg}
+       </div>`
+    : `<div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-[var(--surface-3)] to-[var(--surface-2)] text-[var(--app-primary)] select-none">
+         ${iconSvg}
+       </div>`;
 
   return L.divIcon({
     className: "bg-transparent border-none",
     iconSize: [0, 0],
     iconAnchor: [0, 0],
     html: `
-      <div class="absolute -translate-x-1/2 -translate-y-full flex items-center justify-center pointer-events-auto">
-        <div class="relative flex items-center gap-1.5 whitespace-nowrap rounded-full ${bgClass} ${ringClass} px-3 py-1.5 text-[0.8rem] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-md)] cursor-pointer">
-          ${iconSvg}
-          <span class="font-bold tracking-tight">${shortName}</span>
-          <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent ${arrowColor}"></div>
+      <div class="absolute -translate-x-1/2 -translate-y-[25px] pointer-events-auto cursor-pointer select-none">
+        <div class="animate-marker-appear flex flex-col items-center">
+          <div class="group flex flex-col items-center">
+            <!-- Instagram-style Circular Bubble -->
+            <div class="relative w-[50px] h-[50px] rounded-full overflow-hidden flex items-center justify-center transition-all duration-300 bg-[var(--surface-2)] ${bubbleRing}">
+              ${imageHtml}
+            </div>
+
+            <!-- Name Pill Badge Underneath -->
+            <div class="mt-1 flex items-center justify-center max-w-[110px] transition-transform duration-200 group-hover:scale-105">
+              <span class="truncate px-2.5 py-0.5 rounded-full text-[0.7rem] font-semibold leading-tight tracking-tight backdrop-blur-md transition-colors ${pillClass}">
+                ${escapeHtml(shortName)}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     `,
   });
 }
 
-function createClusterIcon(count: number): L.DivIcon {
-  const size = count >= 100 ? 52 : count >= 20 ? 46 : 40;
+function createClusterIcon(clusterBusinesses: BusinessMapPoint[], totalCount: number): L.DivIcon {
+  const maxShown = 3;
+  const shownBusinesses = clusterBusinesses.slice(0, maxShown);
+  const remainingCount = totalCount - shownBusinesses.length;
+
+  let bubblesHtml = "";
+
+  shownBusinesses.forEach((b, idx) => {
+    const name = b.name ?? "Sucursal";
+    const logoUrl = b.logo_image_url;
+    const category = b.category ?? "default";
+    const iconSvg = getCategoryIcon(category, false);
+    const zIndex = (idx + 1) * 10;
+    const mlStyle = idx > 0 ? "margin-left: -12px;" : "";
+    const delayStyle = `animation-delay: ${idx * 45}ms;`;
+
+    const imageHtml = logoUrl
+      ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover select-none pointer-events-none" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+         <div class="w-full h-full items-center justify-center bg-gradient-to-tr from-[var(--surface-3)] to-[var(--surface-2)] text-[var(--app-primary)] select-none" style="display: none;">
+           ${iconSvg}
+         </div>`
+      : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-[var(--surface-3)] to-[var(--surface-2)] text-[var(--app-primary)] select-none">
+           ${iconSvg}
+         </div>`;
+
+    bubblesHtml += `
+      <div style="width: 38px; height: 38px; z-index: ${zIndex}; ${mlStyle} ${delayStyle}" class="animate-cluster-bubble relative rounded-full overflow-hidden bg-[var(--surface-2)] ring-2 ring-white shadow-[0_4px_14px_rgba(0,0,0,0.35)] flex items-center justify-center shrink-0">
+        ${imageHtml}
+      </div>
+    `;
+  });
+
+  if (remainingCount > 0) {
+    const zIndex = (shownBusinesses.length + 1) * 10;
+    const delayStyle = `animation-delay: ${shownBusinesses.length * 45}ms;`;
+    bubblesHtml += `
+      <div style="width: 38px; height: 38px; z-index: ${zIndex}; margin-left: -12px; ${delayStyle}" class="animate-cluster-bubble relative rounded-full bg-slate-950 dark:bg-black text-white text-[0.8rem] font-black tracking-tight ring-2 ring-white shadow-[0_4px_14px_rgba(0,0,0,0.4)] flex items-center justify-center shrink-0 select-none">
+        +${remainingCount}
+      </div>
+    `;
+  }
+
   return L.divIcon({
     className: "bg-transparent border-none",
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
     html: `
-      <div class="relative flex items-center justify-center w-full h-full">
-        <!-- Outer soft glow ring -->
-        <div class="absolute inset-0 bg-[var(--app-primary)]/15 rounded-full scale-125 animate-pulse"></div>
-        <!-- Inner container -->
-        <div class="relative flex items-center justify-center w-[85%] h-[85%] bg-[var(--app-primary)] text-white rounded-full shadow-[var(--shadow-md)] ring-2 ring-white dark:ring-[var(--surface-2)] text-[0.85rem] font-black transition-transform hover:scale-110 cursor-pointer">
-          ${count}
+      <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer select-none">
+        <div class="animate-marker-appear flex items-center">
+          <div class="flex items-center transition-transform duration-200 hover:scale-105 active:scale-95">
+            ${bubblesHtml}
+          </div>
         </div>
       </div>
     `,
@@ -115,13 +179,13 @@ function createClusterIcon(count: number): L.DivIcon {
 }
 
 const iconCache = new Map<string, L.DivIcon>();
-const clusterIconCache = new Map<number, L.DivIcon>();
+const clusterIconCache = new Map<string, L.DivIcon>();
 
 function getCachedPinIcon(business: BusinessMapPoint | undefined, selected: boolean): L.DivIcon {
   if (!business) {
     return createPinIcon(undefined, selected);
   }
-  const cacheKey = `${business.id}-${selected}`;
+  const cacheKey = `${business.id}-${selected}-${business.logo_image_url ?? "no-logo"}-${business.name}`;
   let icon = iconCache.get(cacheKey);
   if (!icon) {
     icon = createPinIcon(business, selected);
@@ -130,11 +194,16 @@ function getCachedPinIcon(business: BusinessMapPoint | undefined, selected: bool
   return icon;
 }
 
-function getCachedClusterIcon(count: number): L.DivIcon {
-  let icon = clusterIconCache.get(count);
+function getCachedClusterIcon(
+  clusterId: number,
+  pointCount: number,
+  clusterBusinesses: BusinessMapPoint[]
+): L.DivIcon {
+  const cacheKey = `${clusterId}-${pointCount}-${clusterBusinesses.map((b) => `${b.id}:${b.logo_image_url ?? ""}`).join(",")}`;
+  let icon = clusterIconCache.get(cacheKey);
   if (!icon) {
-    icon = createClusterIcon(count);
-    clusterIconCache.set(count, icon);
+    icon = createClusterIcon(clusterBusinesses, pointCount);
+    clusterIconCache.set(cacheKey, icon);
   }
   return icon;
 }
@@ -183,6 +252,7 @@ interface ClusterMarkerProps {
   pointCount: number;
   clusterId: number;
   index: Supercluster<BusinessFeatureProps>;
+  businesses: BusinessMapPoint[];
   onClick: (lat: number, lng: number, zoom: number) => void;
 }
 
@@ -192,6 +262,7 @@ const ClusterMarker = memo(function ClusterMarker({
   pointCount,
   clusterId,
   index,
+  businesses,
   onClick,
 }: ClusterMarkerProps) {
   const eventHandlers = useMemo(
@@ -204,9 +275,16 @@ const ClusterMarker = memo(function ClusterMarker({
     [latitude, longitude, clusterId, index, onClick]
   );
 
+  const clusterBusinesses = useMemo(() => {
+    const leaves = index.getLeaves(clusterId, 3, 0);
+    return leaves
+      .map((leaf) => businesses.find((b) => b.id === leaf.properties.businessId))
+      .filter(Boolean) as BusinessMapPoint[];
+  }, [index, clusterId, businesses]);
+
   const icon = useMemo(
-    () => getCachedClusterIcon(pointCount),
-    [pointCount]
+    () => getCachedClusterIcon(clusterId, pointCount, clusterBusinesses),
+    [clusterId, pointCount, clusterBusinesses]
   );
 
   return (
@@ -259,7 +337,7 @@ export default function SucursalesMapMarkers({
   }, [index, viewport]);
 
   const handleClusterClick = useCallback((lat: number, lng: number, zoom: number) => {
-    map.flyTo([lat, lng], zoom, { duration: 0.35 });
+    map.flyTo([lat, lng], zoom, { duration: 0.45, easeLinearity: 0.25 });
   }, [map]);
 
   return (
@@ -281,6 +359,7 @@ export default function SucursalesMapMarkers({
               pointCount={pointCount}
               clusterId={clusterId}
               index={index}
+              businesses={businesses}
               onClick={handleClusterClick}
             />
           );

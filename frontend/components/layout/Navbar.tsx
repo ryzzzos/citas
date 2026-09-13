@@ -32,19 +32,13 @@ type SessionState =
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isIntroActive, setIsIntroActive] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    return window.sessionStorage.getItem("agenda_web_splash_shown") !== "1";
-  });
+  const [isIntroActive, setIsIntroActive] = useState(() => pathname === "/");
 
   useEffect(() => {
     if (isIntroActive) {
-      window.sessionStorage.setItem("agenda_web_splash_shown", "1");
       const timer = window.setTimeout(() => {
         setIsIntroActive(false);
-      }, 800);
+      }, 900);
       return () => {
         clearTimeout(timer);
       };
@@ -168,22 +162,23 @@ export default function Navbar() {
             key="splash-overlay"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[color:var(--surface-0)] backdrop-blur-md"
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed inset-0 z-[9998] bg-[var(--surface-1)] pointer-events-auto"
+          />
+        )}
+        {isIntroActive && (
+          <div
+            key="splash-logo-container"
+            className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
           >
             <motion.div
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-              className="flex flex-col items-center gap-4"
+              layoutId="navbar-brand-logo-svg"
+              transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
+              className="pointer-events-auto w-[160px] h-[176px]"
             >
-              <BrandLogo size={64} variant="icon" />
-              <div className="flex items-center gap-1 text-2xl font-bold tracking-tight">
-                <span className="text-[color:var(--text-primary)]">Agenda</span>
-                <span className="text-[color:var(--text-secondary)] font-light">Web</span>
-              </div>
+              <BrandLogo size={160} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -208,17 +203,21 @@ export default function Navbar() {
             aria-label="Ir a la página principal de Agenda Web"
           >
             <div className="relative flex items-center gap-2">
+              <div className="relative w-9 h-[39.6px] flex items-center justify-center shrink-0">
+                {!isIntroActive && (
+                  <motion.div
+                    layoutId="navbar-brand-logo-svg"
+                    transition={{ duration: 1.0, ease: [0.32, 0.72, 0, 1] }}
+                    className="absolute inset-0 w-9 h-[39.6px] flex items-center justify-center"
+                  >
+                    <BrandLogo size={36} variant="icon" className="w-full h-full" containerClassName="w-full h-full" />
+                  </motion.div>
+                )}
+              </div>
               <motion.div
-                initial={isIntroActive ? { scale: 0.8, opacity: 0 } : { scale: 1, opacity: 1 }}
-                animate={!isIntroActive ? { scale: 1, opacity: 1 } : {}}
-                transition={{ duration: 0.5, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
-              >
-                <BrandLogo size={36} variant="icon" />
-              </motion.div>
-              <motion.div
-                initial={isIntroActive ? { opacity: 0, x: -10 } : { opacity: 1, x: 0 }}
+                initial={isIntroActive ? { opacity: 0, x: -6 } : { opacity: 1, x: 0 }}
                 animate={!isIntroActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                transition={{ duration: 0.6, delay: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="hidden sm:flex items-center text-base tracking-tight"
               >
                 <span className="font-bold text-[var(--text-primary)]">
@@ -235,7 +234,7 @@ export default function Navbar() {
           <motion.div
             initial={isIntroActive ? { opacity: 0, y: -4 } : { opacity: 1, y: 0 }}
             animate={!isIntroActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.6, delay: 0.6, ease: [0.32, 0.72, 0, 1] }}
             className="flex items-center gap-2 shrink-0"
           >
             {/* Main scrollable nav list */}
