@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.13] - 2026-09-15
+
+### Added
+- **Workflows Automatizados de Sincronización a Producción y Purga Integral**:
+  - Nuevo flujo de GitHub Actions `.github/workflows/sync-branches-to-production.yml` para aplicar migraciones, insertar sedes/negocios y verificar el estado en Supabase (`sync_and_verify` y `verify_only`).
+  - Nuevo flujo de GitHub Actions `.github/workflows/smoke-test-and-clean.yml` con verificación de tolerancia cero a residuos de prueba.
+  - Soporte para ejecución desacoplada en `sync_data_to_supabase.py` mediante los flags `--from-sql` y `--verify-only`.
+  - Fortalecimiento de `clean_smoke_test_data.py` con eliminación en cascada de 11 fases y verificación post-purga.
+
 ## [0.5.12] - 2026-09-12
 
 ### Added

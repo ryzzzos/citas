@@ -91,25 +91,27 @@ jobs:
         if: "${{ github.event.inputs.action == 'clean_smoke_data' }}"
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
           APP_ENV: "development"
         run: |
-          echo "Ejecutando script de purga en Supabase..."
-          python scripts/clean_smoke_test_data.py
+          echo "Ejecutando script de purga garantizada en Supabase..."
+          python scripts/clean_smoke_test_data.py --db-url "${{ secrets.PROD_DATABASE_URL }}"
           echo "¡Purga completada con éxito en Supabase!"
 
       - name: Sincronizar Datos a Supabase
         if: "${{ github.event.inputs.action == 'sync_seed_data' }}"
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
           APP_ENV: "development"
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_STORAGE_BUCKET: "agenda-images"
         run: |
-          echo "Sincronizando datos de desarrollo hacia Supabase..."
-          python scripts/sync_data_to_supabase.py --db-url "${{ secrets.PROD_DATABASE_URL }}"
+          echo "Sincronizando sucursales y datos hacia Supabase..."
+          python scripts/sync_data_to_supabase.py --db-url "${{ secrets.PROD_DATABASE_URL }}" --from-sql scripts/supabase_production_seed.sql
           echo "¡Sincronización completada con éxito en Supabase!"
 
       - name: Resumen final

@@ -28,96 +28,18 @@ client = TestClient(app)
 def _teardown_smoke_resources(unique_suffix: str, business_ids: list[str], user_ids: list[str]):
     """
     Guaranteed teardown for smoke test data.
-    Safely purges any records created during this test run in strict foreign-key order.
+    Safely purges any records created during this test run and any historical smoke data in strict foreign-key order.
     """
-    from app.core.deps import get_db
-    from app.models.booking import Booking
-    from app.models.branch import Branch
-    from app.models.business import Business
-    from app.models.payment import Payment
-    from app.models.schedule import Schedule
-    from app.models.schedule_block import ScheduleBlock
-    from app.models.service import Service
-    from app.models.staff import Staff, staff_services
-    from app.models.user import User
+    from scripts.clean_smoke_test_data import purge_smoke_data
 
-    print("\n[TEARDOWN] Ejecutando limpieza obligatoria de datos de prueba...")
+    print(f"\n[TEARDOWN] Ejecutando limpieza garantizada de datos de prueba ({unique_suffix})...")
     try:
-        db = next(get_db())
-
-        # Target businesses: by ID or by unique suffix
-        biz_id_uuids = [uuid.UUID(bid) for bid in business_ids if bid]
-        suffix_bizs = db.query(Business).filter(
-            or_(
-                Business.slug == f"smoke-barber-{unique_suffix}",
-                Business.name == f"Barberia Smoke {unique_suffix}",
-                Business.id.in_(biz_id_uuids) if biz_id_uuids else False,
-            )
-        ).all()
-        target_biz_ids = list({b.id for b in suffix_bizs} | set(biz_id_uuids))
-
-        # Target users: by ID or by email containing unique_suffix
-        user_id_uuids = [uuid.UUID(uid) for uid in user_ids if uid]
-        suffix_users = db.query(User).filter(
-            or_(
-                User.email.ilike(f"%{unique_suffix}%"),
-                User.id.in_(user_id_uuids) if user_id_uuids else False,
-            )
-        ).all()
-        target_user_ids = list({u.id for u in suffix_users} | set(user_id_uuids))
-
-        # 1. Bookings & Payments
-        booking_filter = or_(
-            Booking.business_id.in_(target_biz_ids) if target_biz_ids else False,
-            Booking.customer_email.ilike(f"%{unique_suffix}%"),
-            Booking.user_id.in_(target_user_ids) if target_user_ids else False,
-        )
-        target_bookings = db.query(Booking).filter(booking_filter).all()
-        target_booking_ids = [b.id for b in target_bookings]
-
-        if target_booking_ids:
-            db.query(Payment).filter(Payment.booking_id.in_(target_booking_ids)).delete(synchronize_session=False)
-            db.query(Booking).filter(Booking.id.in_(target_booking_ids)).delete(synchronize_session=False)
-
-        # 2. Schedules & Schedule Blocks
-        if target_biz_ids:
-            db.query(ScheduleBlock).filter(ScheduleBlock.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
-            db.query(Schedule).filter(Schedule.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
-
-            # 3. Staff & Staff Services
-            target_staff = db.query(Staff).filter(Staff.business_id.in_(target_biz_ids)).all()
-            target_staff_ids = [s.id for s in target_staff]
-            if target_staff_ids:
-                db.execute(staff_services.delete().where(staff_services.c.staff_id.in_(target_staff_ids)))
-                db.query(Staff).filter(Staff.id.in_(target_staff_ids)).delete(synchronize_session=False)
-
-            # 4. Services
-            db.query(Service).filter(Service.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
-
-            # 5. Branches
-            db.query(Branch).filter(Branch.business_id.in_(target_biz_ids)).delete(synchronize_session=False)
-
-            # 6. Businesses
-            db.query(Business).filter(Business.id.in_(target_biz_ids)).delete(synchronize_session=False)
-
-        # 7. Users
-        if target_user_ids:
-            db.query(User).filter(User.id.in_(target_user_ids)).delete(synchronize_session=False)
-
-        db.commit()
-
-        # 8. Local storage cleanup
-        backend_dir = Path(__file__).resolve().parent
-        for bid in target_biz_ids:
-            biz_str = str(bid)
-            for sub in ["services", "businesses", "staff"]:
-                local_dir = backend_dir / "storage" / sub / biz_str
-                if local_dir.exists():
-                    shutil.rmtree(local_dir, ignore_errors=True)
-
+        purge_smoke_data(database_url=settings.database_url, dry_run=False)
         print(f"   [OK] Teardown finalizado: Base de datos limpia sin residuos de la prueba ({unique_suffix}).")
     except Exception as cleanup_err:
-        print(f"   [AVISO] Error durante la rutina de teardown: {cleanup_err}")
+        print(f"   [ERROR] Error durante la rutina de teardown: {cleanup_err}")
+        raise cleanup_err
+
 
 
 def run_predeploy_smoke_tests():

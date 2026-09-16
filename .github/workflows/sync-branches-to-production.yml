@@ -1,0 +1,84 @@
+name: Sync Branches & Businesses to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Acción a realizar en Supabase'
+        required: true
+        default: 'sync_and_verify'
+        type: choice
+        options:
+          - sync_and_verify  # Aplica migraciones pendientes, inserta sucursales y verifica
+          - verify_only      # Solo inspecciona y lista las sucursales existentes en Supabase
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/scripts/supabase_production_seed.sql'
+      - '.github/workflows/sync-branches-to-production.yml'
+
+jobs:
+  sync_production:
+    name: Sincronizar Sucursales y Negocios a Supabase
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar dependencias del backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validar Secreto PROD_DATABASE_URL
+        run: |
+          if [ -z "${{ secrets.PROD_DATABASE_URL }}" ]; then
+            echo "ERROR CRÍTICO: El secreto 'PROD_DATABASE_URL' no está configurado en GitHub Secrets."
+            echo "Ve a Settings > Secrets and variables > Actions y crea 'PROD_DATABASE_URL'."
+            exit 1
+          fi
+          echo "Secreto PROD_DATABASE_URL detectado correctamente."
+
+      - name: Aplicar Migraciones Pendientes (alembic upgrade head)
+        if: "${{ github.event_name == 'push' || github.event.inputs.action == 'sync_and_verify' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Aplicando migraciones pendientes en Supabase para garantizar compatibilidad del esquema..."
+          alembic upgrade head
+          echo "Esquema actualizado a la última versión."
+
+      - name: Sincronizar Sucursales y Negocios desde Seed SQL
+        if: "${{ github.event_name == 'push' || github.event.inputs.action == 'sync_and_verify' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Cargando sucursales, negocios, servicios, staff y horarios a Supabase..."
+          python scripts/sync_data_to_supabase.py --db-url "${{ secrets.PROD_DATABASE_URL }}" --from-sql scripts/supabase_production_seed.sql
+
+      - name: Reporte de Verificación de Producción
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          python scripts/sync_data_to_supabase.py --db-url "${{ secrets.PROD_DATABASE_URL }}" --verify-only
