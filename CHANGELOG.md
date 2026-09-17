@@ -6,6 +6,13 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.16] - 2026-09-17
+
+### Improved
+- **Estabilidad de Producción y Mantenimiento de Despliegue**:
+  - Verificación y consolidación del flujo de pre-despliegue, asegurando la sincronización limpia de la base de datos de producción y suites de pruebas de humo sin residuos.
+  - Validación completa de compilación y verificación de tipos en frontend y backend.
+
 ## [0.5.15] - 2026-09-17
 
 ### Fixed
