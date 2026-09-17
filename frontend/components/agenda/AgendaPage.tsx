@@ -398,7 +398,6 @@ export default function AgendaPage() {
         onNext={() => setAnchorDate((previous) => shiftAnchorDate(previous, view, 1))}
       />
 
-      {/* <AgendaFiltersBar filters={filters} staff={staff} services={services} onFiltersChange={setFilters} /> */}
       <AgendaHorizontalDays anchorDate={anchorDate} onDateSelect={setAnchorDate} timezone={timezone} view={view} />
 
       <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">

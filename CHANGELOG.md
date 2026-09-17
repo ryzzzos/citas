@@ -6,6 +6,17 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.14] - 2026-09-17
+
+### Removed
+- **Depuración de Componentes Obsoletos**:
+  - Eliminación de archivos y componentes legacy en desuso (`AgendaFiltersBar.tsx`, `BookingCard.tsx`, `ChartPieDonutActive.tsx`, `SaaSVirtuesSection.tsx`, `BranchSelector.tsx`).
+  - Remoción de imports y comentarios residuales en `AgendaPage.tsx`.
+
+### Improved
+- **Optimización de Semillas y Horarios**:
+  - Sincronización precisa de intervalos y horarios por especialista en `seed_demo_businesses.py` y `supabase_production_seed.sql`.
+
 ## [0.5.13] - 2026-09-15
 
 ### Added
