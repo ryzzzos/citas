@@ -17,6 +17,8 @@ on:
       - main
     paths:
       - 'backend/scripts/supabase_production_seed.sql'
+      - 'backend/scripts/sync_data_to_supabase.py'
+      - 'backend/scripts/clean_smoke_test_data.py'
       - '.github/workflows/sync-branches-to-production.yml'
 
 jobs:
@@ -62,6 +64,17 @@ jobs:
           echo "Aplicando migraciones pendientes en Supabase para garantizar compatibilidad del esquema..."
           alembic upgrade head
           echo "Esquema actualizado a la última versión."
+
+      - name: Purgar Datos de Prueba (Barberia Smoke)
+        if: "${{ github.event_name == 'push' || github.event.inputs.action == 'sync_and_verify' }}"
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          SECRET_KEY: "github-actions-temporary-secret-key-for-migrations-safe-123456"
+          APP_ENV: "development"
+        run: |
+          echo "Purgando posibles residuos de pruebas de humo previas..."
+          python scripts/clean_smoke_test_data.py --db-url "${{ secrets.PROD_DATABASE_URL }}"
 
       - name: Sincronizar Sucursales y Negocios desde Seed SQL
         if: "${{ github.event_name == 'push' || github.event.inputs.action == 'sync_and_verify' }}"

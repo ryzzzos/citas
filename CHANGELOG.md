@@ -6,6 +6,18 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.15] - 2026-09-17
+
+### Fixed
+- **Resolución de Conflictos de Email/Slug en Seed de Producción (`ix_users_email` / `ix_businesses_slug`)**:
+  - Incorporación de bloque de reconciliación dinámica en `backend/scripts/sync_data_to_supabase.py` y `supabase_production_seed.sql` (`DO $$ ... $$`) para limpiar registros previos de negocios o usuarios con UUIDs discrepantes antes de aplicar la semilla.
+  - Prevención de fallos por restricción única al sincronizar cuentas de propietarios reales (`maxialex.com@gmail.com`, `admin@gmail.com`) y sedes en Supabase.
+
+### Added
+- **Purga Automática Previa de Datos Smoke en Workflow de Sincronización**:
+  - Adición del paso `Purgar Datos de Prueba (Barberia Smoke)` en `.github/workflows/sync-branches-to-production.yml` previo a la carga de datos.
+  - Ejecución de `purge_smoke_data` dentro de `apply_sql_file_to_db` en `sync_data_to_supabase.py` para asegurar que ningún residuo de pruebas de humo persista en Supabase.
+
 ## [0.5.14] - 2026-09-17
 
 ### Removed

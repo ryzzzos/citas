@@ -47,6 +47,7 @@ from app.models.service import Service
 from app.models.service_category import ServiceCategory
 from app.models.staff import Staff
 from app.models.user import User
+from scripts.clean_smoke_test_data import purge_smoke_data
 
 
 def normalize_db_url(url: str) -> str:
@@ -170,11 +171,18 @@ def verify_production_data(target_db_url: str):
     print("=" * 75)
 
 
-def apply_sql_file_to_db(sql_file_path: Path, target_db_url: str):
+def apply_sql_file_to_db(sql_file_path: Path, target_db_url: str, purge_smoke: bool = True):
     """Executes an idempotent SQL seed file directly against the target database."""
     target_db_url = normalize_db_url(target_db_url)
     if not sql_file_path.exists():
         raise FileNotFoundError(f"Archivo SQL no encontrado: {sql_file_path}")
+
+    if purge_smoke:
+        print("\n[PURGE] Purgando datos residuales de smoke tests en la base de datos destino...")
+        try:
+            purge_smoke_data(target_db_url)
+        except Exception as purge_err:
+            print(f"    [AVISO] Purga de smoke previa arrojó: {purge_err}")
 
     sql_content = sql_file_path.read_text(encoding="utf-8")
     print(f"\n[APPLY] Conectando a la base de datos para aplicar seed desde: {sql_file_path.name}")
@@ -330,6 +338,24 @@ def sync_data(target_db_url: str | None = None, from_sql: str | None = None, upd
             "BEGIN;",
             "",
         ]
+
+        # 4.0 Pre-reconciliation block to prevent UniqueViolations on ix_users_email / ix_businesses_slug / uq_businesses_owner_id
+        owner_emails_quoted = ", ".join(sql_quote(u.email) for u in real_owners)
+        owner_ids_quoted = ", ".join(sql_quote(u.id) for u in real_owners)
+        biz_slugs_quoted = ", ".join(sql_quote(b.slug) for b in real_businesses)
+        biz_ids_quoted = ", ".join(sql_quote(b.id) for b in real_businesses)
+
+        sql_lines.append("-- 0. RECONCILIACIÓN PREVIA (Evita UniqueViolations en ix_users_email / ix_businesses_slug)")
+        sql_lines.append("DO $$")
+        sql_lines.append("BEGIN")
+        if biz_slugs_quoted and biz_ids_quoted:
+            sql_lines.append("    -- Eliminar negocios previos con slug duplicado pero diferente UUID (cascada elimina ramas y dependientes)")
+            sql_lines.append(f"    DELETE FROM businesses WHERE slug IN ({biz_slugs_quoted}) AND id NOT IN ({biz_ids_quoted});")
+        if owner_emails_quoted and owner_ids_quoted:
+            sql_lines.append("    -- Eliminar usuarios previos con email duplicado pero diferente UUID")
+            sql_lines.append(f"    DELETE FROM users WHERE email IN ({owner_emails_quoted}) AND id NOT IN ({owner_ids_quoted});")
+        sql_lines.append("END $$;")
+        sql_lines.append("")
 
         # 4.1 USERS
         sql_lines.append("-- 1. USUARIOS (PROPIETARIOS)")

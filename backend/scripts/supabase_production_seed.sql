@@ -1,9 +1,18 @@
 -- ==========================================================================
 -- Agenda Web Platform - Production Seed Data (Local to Supabase)
--- Generado el: 2026-09-17 12:27:55
+-- Generado el: 2026-09-17 13:03:40
 -- Script idempotente con manejo de ON CONFLICT para inserción segura.
 -- ==========================================================================
 BEGIN;
+
+-- 0. RECONCILIACIÓN PREVIA (Evita UniqueViolations en ix_users_email / ix_businesses_slug)
+DO $$
+BEGIN
+    -- Eliminar negocios previos con slug duplicado pero diferente UUID (cascada elimina ramas y dependientes)
+    DELETE FROM businesses WHERE slug IN ('barberia-sena', 'barberia-centro-norte', 'kine-andina-sabaneta', 'estetica-aura-laureles', 'spa-bosque-envigado', 'clinica-sonrisa-bello', 'prueba-supabase', 'vitalis-spa-wellness', 'estudio-dental-milla-de-oro', 'barberia-provenza-lounge') AND id NOT IN ('376c5a91-40f7-4327-afc8-9f8546a356e2'::uuid, 'b7946ffd-9760-4a54-8820-037c43010438'::uuid, 'ceb3df34-2243-4c00-a5fa-a9838b788a47'::uuid, 'ed43005f-834f-411c-8bea-81d70866f58f'::uuid, '3fc3a970-025d-4c23-af3d-ffb154bb14ca'::uuid, 'd23b8869-a6a1-4f82-baf3-929e4f83c0b4'::uuid, '4c2a9bcd-c0d5-4ee7-917e-3d036c56f53c'::uuid, '0775b2f5-446d-4ecb-925b-2f34a04d0c57'::uuid, '32586a99-a0cc-4bb1-9b2e-93bc7e19a93c'::uuid, 'bdc435e5-d06e-4274-8f9d-97e675ec7e96'::uuid);
+    -- Eliminar usuarios previos con email duplicado pero diferente UUID
+    DELETE FROM users WHERE email IN ('owner.estetica.aura@agenda-demo.co', 'owner.spa.bosque@agenda-demo.co', 'owner.clinica.sonrisa@agenda-demo.co', 'owner.kine.andina@agenda-demo.co', 'maxialex.com@gmail.com', 'admin@gmail.com', 'owner.barberia.norte@agenda-demo.co', 'owner.provenza.barber@agenda-demo.co', 'owner.vitalis.spa@agenda-demo.co', 'owner.dental.millaoro@agenda-demo.co') AND id NOT IN ('3c25c496-c720-49b2-8aab-3b5e1adce08d'::uuid, '3e02e46e-55ee-4548-bf23-5e19ca36314a'::uuid, '4748bf51-3b51-4797-8e65-7fae21687087'::uuid, 'd9b78219-ef6b-4639-a013-b344cc3f6c64'::uuid, '292e629a-4ece-416c-8780-24a5d0e4dc22'::uuid, '9110a8f4-ae07-4514-811f-f7f90473717a'::uuid, 'd1a06872-b314-4d89-848e-4d42013dc5a1'::uuid, '0a9997ca-9741-4118-bf28-4279c456a150'::uuid, '6f20b2c3-4600-4e33-a857-534358b3d324'::uuid, 'bb279d57-d5b5-42db-bd9f-985082950675'::uuid);
+END $$;
 
 -- 1. USUARIOS (PROPIETARIOS)
 INSERT INTO users (id, name, email, password_hash, phone, role, created_at) VALUES ('3c25c496-c720-49b2-8aab-3b5e1adce08d'::uuid, 'Javier Mena', 'owner.estetica.aura@agenda-demo.co', '$2b$12$rW8VONMuWSo3HRjGceQA9u4q7DWixG7q5bneoNkxZjXBjtaU/yJz6', '+57 302 622 2202', 'business_owner', '2026-04-14T18:48:06.642166-05:00'::timestamptz) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, email = EXCLUDED.email, password_hash = EXCLUDED.password_hash, phone = EXCLUDED.phone, role = EXCLUDED.role;
