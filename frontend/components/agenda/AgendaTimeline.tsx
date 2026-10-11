@@ -461,7 +461,13 @@ const handleSelectBooking = useCallback((booking: AgendaBooking) => {
 setSelectedBooking(booking);
 setDrawerStatus(booking.status);
 setStatusBeforeCancel(null);
-setSelectedPaymentMethod(null);
+const initialMethod =
+  booking.payment?.payment_method === 'cash' ||
+  booking.payment?.payment_method === 'credit_card' ||
+  booking.payment?.payment_method === 'transfer'
+    ? (booking.payment.payment_method as PaymentMethod)
+    : null;
+setSelectedPaymentMethod(initialMethod);
 setCopiedText(null);
 }, []);
 
@@ -700,6 +706,14 @@ if (found) break;
 if (found) {
 setSelectedBooking(found);
 setDrawerStatus(found.status);
+setStatusBeforeCancel(null);
+const initialMethod =
+  found.payment?.payment_method === 'cash' ||
+  found.payment?.payment_method === 'credit_card' ||
+  found.payment?.payment_method === 'transfer'
+    ? (found.payment.payment_method as PaymentMethod)
+    : null;
+setSelectedPaymentMethod(initialMethod);
 setCopiedText(null);
 }
 }
@@ -719,30 +733,70 @@ behavior: "smooth",
 
 
 
-const handleCloseAndSave = () => {
-if (selectedBooking) {
-// 1. Persist status change if it differs
-if (drawerStatus && drawerStatus !== selectedBooking.status) {
-if (onStatusUpdate) {
-onStatusUpdate(selectedBooking.id, drawerStatus);
-}
-}
-// 2. Persist payment method if one was selected and booking wasn't already paid
-if (selectedPaymentMethod && onPaymentRegister && !(selectedBooking.payment?.status === "paid" || selectedBooking.paid_at)) {
-onPaymentRegister(selectedBooking.id, selectedPaymentMethod);
-}
-}
-setSelectedBooking(null);
-setSelectedPaymentMethod(null);
-setCopiedText(null);
-// Remove query params from URL to clean up the address bar
-if (typeof window !== "undefined") {
-const url = new URL(window.location.href);
-url.searchParams.delete("bookingId");
-url.searchParams.delete("date");
-window.history.replaceState({}, "", url.toString());
-}
-};
+  const handleSelectPaymentMethod = useCallback((method: PaymentMethod) => {
+    setSelectedPaymentMethod(method);
+    const currentStatus = drawerStatus || selectedBooking?.status;
+    if (currentStatus === "pending") {
+      setDrawerStatus("confirmed");
+    }
+  }, [drawerStatus, selectedBooking]);
+
+  const handleClose = useCallback(() => {
+    setSelectedBooking(null);
+    setDrawerStatus(null);
+    setStatusBeforeCancel(null);
+    setSelectedPaymentMethod(null);
+    setCopiedText(null);
+    // Remove query params from URL to clean up the address bar
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("bookingId");
+      url.searchParams.delete("date");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (!selectedBooking) return;
+
+    const currentStatus = drawerStatus || selectedBooking.status;
+    const isPaid = selectedBooking.payment?.status === "paid" || !!selectedBooking.paid_at;
+    const existingMethod = (selectedBooking.payment?.payment_method as PaymentMethod) || null;
+
+    // Has payment method changed or is it newly selected?
+    const paymentChanged =
+      selectedPaymentMethod !== null && (!isPaid || selectedPaymentMethod !== existingMethod);
+
+    // If a payment was selected/changed while booking was pending, auto-advance to confirmed
+    let finalStatus = drawerStatus;
+    if (paymentChanged && currentStatus === "pending") {
+      finalStatus = "confirmed";
+    }
+
+    const statusChanged = finalStatus !== null && finalStatus !== selectedBooking.status;
+
+    if (paymentChanged && onPaymentRegister) {
+      onPaymentRegister(selectedBooking.id, selectedPaymentMethod);
+    }
+
+    if (statusChanged && onStatusUpdate) {
+      onStatusUpdate(selectedBooking.id, finalStatus!);
+    }
+
+    handleClose();
+  }, [selectedBooking, drawerStatus, selectedPaymentMethod, onPaymentRegister, onStatusUpdate, handleClose]);
+
+  // Close drawer on Escape key without saving
+  useEffect(() => {
+    if (!selectedBooking) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedBooking, handleClose]);
 
 const hourMarkers = timelineSlots.filter((slot) => slot.endsWith(":00"));
 const canvasHeight = (22 - 6) * 60 * pxPerMin;
@@ -923,7 +977,7 @@ animate={{ opacity: 1 }}
 exit={{ opacity: 0 }}
 transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
 className="fixed inset-0 z-50 bg-[var(--text-primary)]/10 backdrop-blur-sm"
-onClick={handleCloseAndSave}
+onClick={handleClose}
 />
 
 {/* Side Drawer */}
@@ -939,7 +993,7 @@ className="fixed inset-y-0 right-0 z-55 flex w-[90vw] max-w-[400px] flex-col ove
 <div className="flex items-center gap-3">
 <button
 type="button"
-onClick={handleCloseAndSave}
+onClick={handleClose}
 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-3)] active:scale-95 border border-[var(--border-strong)] bg-[var(--surface-3)]/60"
 >
 <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
@@ -1112,7 +1166,7 @@ Cobro en Sucursal
 </div>
 
 <AnimatePresence mode="wait">
-{selectedBooking.payment?.status === "paid" || selectedBooking.paid_at ? (
+{((drawerStatus || selectedBooking.status) === "completed" && (selectedPaymentMethod || selectedBooking.payment?.payment_method || selectedBooking.paid_at)) ? (
 <motion.div
 key="paid-badge"
 initial={{ opacity: 0, scale: 0.95 }}
@@ -1123,7 +1177,15 @@ className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-su
 >
 <CheckCircle2 className="h-4 w-4 text-[var(--color-success)] shrink-0" />
 <p className="text-xs font-bold text-[var(--color-success)]">
-Pagado vía {selectedBooking.payment?.payment_method === "cash" ? "Efectivo" : selectedBooking.payment?.payment_method === "credit_card" ? "Tarjeta" : selectedBooking.payment?.payment_method === "transfer" ? "Transferencia" : "—"}
+Pagado vía {
+  (selectedPaymentMethod || selectedBooking.payment?.payment_method) === "cash"
+    ? "Efectivo"
+    : (selectedPaymentMethod || selectedBooking.payment?.payment_method) === "credit_card"
+    ? "Tarjeta"
+    : (selectedPaymentMethod || selectedBooking.payment?.payment_method) === "transfer"
+    ? "Transferencia"
+    : "—"
+}
 </p>
 </motion.div>
 ) : (
@@ -1143,7 +1205,7 @@ className="grid grid-cols-3 gap-2"
 <button
 key={option.method}
 type="button"
-onClick={() => setSelectedPaymentMethod(option.method)}
+onClick={() => handleSelectPaymentMethod(option.method)}
 className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-2 transition-all active:scale-[0.96] ${
 selectedPaymentMethod === option.method
 ? "border-[var(--color-success)] bg-[var(--color-success)]/10 text-[var(--color-success)] shadow-[0_0_0_1px_var(--color-success)]"
@@ -1218,7 +1280,7 @@ Cancelar Cita
 <div className="mt-auto shrink-0 border-t border-[var(--border-strong)] bg-[var(--surface-1)] p-4">
 <button
 type="button"
-onClick={handleCloseAndSave}
+onClick={handleSave}
 className="w-full py-3 rounded-xl bg-[linear-gradient(135deg,var(--app-primary),var(--app-primary-strong))] text-xs font-bold text-[var(--surface-3)] shadow-[var(--shadow-md)] transition-all hover:brightness-110 active:scale-[0.98]"
 >
 Guardar

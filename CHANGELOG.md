@@ -6,6 +6,20 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [0.5.17] - 2026-10-10
+
+### Added
+- **Series Temporales Reales para Gráficos de Balance**:
+  - Generación de datos de ventas reales en el endpoint de balance (`backend/app/routers/balance.py`), agrupando cobros efectivos por día, semana o mes según el periodo (`sales_chart`), en estricto cumplimiento de la política de métricas reales.
+  - Conexión interactiva del selector de rango y densidad de barras en `ChartBarMultiple.tsx`.
+- **Componente de Preguntas Frecuentes Reutilizable**:
+  - Extracción y rediseño de `LandingFaqSection.tsx` con estética Apple, acordeón fluido en Framer Motion y cumplimiento total de tokens de diseño.
+
+### Improved
+- **Flujo de Pagos y Confirmación de Citas en Agenda**:
+  - En `backend/app/routers/bookings.py`, registrar el pago de una cita en estado pendiente la avanza automáticamente a confirmada (`confirmed`).
+  - En `AgendaTimeline.tsx`, selección de método de pago en el drawer sincroniza automáticamente el estado y persiste cambios de forma segura.
+
 ## [0.5.16] - 2026-09-17
 
 ### Improved

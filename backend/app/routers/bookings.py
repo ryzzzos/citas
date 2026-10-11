@@ -229,6 +229,9 @@ def register_booking_payment(
     payment.status = "paid"
     payment.payment_method = data.payment_method
     booking.paid_at = datetime.now(timezone.utc)
+    if booking.status == "pending":
+        booking.status = "confirmed"
+        booking.confirmed_at = datetime.now(timezone.utc)
 
     db.commit()
     db.refresh(booking)

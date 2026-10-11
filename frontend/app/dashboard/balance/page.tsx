@@ -42,6 +42,7 @@ export default function BalancePage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [period, setPeriod] = useState<string>("month");
+  const [chartRange, setChartRange] = useState<string>("current");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -69,6 +70,7 @@ export default function BalancePage() {
         setLoading(true);
         const data = await getBusinessBalance(business.id, {
           period,
+          chart_range: chartRange,
           branch_id: activeBranch?.id || undefined,
         });
         setBalance(data);
@@ -80,7 +82,7 @@ export default function BalancePage() {
       }
     }
     loadBalance();
-  }, [business, period, activeBranch]);
+  }, [business, period, chartRange, activeBranch]);
 
   const periodOptions = [
     { value: "week", label: "Semana" },
@@ -240,7 +242,10 @@ export default function BalancePage() {
           <SegmentedControl
             name="balance-period"
             value={period}
-            onChange={setPeriod}
+            onChange={(newPeriod) => {
+              setPeriod(newPeriod);
+              setChartRange("current");
+            }}
             options={periodOptions}
             width={90}
           />
@@ -309,8 +314,11 @@ export default function BalancePage() {
         <div className="lg:col-span-2">
           <ChartBarMultiple
             period={period}
+            chartRange={chartRange}
+            onRangeChange={setChartRange}
             grossIncome={balance.gross_income.value}
             trendDelta={balance.gross_income.delta}
+            chartData={balance.sales_chart}
           />
         </div>
 

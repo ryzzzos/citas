@@ -154,6 +154,11 @@ export interface ExpensesBreakdown {
   variable_costs: number;
 }
 
+export interface ChartDataPoint {
+  label: string;
+  sales: number;
+}
+
 export interface BalanceResponse {
   period: string;
   start_date: string;
@@ -166,11 +171,13 @@ export interface BalanceResponse {
   payment_methods: PaymentMethodBreakdown;
   staff_commissions: StaffCommissionItem[];
   profitable_services: ProfitableServiceItem[];
+  sales_chart?: ChartDataPoint[];
 }
 
 export interface GetBusinessBalanceParams {
   branch_id?: string | null;
   period?: string;
+  chart_range?: string | null;
 }
 
 export async function getBusinessBalance(

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import { motion } from "framer-motion";
 import FinalCTASection from "@/components/landing/FinalCTASection";
 import DemoLoginButton from "@/components/auth/DemoLoginButton";
 import { KineticText } from "@/components/ui/KineticText";
@@ -11,71 +10,11 @@ import BrandLogo from "@/components/ui/BrandLogo";
 import Safari from "@/components/ui/Safari";
 import FeatureSlideshow from "@/components/landing/FeatureSlideshow";
 import PricingSection from "@/components/landing/PricingSection";
+import LandingFaqSection from "@/components/landing/LandingFaqSection";
 import { LightRays } from "@/components/ui/LightRays";
 import { InfiniteMarquee } from "@/components/ui/InfiniteMarquee";
 import { listBusinesses } from "@/lib/api/businesses";
 import type { Business } from "@/types";
-import { cn } from "@/lib/utils";
-
-/* ── FAQ Accordion Items ────────────────────────────────────── */
-
-const FAQ_ITEMS = [
-  {
-    question: "¿Tiene algún costo para los clientes?",
-    answer: "No, para los clientes finales es 100% gratis. Puedes buscar, cotizar y agendar tus citas en cualquier negocio registrado sin cargos adicionales.",
-  },
-  {
-    question: "¿Cómo funciona la cuenta para dueños de negocios?",
-    answer: "Si eres emprendedor o dueño de negocio, puedes registrar tu local en segundos. Podrás definir tus servicios, sucursales, horarios de atención de tu personal y administrar la agenda en tiempo real desde tu panel administrativo.",
-  },
-  {
-    question: "¿El sistema evita que dos clientes reserven a la misma hora?",
-    answer: "Sí, nuestro motor de reservas valida en tiempo real la disponibilidad del especialista asignado y de la sucursal antes de confirmar, garantizando cero conflictos de sobre-reserva.",
-  },
-  {
-    question: "¿Es amigable con dispositivos móviles?",
-    answer: "Totalmente. Toda la plataforma está diseñada con enfoque 'Mobile-First' y respuesta ultrarrápida, garantizando una navegación intuitiva y sin fricción en cualquier celular, tablet o computador.",
-  },
-];
-
-/* ── FAQ Component ─────────────────────────────────────────── */
-
-function FAQAccordionItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="border-b border-[var(--border-strong)]/40 last:border-b-0 py-3.5">
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="w-full flex items-center justify-between text-left font-semibold text-[0.92rem] text-[var(--text-primary)] hover:text-[var(--app-primary)] transition-colors py-1 cursor-pointer"
-      >
-        <span>{question}</span>
-        {open ? (
-          <Minus className="h-4 w-4 text-[var(--app-primary)] shrink-0 ml-2" />
-        ) : (
-          <Plus className="h-4 w-4 text-[var(--text-muted)] shrink-0 ml-2" />
-        )}
-      </button>
-
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <p className="text-[0.82rem] leading-relaxed text-[var(--text-muted)] pt-2 pb-1">
-              {answer}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 /* ── HomePage Component ─────────────────────────────────────── */
 
@@ -212,22 +151,7 @@ export default function HomePage() {
       <PricingSection />
 
       {/* ── FAQ SECTION ──────────────────────────────────────── */}
-      <section className="relative z-10 max-w-3xl mx-auto px-5 sm:px-6 py-12 sm:py-24">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            Preguntas Frecuentes
-          </h2>
-          <p className="text-[0.82rem] text-[var(--text-muted)] mt-2">
-            Todo lo que necesitas saber sobre el uso y registro en Agenda Web.
-          </p>
-        </div>
-
-        <div className="bg-[var(--surface-3)] border border-[var(--border-strong)] rounded-[var(--radius-lg)] p-4 sm:p-6 shadow-[var(--shadow-sm)]">
-          {FAQ_ITEMS.map((item, idx) => (
-            <FAQAccordionItem key={idx} question={item.question} answer={item.answer} />
-          ))}
-        </div>
-      </section>
+      <LandingFaqSection />
 
       {/* ── FINAL HIGH-IMPACT CTA SECTION ────────────────────── */}
       <FinalCTASection />

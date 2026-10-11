@@ -1,6 +1,6 @@
 -- ==========================================================================
 -- Agenda Web Platform - Production Seed Data (Local to Supabase)
--- Generado el: 2026-09-17 13:06:57
+-- Generado el: 2026-10-10 19:13:56
 -- Script idempotente con manejo de ON CONFLICT para inserción segura.
 -- ==========================================================================
 BEGIN;

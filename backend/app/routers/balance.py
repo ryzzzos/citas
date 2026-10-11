@@ -49,6 +49,10 @@ class ProfitableServiceItem(BaseModel):
     bookings_count: int
     income: float
 
+class ChartDataPoint(BaseModel):
+    label: str
+    sales: float
+
 class KPIItem(BaseModel):
     value: float
     delta: int
@@ -65,12 +69,14 @@ class BalanceResponse(BaseModel):
     payment_methods: PaymentMethodBreakdown
     staff_commissions: List[StaffCommissionItem]
     profitable_services: List[ProfitableServiceItem]
+    sales_chart: List[ChartDataPoint] = []
 
 @router.get("/businesses/{business_id}/balance", response_model=BalanceResponse)
 def get_business_balance(
     business_id: uuid.UUID,
     branch_id: uuid.UUID | None = Query(None),
     period: str = Query("month"),
+    chart_range: str = Query("current"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_business_owner),
 ):
@@ -261,7 +267,7 @@ def get_business_balance(
         end_date
     ).filter(Booking.status != "cancelled").group_by(Service.id, Service.name).order_by(
         func.count(Booking.id).desc()
-    ).limit(5).all()
+    ).limit(10).all()
 
     profitable_services = []
     for name, count, total_income in services_breakdown_q:
@@ -272,6 +278,133 @@ def get_business_balance(
                 income=float(total_income or 0)
             )
         )
+
+    # 11. Real sales time series for charts
+    month_names_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    sales_chart: List[ChartDataPoint] = []
+
+    if period == "week":
+        num_weeks = 3 if chart_range == "last3" else (2 if chart_range == "last2" else 1)
+        total_days = num_weeks * 7
+        monday_current = today - timedelta(days=today.weekday())
+        chart_start = monday_current - timedelta(days=7 * (num_weeks - 1))
+        chart_end = monday_current + timedelta(days=6)
+
+        daily_sales_q = apply_filters(
+            db.query(Booking.booking_date, func.sum(Payment.amount)).join(Payment, Payment.booking_id == Booking.id),
+            chart_start,
+            chart_end
+        ).filter(or_(Payment.status == "paid", Booking.status.in_(["confirmed", "completed"]))).group_by(Booking.booking_date).all()
+        daily_sums = {row[0]: float(row[1] or 0) for row in daily_sales_q}
+
+        if num_weeks == 1:
+            day_labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+            sales_chart = [
+                ChartDataPoint(label=day_labels[i], sales=daily_sums.get(chart_start + timedelta(days=i), 0.0))
+                for i in range(7)
+            ]
+        else:
+            sales_chart = [
+                ChartDataPoint(
+                    label=(chart_start + timedelta(days=i)).strftime("%d/%m"),
+                    sales=daily_sums.get(chart_start + timedelta(days=i), 0.0)
+                )
+                for i in range(total_days)
+            ]
+
+    elif period == "year":
+        num_years = 3 if chart_range == "last3" else (2 if chart_range == "last2" else 1)
+        start_year = today.year - (num_years - 1)
+        chart_start = date(start_year, 1, 1)
+        chart_end = date(today.year, 12, 31)
+
+        year_sales_q = apply_filters(
+            db.query(
+                func.extract('year', Booking.booking_date),
+                func.extract('month', Booking.booking_date),
+                func.sum(Payment.amount)
+            ).join(Payment, Payment.booking_id == Booking.id),
+            chart_start,
+            chart_end
+        ).filter(or_(Payment.status == "paid", Booking.status.in_(["confirmed", "completed"]))).group_by(
+            func.extract('year', Booking.booking_date),
+            func.extract('month', Booking.booking_date)
+        ).all()
+
+        y_m_sums = {(int(row[0]), int(row[1])): float(row[2] or 0) for row in year_sales_q}
+
+        if num_years == 1:
+            sales_chart = [
+                ChartDataPoint(label=month_names_es[m - 1], sales=y_m_sums.get((today.year, m), 0.0))
+                for m in range(1, 13)
+            ]
+        else:
+            sales_chart = []
+            for y in range(start_year, today.year + 1):
+                y_suffix = str(y)[-2:]
+                for m in range(1, 13):
+                    sales_chart.append(
+                        ChartDataPoint(
+                            label=f"{month_names_es[m - 1]} '{y_suffix}",
+                            sales=y_m_sums.get((y, m), 0.0)
+                        )
+                    )
+
+    else: # "month"
+        num_months = 3 if chart_range == "last3" else (2 if chart_range == "last2" else 1)
+        months_to_query = []
+        for i in range(num_months - 1, -1, -1):
+            m = today.month - i
+            y = today.year
+            while m <= 0:
+                m += 12
+                y -= 1
+            months_to_query.append((y, m))
+
+        chart_start = date(months_to_query[0][0], months_to_query[0][1], 1)
+        last_day_m = calendar.monthrange(months_to_query[-1][0], months_to_query[-1][1])[1]
+        chart_end = date(months_to_query[-1][0], months_to_query[-1][1], last_day_m)
+
+        month_sales_q = apply_filters(
+            db.query(Booking.booking_date, func.sum(Payment.amount)).join(Payment, Payment.booking_id == Booking.id),
+            chart_start,
+            chart_end
+        ).filter(or_(Payment.status == "paid", Booking.status.in_(["confirmed", "completed"]))).group_by(Booking.booking_date).all()
+
+        if num_months == 1:
+            w_sums = [0.0, 0.0, 0.0, 0.0]
+            for b_date, amt in month_sales_q:
+                day = b_date.day
+                val = float(amt or 0)
+                if day <= 7: w_sums[0] += val
+                elif day <= 14: w_sums[1] += val
+                elif day <= 21: w_sums[2] += val
+                else: w_sums[3] += val
+            sales_chart = [
+                ChartDataPoint(label="Semana 1", sales=w_sums[0]),
+                ChartDataPoint(label="Semana 2", sales=w_sums[1]),
+                ChartDataPoint(label="Semana 3", sales=w_sums[2]),
+                ChartDataPoint(label="Semana 4", sales=w_sums[3]),
+            ]
+        else:
+            m_w_sums = {}
+            for b_date, amt in month_sales_q:
+                val = float(amt or 0)
+                day = b_date.day
+                w_idx = 0 if day <= 7 else (1 if day <= 14 else (2 if day <= 21 else 3))
+                key = (b_date.year, b_date.month, w_idx)
+                m_w_sums[key] = m_w_sums.get(key, 0.0) + val
+
+            sales_chart = []
+            for y, m in months_to_query:
+                m_prefix = month_names_es[m - 1]
+                for w in range(4):
+                    sales_chart.append(
+                        ChartDataPoint(
+                            label=f"{m_prefix} S{w + 1}",
+                            sales=m_w_sums.get((y, m, w), 0.0)
+                        )
+                    )
 
     return BalanceResponse(
         period=period,
@@ -288,5 +421,6 @@ def get_business_balance(
         new_customers=KPIItem(value=float(current_new_cust), delta=get_delta(current_new_cust, prev_new_cust)),
         payment_methods=PaymentMethodBreakdown(**pay_methods),
         staff_commissions=staff_commissions,
-        profitable_services=profitable_services
+        profitable_services=profitable_services,
+        sales_chart=sales_chart
     )

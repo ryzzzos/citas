@@ -76,7 +76,7 @@ export default function FinalCTASection() {
           className="absolute inset-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, #0f0c1a 0%, #080d1a 60%, #0a0a0f 100%)",
+              "radial-gradient(ellipse 80% 60% at 50% 0%, #0f0c1a 0%, #120e0b 60%, #0a0a0f 100%)",
           }}
         />
 
@@ -105,7 +105,7 @@ export default function FinalCTASection() {
         <FloatingOrb
           size={280}
           duration={ORB_DURATIONS[2]}
-          color="radial-gradient(circle, rgba(0,122,255,0.14) 0%, transparent 70%)"
+          color="radial-gradient(circle, rgba(255,115,0,0.16) 0%, transparent 70%)"
           style={{ top: "40%", right: "20%" }}
         />
 
@@ -206,7 +206,7 @@ export default function FinalCTASection() {
               text="Cero Doble-Reserva"
               iconColor="text-[#10b981]"
             />
-            <TrustPill icon={Clock} text="Reservas 24/7 en Automático" iconColor="text-[#007aff]" />
+            <TrustPill icon={Clock} text="Reservas 24/7 en Automático" iconColor="text-[var(--app-primary)]" />
           </motion.div>
 
           {/* CTA Buttons */}
